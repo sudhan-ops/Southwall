@@ -14,7 +14,7 @@ import { User as UserIcon, Loader2, ClipboardList, LogOut, LogIn, Crosshair, Che
 import { AvatarUpload } from '../../components/onboarding/AvatarUpload';
 import { format } from 'date-fns';
 import Modal from '../../components/ui/Modal';
-import SlideToConfirm from '../../components/ui/SlideToConfirm';
+
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useThemeStore } from '../../store/themeStore';
 import Checkbox from '../../components/ui/Checkbox';
@@ -322,9 +322,9 @@ const ProfilePage: React.FC = () => {
                             {isAttendanceLoading ? (
                                 <div className="flex items-center justify-center text-muted h-[56px]"><Loader2 className="h-6 w-6 animate-spin" /></div>
                             ) : isCheckedIn ? (
-                                <SlideToConfirm onConfirm={handleSlideConfirm} isActionInProgress={isActionInProgress} text="Slide to Check Out" confirmText={isSubmittingAttendance ? "Checking Out..." : "Confirm..."} slideDirection="left" className="fo-slider--checkout" />
+                                <Button onClick={handleSlideConfirm} variant="danger" className="w-full !py-4 text-lg font-bold shadow-lg shadow-red-100 hover:shadow-red-200 transition-all rounded-2xl" isLoading={isActionInProgress}><LogOut className="mr-3 h-6 w-6" /> Check Out</Button>
                             ) : (
-                                <SlideToConfirm onConfirm={handleSlideConfirm} isActionInProgress={isActionInProgress} text="Slide to Check In" confirmText={isSubmittingAttendance ? "Checking In..." : "Confirm..."} slideDirection="right" className="fo-slider--checkin" />
+                                <Button onClick={handleSlideConfirm} variant="primary" className="w-full !py-4 text-lg font-bold shadow-lg shadow-emerald-100 hover:shadow-emerald-200 transition-all rounded-2xl" isLoading={isActionInProgress}><LogIn className="mr-3 h-6 w-6" /> Check In</Button>
                             )}
                         </div>
                     </section>

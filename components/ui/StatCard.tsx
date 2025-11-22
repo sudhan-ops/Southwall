@@ -2,14 +2,14 @@
 import React from 'react';
 
 interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
+    title: string;
+    value: string | number;
+    icon: React.ElementType;
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon }) => (
-    <div className="bg-card p-4 rounded-2xl flex items-center col-span-1">
-        <div className="p-3 rounded-full bg-accent-light mr-4">
+    <div className="bg-card p-4 rounded-2xl flex flex-col md:flex-row items-start md:items-center col-span-1 gap-3 md:gap-0">
+        <div className="p-3 rounded-full bg-accent-light md:mr-4">
             <Icon className="h-6 w-6 text-accent-dark" />
         </div>
         <div>

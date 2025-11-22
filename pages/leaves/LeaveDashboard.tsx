@@ -21,13 +21,13 @@ import OTCalendar from './OTCalendar';
 // --- Reusable Components ---
 
 const LeaveBalanceCard: React.FC<{ title: string; value: string; icon: React.ElementType }> = ({ title, value, icon: Icon }) => (
-    <div className="bg-card p-4 rounded-xl flex items-center gap-4 border border-border">
-        <div className="bg-accent-light p-3 rounded-full">
-            <Icon className="h-6 w-6 text-accent-dark" />
+    <div className="bg-card p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 border border-border text-left">
+        <div className="bg-accent-light p-2 md:p-3 rounded-full">
+            <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent-dark" />
         </div>
         <div>
-            <p className="text-sm text-muted">{title}</p>
-            <p className="text-2xl font-bold text-primary-text">{value}</p>
+            <p className="text-xs md:text-sm text-muted font-medium">{title}</p>
+            <p className="text-lg md:text-2xl font-bold text-primary-text">{value}</p>
         </div>
     </div>
 );
@@ -297,7 +297,7 @@ const LeaveDashboard: React.FC = () => {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {balanceCards.map(b => <LeaveBalanceCard key={b.title} {...b} />)}
                 {/* Show Overtime card only for field officers */}
                 {user?.role === 'field_officer' && (
@@ -314,22 +314,22 @@ const LeaveDashboard: React.FC = () => {
             </div>
 
             {isMobile && (
-                <div className="my-4">
-                    <Button onClick={() => setIsFormOpen(true)} size="lg" className="w-full justify-center">
+                <div className="my-4 w-full">
+                    <Button onClick={() => setIsFormOpen(true)} size="lg" className="w-full justify-center text-lg">
                         <Plus className="mr-2 h-5" /> New Request
                     </Button>
                 </div>
             )}
 
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
                 <div className="mb-6">
                     <div className="w-full sm:w-auto md:border-b border-border">
-                        <nav className="flex flex-col md:flex-row md:space-x-6 md:overflow-x-auto space-y-1 md:space-y-0" aria-label="Tabs">
+                        <nav className="flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" aria-label="Tabs">
                             {filterTabs.map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setFilter(tab)}
-                                    className={`whitespace-nowrap font-medium text-sm rounded-lg md:rounded-none w-full md:w-auto text-left md:text-center px-4 py-3 md:px-1 md:py-3 md:bg-transparent md:border-b-2
+                                    className={`whitespace-nowrap font-medium text-base rounded-lg md:rounded-none w-full md:w-auto text-left px-4 py-2 md:px-1 md:py-3 md:bg-transparent md:border-b-2
                                     ${filter === tab
                                             ? 'bg-accent-light text-accent-dark md:border-accent'
                                             : 'text-muted hover:bg-accent-light hover:text-accent-dark md:border-transparent md:hover:border-accent'
@@ -346,24 +346,24 @@ const LeaveDashboard: React.FC = () => {
                     <table className="min-w-full responsive-table">
                         <thead>
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Type</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Dates</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Reason</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Status</th>
+                                <th className="px-4 py-3 text-left text-sm font-medium text-muted uppercase">Type</th>
+                                <th className="px-4 py-3 text-left text-sm font-medium text-muted uppercase">Dates</th>
+                                <th className="px-4 py-3 text-left text-sm font-medium text-muted uppercase">Reason</th>
+                                <th className="px-4 py-3 text-left text-sm font-medium text-muted uppercase">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border md:bg-card md:divide-y-0">
                             {isLoading ? (
                                 <tr><td colSpan={4} className="text-center py-10 text-muted">Loading...</td></tr>
                             ) : requests.length === 0 ? (
-                                <tr><td colSpan={4} className="text-center py-10 text-muted">No requests found.</td></tr>
+                                <tr><td colSpan={4} className="text-center py-10 text-muted text-lg">No requests found.</td></tr>
                             ) : (
                                 requests.map(req => (
                                     <tr key={req.id}>
-                                        <td data-label="Type" className="px-4 py-3 font-medium">{req.leaveType} {req.dayOption && `(${req.dayOption})`}</td>
-                                        <td data-label="Dates" className="px-4 py-3 text-muted">{format(new Date(req.startDate.replace(/-/g, '/')), 'dd MMM')} - {format(new Date(req.endDate.replace(/-/g, '/')), 'dd MMM')}</td>
-                                        <td data-label="Reason" className="px-4 py-3 text-muted max-w-xs truncate">{req.reason}</td>
-                                        <td data-label="Status" className="px-4 py-3"><LeaveStatusChip status={req.status} /></td>
+                                        <td data-label="Type" className="px-4 py-3 font-medium text-base">{req.leaveType} {req.dayOption && `(${req.dayOption})`}</td>
+                                        <td data-label="Dates" className="px-4 py-3 text-muted text-base">{format(new Date(req.startDate.replace(/-/g, '/')), 'dd MMM')} - {format(new Date(req.endDate.replace(/-/g, '/')), 'dd MMM')}</td>
+                                        <td data-label="Reason" className="px-4 py-3 text-muted max-w-xs truncate text-base">{req.reason}</td>
+                                        <td data-label="Status" className="px-4 py-3 text-base"><LeaveStatusChip status={req.status} /></td>
                                     </tr>
                                 ))
                             )}
@@ -372,7 +372,7 @@ const LeaveDashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
                 <h3 className="text-lg font-semibold mb-4 text-primary-text">Compensatory Off Tracker</h3>
                 {isCompOffHistoryDisabled ? (
                     <div className="text-center py-10 text-muted bg-page rounded-lg">
@@ -395,7 +395,7 @@ const LeaveDashboard: React.FC = () => {
                                 {isLoading ? (
                                     <tr><td colSpan={4} className="text-center py-10 text-muted">Loading...</td></tr>
                                 ) : compOffLogs.length === 0 ? (
-                                    <tr><td colSpan={4} className="text-center py-10 text-muted">No comp-off history found.</td></tr>
+                                    <tr><td colSpan={4} className="text-center py-10 text-muted text-lg">No comp-off history found.</td></tr>
                                 ) : (
                                     compOffLogs.map(log => (
                                         <tr key={log.id}>

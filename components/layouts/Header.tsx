@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16">
                         <div className="flex-none md:hidden w-10">
-                            <button onClick={handleMobileExit} className="inline-flex items-center justify-center p-2 rounded-md text-muted hover:bg-page focus:outline-none" aria-label="Go to profile page">
+                            <button onClick={handleMobileExit} className="btn-icon inline-flex items-center justify-center p-2 rounded-md text-muted hover:bg-page focus:outline-none" aria-label="Go to profile page">
                                 <span className="sr-only">Go to profile</span>
                                 <ArrowLeft className="block h-6 w-6" />
                             </button>

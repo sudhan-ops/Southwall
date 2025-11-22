@@ -166,13 +166,13 @@ const AttendanceCalendar: React.FC = () => {
     const startDay = getDay(startOfMonth(currentDate)); // 0-6
 
     return (
-        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border border-border bg-white p-3 rounded-xl shadow-sm w-full max-w-[320px]">
+        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border border-border bg-white p-3 rounded-xl shadow-sm w-full md:w-full md:max-w-[320px]">
             <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-primary-text">Attendance Calendar</h3>
                 <div className="flex items-center gap-1">
-                    <Button variant="secondary" size="sm" className="!p-1 h-6 w-6" onClick={() => setCurrentDate(subMonths(currentDate, 1))}><ChevronLeft className="h-3 w-3" /></Button>
-                    <span className="font-medium min-w-[80px] text-center text-xs">{format(currentDate, 'MMMM yyyy')}</span>
-                    <Button variant="secondary" size="sm" className="!p-1 h-6 w-6" onClick={() => setCurrentDate(addMonths(currentDate, 1))}><ChevronRight className="h-3 w-3" /></Button>
+                    <Button variant="secondary" size="sm" className="btn-icon !p-1 h-6 w-6" onClick={() => setCurrentDate(subMonths(currentDate, 1))}><ChevronLeft className="h-3 w-3" /></Button>
+                    <span className="font-medium min-w-[80px] text-center text-sm">{format(currentDate, 'MMMM yyyy')}</span>
+                    <Button variant="secondary" size="sm" className="btn-icon !p-1 h-6 w-6" onClick={() => setCurrentDate(addMonths(currentDate, 1))}><ChevronRight className="h-3 w-3" /></Button>
                 </div>
             </div>
 
@@ -181,7 +181,7 @@ const AttendanceCalendar: React.FC = () => {
             ) : (
                 <div className="grid grid-cols-7 gap-1">
                     {weekDays.map(d => (
-                        <div key={d} className="text-center text-[10px] font-medium text-muted py-1">{d}</div>
+                        <div key={d} className="text-center text-xs font-medium text-muted py-1">{d}</div>
                     ))}
                     {/* Empty cells for start of month */}
                     {Array.from({ length: startDay }).map((_, i) => (
@@ -192,13 +192,13 @@ const AttendanceCalendar: React.FC = () => {
                         const colorClass = getStatusColor(status);
                         return (
                             <div key={date.toISOString()} className={`aspect-square rounded border flex flex-col items-center justify-center ${colorClass} transition-colors`}>
-                                <span className="text-xs font-semibold">{format(date, 'd')}</span>
+                                <span className="text-sm font-semibold">{format(date, 'd')}</span>
                             </div>
                         );
                     })}
                 </div>
             )}
-            <div className="mt-3 flex gap-3 text-[10px] text-muted justify-center flex-wrap">
+            <div className="mt-3 flex gap-3 text-xs text-muted justify-center flex-wrap">
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-emerald-100 border border-emerald-300 rounded-sm"></div> Present</div>
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-pink-100 border border-pink-300 rounded-sm"></div> Absent</div>
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-red-200 border border-red-400 rounded-sm"></div> Holiday</div>

@@ -18,7 +18,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ file, onFileChange }
   const handleFileSelect = useCallback(async (selectedFile: File) => {
     if (selectedFile && selectedFile.type.startsWith('image/')) {
       setError('');
-      
+
       const fileData: UploadedFile = {
         name: selectedFile.name,
         type: selectedFile.type,
@@ -33,7 +33,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ file, onFileChange }
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-        handleFileSelect(selectedFile);
+      handleFileSelect(selectedFile);
     }
   };
 
@@ -73,7 +73,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ file, onFileChange }
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-1.5 bg-card/70 backdrop-blur-sm rounded-full text-red-600 hover:bg-red-100 transition-colors"
+            id="avatar-delete-button"
+            className="avatar-delete-btn btn-icon absolute top-2 right-2 p-1.5 rounded-full transition-colors !bg-white/90 !text-red-600 hover:!bg-red-100"
             aria-label="Remove photo"
           >
             <Trash2 className="w-4 h-4" />
@@ -86,14 +87,19 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ file, onFileChange }
           {file ? 'Change' : 'Upload'}
         </label>
         <input id={inputId} name={inputId} type="file" className="sr-only" onChange={handleFileChange} accept="image/*" disabled={isLoading} />
-        <Button type="button" variant="secondary" size="md" onClick={() => setIsCameraOpen(true)} disabled={isLoading} className="px-4 py-2">
-            <Camera className="w-4 h-4 mr-2" />
-            Capture
-        </Button>
+        <button
+          type="button"
+          onClick={() => setIsCameraOpen(true)}
+          disabled={isLoading}
+          className={`avatar-capture-btn inline-flex items-center justify-center px-4 py-2 font-semibold rounded-full transition-colors duration-200 text-sm border border-red-200 !text-red-600 hover:!bg-red-50 !bg-card/70 backdrop-blur-sm ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <Camera className="w-4 h-4 mr-2" />
+          Capture
+        </button>
       </div>
-       {error && (
+      {error && (
         <p className="text-xs text-red-600 text-center max-w-[160px] flex items-center gap-1">
-            <AlertTriangle className="h-3 w-3 flex-shrink-0"/> {error}
+          <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {error}
         </p>
       )}
     </div>

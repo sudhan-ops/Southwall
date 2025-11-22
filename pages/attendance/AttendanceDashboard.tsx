@@ -86,12 +86,12 @@ Chart.register(
 
 // --- Reusable Dashboard Components ---
 const ChartContainer: React.FC<{ title: string, icon: React.ElementType, children: React.ReactNode }> = ({ title, icon: Icon, children }) => (
-    <div className="bg-card p-6 rounded-xl shadow-card col-span-1">
+    <div className="bg-card p-4 md:p-6 rounded-xl shadow-card col-span-1">
         <div className="flex items-center mb-4">
             <Icon className="h-5 w-5 mr-3 text-muted" />
             <h3 className="font-semibold text-primary-text">{title}</h3>
         </div>
-        <div className="h-60 relative">{children}</div>
+        <div className="h-64 md:h-80 relative">{children}</div>
     </div>
 );
 
@@ -1281,7 +1281,6 @@ const AttendanceDashboard: React.FC = () => {
                         <Button
                             key={filter}
                             type="button"
-                            size="sm"
                             onClick={() => handleSetDateFilter(filter)}
                             className={activeDateFilter === filter
                                 ? "text-white shadow-md border"
@@ -1293,7 +1292,7 @@ const AttendanceDashboard: React.FC = () => {
                         </Button>
                     ))}
                     <div className="relative" ref={datePickerRef}>
-                        <Button type="button" variant="outline" size="sm" onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} className="hover:bg-gray-100">
+                        <Button type="button" variant="outline" onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} className="hover:bg-gray-100">
                             <Calendar className="mr-2 h-4 w-4" />
                             <span>
                                 {activeDateFilter === 'Custom'
@@ -1379,7 +1378,7 @@ const AttendanceDashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Total Employees" value={dashboardData?.totalEmployees || 0} icon={Users} />
                 <StatCard title={`Present ${statDateLabel}`} value={dashboardData?.presentToday || 0} icon={UserCheck} />
                 <StatCard title={`Absent ${statDateLabel}`} value={dashboardData?.absentToday || 0} icon={UserX} />

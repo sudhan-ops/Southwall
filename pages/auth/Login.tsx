@@ -46,6 +46,7 @@ const Login: React.FC = () => {
     const { deviceInfo, isNewDevice, previousDevice } = useDeviceFingerprint();
     const [deviceAlertSent, setDeviceAlertSent] = useState(false);
 
+
     useEffect(() => {
         setError(null);
 
@@ -111,28 +112,44 @@ const Login: React.FC = () => {
         <>
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="space-y-3">
                 <fieldset disabled={isFormDisabled} className="space-y-3">
-                    <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-                        <Input id="email" type="email" autoComplete="email" placeholder="Email Address" registration={registerEmail('email')} error={emailErrors.email?.message} className="pl-11 !bg-white/10 !text-white !border-white/20 placeholder:!text-gray-300 !py-2" />
+                    <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none" />
+                        <Input
+                            id="email"
+                            type="email"
+                            autoComplete="email"
+                            placeholder="Email"
+                            registration={registerEmail('email')}
+                            error={emailErrors.email?.message}
+                            className="!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all"
+                        />
                     </div>
-                    <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-                        <Input id="password" type="password" autoComplete="current-password" placeholder="Password" registration={registerEmail('password')} error={emailErrors.password?.message} className="pl-11 !bg-white/10 !text-white !border-white/20 placeholder:!text-gray-300 !py-2" />
+                    <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none" />
+                        <Input
+                            id="password"
+                            type="password"
+                            autoComplete="current-password"
+                            placeholder="Password"
+                            registration={registerEmail('password')}
+                            error={emailErrors.password?.message}
+                            className="!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all"
+                        />
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex-shrink-0">
                             <Checkbox
                                 id="rememberMe"
                                 label="Remember me"
-                                labelClassName="text-white"
+                                labelClassName="text-white font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
-                                className="text-white/80"
+                                inputClassName="text-[#22c55e] border-white/20 rounded bg-black/40 focus:ring-[#22c55e]"
                             />
                         </div>
                         <Link
                             to="/auth/forgot-password"
-                            className={`text-sm font-medium text-white/80 hover:text-white ${isFormDisabled ? 'pointer-events-none opacity-50' : ''}`}
+                            className={`text-sm font-medium !text-white hover:text-gray-200 transition-colors auth-link ${isFormDisabled ? 'pointer-events-none opacity-50' : ''}`}
                             aria-disabled={isFormDisabled}
                             onClick={(e) => { if (isFormDisabled) e.preventDefault(); }}
                         >
@@ -150,20 +167,37 @@ const Login: React.FC = () => {
                     )}
                 </div>
 
-                <Button type="submit" className="w-full" isLoading={loading} size="md" disabled={isFormDisabled}>Sign in</Button>
+                <Button
+                    type="submit"
+                    className="w-full !bg-transparent border border-[#22c55e] !text-[#22c55e] hover:!bg-[#22c55e] hover:!text-white !font-bold !py-3 !rounded-full shadow-lg shadow-green-500/20 transition-all transform hover:scale-[1.02] signin-btn"
+                    isLoading={loading}
+                    size="lg"
+                    disabled={isFormDisabled}
+                >
+                    Sign In
+                </Button>
             </form>
 
-            <div className="auth-separator my-2">OR</div>
+            <div className="flex items-center my-6">
+                <div className="flex-1 border-t border-white/10"></div>
+                <span className="px-4 text-sm text-gray-400 font-medium">OR</span>
+                <div className="flex-1 border-t border-white/10"></div>
+            </div>
 
-            <button type="button" onClick={handleGoogleLogin} className="google-signin-btn !py-2" disabled={isFormDisabled}>
-                <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.519-3.487-11.181-8.264l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C39.99,35.508,44,30.021,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+            <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 hover:bg-gray-100 font-bold py-3 rounded-full transition-all transform hover:scale-[1.02] shadow-lg google-btn"
+                disabled={isFormDisabled}
+            >
+                <svg className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.519-3.487-11.181-8.264l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C39.99,35.508,44,30.021,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
                 Sign in with Google
             </button>
 
             <div className="text-center mt-4">
                 <p className="text-sm text-gray-300">
                     Don't have an account?{' '}
-                    <Link to="/auth/signup" className="font-medium text-white/80 hover:text-white">Sign Up</Link>
+                    <Link to="/auth/signup" className="font-medium !text-white hover:text-gray-200 auth-link">Sign Up</Link>
                 </p>
             </div>
         </>

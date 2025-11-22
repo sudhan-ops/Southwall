@@ -85,11 +85,16 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                     ? 'text-white shadow-sm border'
                                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                                 : isActive
-                                    ? 'text-white shadow-md border'
+                                    ? 'bg-white text-[#0d2c18] shadow-md'
                                     : 'text-gray-400 hover:bg-white/10 hover:text-white'
                             }`
                         }
-                        style={({ isActive }) => isActive ? { backgroundColor: '#006B3F', borderColor: '#005632' } : {}}
+                        style={({ isActive }) => {
+                            if (!isActive) return {};
+                            return mode === 'light'
+                                ? { backgroundColor: '#006B3F', borderColor: '#005632' }
+                                : { backgroundColor: '#ffffff', color: '#0d2c18' };
+                        }}
                         title={isCollapsed ? link.label : undefined}
                     >
                         {({ isActive }) => (
@@ -97,7 +102,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                 <link.icon
                                     className={`h-5 w-5 flex-shrink-0 transition-colors duration-200 ${mode === 'light'
                                         ? isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'
-                                        : isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                                        : isActive ? 'text-[#0d2c18]' : 'text-gray-400 group-hover:text-white'
                                         } ${isCollapsed ? '' : 'mr-3'}`}
                                 />
                                 {!isCollapsed && <span>{link.label}</span>}
@@ -228,7 +233,7 @@ const MainLayout: React.FC = () => {
                         className="fixed inset-y-0 left-0 w-80 bg-[#0d2c18] z-40 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl flex flex-col border-r border-white/10"
                         style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)' }}
                     >
-                        <div className="p-4 flex justify-center h-20 items-center flex-shrink-0 bg-white shadow-sm">
+                        <div className="p-4 flex justify-center h-20 items-center flex-shrink-0 !bg-white shadow-sm">
                             <Logo />
                         </div>
                         <div className="flex-1 overflow-y-auto py-2 custom-scrollbar">

@@ -59,7 +59,7 @@ const AuthLayout: React.FC = () => {
 
             {/* Centered content container */}
             <div className="relative w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl p-4">
-                <div className="w-full grid md:grid-cols-2 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md bg-black/40 border border-white/10">
+                <div className="auth-card-container w-full grid md:grid-cols-2 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md bg-black/40 border border-white/10">
                     {/* Left Visual Column */}
                     <div className="hidden md:flex flex-col justify-between p-6 lg:p-10 xl:p-16 bg-gradient-to-br from-black/40 to-black/70">
                         <div>
@@ -78,11 +78,11 @@ const AuthLayout: React.FC = () => {
                     </div>
 
                     {/* Right Form Column with Glassmorphism effect */}
-                    <div className="p-6 lg:p-10 xl:p-16 flex flex-col justify-center bg-black/40 backdrop-blur-xl border-l border-white/10">
+                    <div className="p-6 lg:p-10 xl:p-16 flex flex-col justify-center bg-[#050505]/85 backdrop-blur-xl border-l border-white/10">
                         <div className="w-full max-w-md mx-auto">
                             {/* Mobile-only Logo */}
-                            <div className="md:hidden flex justify-center mb-6">
-                                <Logo className="h-8" />
+                            <div className="md:hidden flex justify-center mb-8">
+                                <Logo className="h-12" />
                             </div>
                             <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">{pageInfo.title}</h2>
                             <p className="text-gray-300 mb-4 lg:mb-6 xl:mb-8 text-xs lg:text-sm xl:text-base">{pageInfo.subtitle}</p>

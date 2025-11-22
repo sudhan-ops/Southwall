@@ -27,14 +27,26 @@ const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
   const thumbRef = useRef<HTMLDivElement>(null);
   const startXRef = useRef(0);
 
+  // Calculate the initial position based on slide direction
+  const getInitialPosition = useCallback(() => {
+    if (!sliderRef.current || !thumbRef.current) return 0;
+    if (slideDirection === 'left') {
+      const sliderRect = sliderRef.current.getBoundingClientRect();
+      const thumbRect = thumbRef.current.getBoundingClientRect();
+      return sliderRect.width - thumbRect.width - 8; // 8px for padding
+    }
+    return 0;
+  }, [slideDirection]);
+
   const snapBack = useCallback(() => {
+    const initialPos = getInitialPosition();
     if (thumbRef.current) {
       thumbRef.current.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), scale 0.2s ease';
-      thumbRef.current.style.transform = 'translateX(0px) scale(1)';
+      thumbRef.current.style.transform = `translateX(${initialPos}px) scale(1)`;
     }
-    setPosition(0);
+    setPosition(initialPos);
     setIsDragging(false);
-  }, []);
+  }, [getInitialPosition]);
 
   const handleDragStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (isActionInProgress || isConfirmed) return;
@@ -52,30 +64,39 @@ const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
     const thumbRect = thumbRef.current.getBoundingClientRect();
 
     const deltaX = clientX - startXRef.current;
+    const maxTravel = sliderRect.width - thumbRect.width - 8; // 8px padding
+    const initialPos = getInitialPosition();
 
     let newPosition;
     if (slideDirection === 'right') {
-      newPosition = Math.max(0, Math.min(deltaX, sliderRect.width - thumbRect.width - 8)); // 8 for padding
+      // Slide from left (0) to right (maxTravel)
+      newPosition = Math.max(0, Math.min(deltaX, maxTravel));
     } else { // 'left'
-      newPosition = Math.min(0, Math.max(deltaX, -(sliderRect.width - thumbRect.width - 8)));
+      // Slide from right (initialPos which is maxTravel) to left (0)
+      // We need to subtract deltaX from the initial position
+      // When dragging left, deltaX is negative, so initialPos + deltaX moves left
+      newPosition = Math.max(0, Math.min(initialPos + deltaX, maxTravel));
     }
 
     setPosition(newPosition);
     thumbRef.current.style.transform = `translateX(${newPosition}px) scale(1.1)`;
-  }, [isDragging, slideDirection]);
+  }, [isDragging, slideDirection, getInitialPosition]);
 
   const handleDragEnd = useCallback(() => {
     if (!isDragging || !sliderRef.current || !thumbRef.current) return;
     setIsDragging(false);
     const sliderRect = sliderRef.current.getBoundingClientRect();
     const thumbRect = thumbRef.current.getBoundingClientRect();
-    const threshold = (sliderRect.width - thumbRect.width) * 0.75;
+    const maxTravel = sliderRect.width - thumbRect.width - 8;
+    const threshold = maxTravel * 0.5; // 50% threshold
 
     let confirmed = false;
-    if (slideDirection === 'right' && position > threshold) {
-      confirmed = true;
-    } else if (slideDirection === 'left' && position < -threshold) {
-      confirmed = true;
+    if (slideDirection === 'right') {
+      // For right slide: position should be > threshold (moved far enough right)
+      confirmed = position > threshold;
+    } else { // 'left'
+      // For left slide: position should be < (maxTravel - threshold) (moved far enough left from the right)
+      confirmed = position < (maxTravel - threshold);
     }
 
     if (confirmed) {
@@ -114,7 +135,18 @@ const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
     }
   }, [isActionInProgress, isConfirmed, snapBack]);
 
+  // Set initial position when component mounts or direction changes
+  useEffect(() => {
+    const initialPos = getInitialPosition();
+    setPosition(initialPos);
+    if (thumbRef.current) {
+      thumbRef.current.style.transform = `translateX(${initialPos}px) scale(1)`;
+    }
+  }, [slideDirection, getInitialPosition]);
+
   const showSuccess = isConfirmed && !isActionInProgress;
+  const initialPos = getInitialPosition();
+  const isAtInitialPosition = Math.abs(position - initialPos) < 5; // Allow 5px tolerance
 
   return (
     <div
@@ -135,7 +167,7 @@ const SlideToConfirm: React.FC<SlideToConfirmProps> = ({
           <ChevronLeft className="h-6 w-6" />
         )}
       </div>
-      <span className={`fo-slider-text ${position !== 0 || (isActionInProgress && isConfirmed) ? 'opacity-0' : 'opacity-100'}`}>{text}</span>
+      <span className={`fo-slider-text ${!isAtInitialPosition || (isActionInProgress && isConfirmed) ? 'opacity-0' : 'opacity-100'}`}>{text}</span>
       <span className={`fo-slider-text absolute transition-opacity duration-300 ${isActionInProgress && isConfirmed ? 'opacity-100' : 'opacity-0'}`}>{confirmText}</span>
     </div>
   );

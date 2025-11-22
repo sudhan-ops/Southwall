@@ -44,7 +44,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
         }
         setIsOpen(false);
     };
-    
+
     const handleMarkAll = () => {
         markAllAsRead();
     }
@@ -53,12 +53,12 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
         <div className={`relative notification-bell ${className}`} ref={panelRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-full hover:bg-page text-muted"
+                className="btn-icon relative p-2 rounded-full hover:bg-page text-muted"
                 aria-label={`Notifications (${unreadCount} unread)`}
             >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-card" />
+                    <span className="notification-dot absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500" />
                 )}
             </button>
 
@@ -67,7 +67,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                     <div className="flex justify-between items-center p-3 border-b border-border">
                         <h4 className="font-semibold text-primary-text">Notifications</h4>
                         {unreadCount > 0 && (
-                             <Button variant="outline" size="sm" onClick={handleMarkAll}>Mark all as read</Button>
+                            <Button variant="outline" size="sm" onClick={handleMarkAll}>Mark all as read</Button>
                         )}
                     </div>
                     <div className="max-h-96 overflow-y-auto">
@@ -76,11 +76,10 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                                 <div
                                     key={notif.id}
                                     onClick={() => handleNotificationClick(notif)}
-                                    className={`flex items-start gap-3 p-3 border-b border-border cursor-pointer transition-colors ${
-                                        !notif.isRead 
-                                        ? 'bg-accent-light hover:brightness-125' 
+                                    className={`flex items-start gap-3 p-3 border-b border-border cursor-pointer transition-colors ${!notif.isRead
+                                        ? 'bg-accent-light hover:brightness-125'
                                         : 'hover:bg-page'
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex-shrink-0 mt-0.5"><NotificationIcon type={notif.type} /></div>
                                     <div className="flex-1">

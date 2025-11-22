@@ -197,7 +197,7 @@ const SupportDashboard: React.FC = () => {
 
     const StatCard: React.FC<{ title: string, value: number, icon: React.ReactNode, colorClass: string }> = ({ title, value, icon, colorClass }) => (
         <div className="relative overflow-hidden bg-card p-5 rounded-2xl border border-border shadow-sm">
-            <div className={`absolute top-0 right-0 p-3 opacity-10 ${colorClass}`}>
+            <div className={`absolute top-0 right-0 p-3 opacity-30 ${colorClass}`}>
                 {icon}
             </div>
             <p className="text-sm font-medium text-muted mb-1">{title}</p>
