@@ -242,17 +242,17 @@ const SupportDashboard: React.FC = () => {
             </Modal>
 
             {/* Header Section */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 to-teal-900 dark:bg-none dark:bg-transparent p-6 lg:p-10 shadow-xl dark:shadow-none transition-all">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-16 -mt-16 dark:hidden"></div>
+            <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-200 dark:border-none dark:bg-transparent p-6 lg:p-10 shadow-sm dark:shadow-none transition-all">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50/50 opacity-20 rounded-full blur-3xl -mr-16 -mt-16 dark:hidden"></div>
                 <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm dark:bg-emerald-900/30">
-                                <LifeBuoy className="h-6 w-6 text-emerald-400" />
+                            <div className="p-2 bg-emerald-50 rounded-lg backdrop-blur-sm dark:bg-emerald-900/30">
+                                <LifeBuoy className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                             </div>
-                            <h2 className="text-2xl lg:text-3xl font-bold text-white dark:text-white">Support & Audit</h2>
+                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Support & Audit</h2>
                         </div>
-                        <p className="text-emerald-100/80 dark:text-gray-400 max-w-xl text-sm">
+                        <p className="text-gray-500 dark:text-gray-400 max-w-xl text-sm">
                             Track issues, request audits, and connect with support staff in real-time.
                         </p>
                     </div>
@@ -261,14 +261,14 @@ const SupportDashboard: React.FC = () => {
                             <Button
                                 onClick={() => setIsNearbyModalOpen(true)}
                                 variant="secondary"
-                                className="flex-1 lg:flex-none bg-transparent border-none text-white hover:bg-transparent shadow-none p-0 text-sm dark:text-white dark:hover:text-emerald-400 transition-colors"
+                                className="flex-1 lg:flex-none bg-gray-100 text-gray-900 hover:bg-gray-200 border-none shadow-none p-0 text-sm dark:bg-transparent dark:text-white dark:hover:text-emerald-400 transition-colors"
                             >
                                 <UserCheck className="mr-1.5 h-3.5 w-3.5" /> Nearby
                             </Button>
                         )}
                         <Button
                             onClick={() => setIsNewTicketModalOpen(true)}
-                            className="flex-1 lg:flex-none bg-emerald-500 hover:bg-emerald-400 text-white border-none shadow-lg shadow-emerald-900/20 text-sm py-2 px-4 dark:!bg-transparent dark:!shadow-none dark:hover:bg-transparent dark:text-white dark:hover:text-emerald-400 transition-colors"
+                            className="flex-1 lg:flex-none bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-md shadow-emerald-200 dark:shadow-none text-sm py-2 px-4 dark:!bg-transparent dark:hover:bg-transparent dark:text-white dark:hover:text-emerald-400 transition-colors"
                         >
                             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Ticket
                         </Button>

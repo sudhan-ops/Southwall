@@ -166,7 +166,7 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ user, permissions, setIsMob
                 permissionName={permissionNeeded}
             />
             <nav
-                className={`fixed bottom-6 left-6 right-6 z-50 md:hidden bg-[#0d2c18]/95 backdrop-blur-xl border border-white/15 rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-[150%]' : 'translate-y-0'}`}
+                className={`fixed bottom-6 left-6 right-6 z-[100] md:hidden bg-[#0d2c18] !bg-[#0d2c18] border border-white/15 rounded-2xl shadow-2xl shadow-black/40 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-[150%]' : 'translate-y-0'}`}
                 style={{
                     height: '64px',
                 }}
@@ -182,9 +182,9 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ user, permissions, setIsMob
                         const containerClasses = "flex flex-col items-center justify-center w-16 h-full active:scale-95 transition-transform duration-200";
 
                         // Icon container classes for the shape and color
-                        const iconContainerClasses = `flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 ${showActive
-                            ? "bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-lg shadow-green-900/30 scale-105"
-                            : "text-white/60 hover:text-white"
+                        const iconContainerClasses = `flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-500 ${showActive
+                            ? "bg-gradient-to-tr from-emerald-500 to-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] scale-110"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
                             }`;
 
                         // Render button for actions (like Menu)
@@ -193,12 +193,12 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ user, permissions, setIsMob
                                 <button
                                     key={item.key}
                                     onClick={item.onClick}
-                                    className={containerClasses}
+                                    className={`${containerClasses} group`}
                                     aria-label={item.label}
                                 >
                                     <div className={iconContainerClasses}>
                                         <item.icon
-                                            className="transition-colors duration-200"
+                                            className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${showActive ? 'rotate-[360deg] scale-110' : 'rotate-0 scale-100 group-hover:rotate-12'}`}
                                             size={24}
                                         />
                                     </div>
@@ -212,12 +212,12 @@ const MobileNavBar: React.FC<MobileNavBarProps> = ({ user, permissions, setIsMob
                                 key={item.key}
                                 to={item.to!}
                                 end={item.end}
-                                className={containerClasses}
+                                className={`${containerClasses} group`}
                             >
                                 <div className={iconContainerClasses}>
                                     <item.icon
                                         size={24}
-                                        className="transition-colors duration-200"
+                                        className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${showActive ? 'rotate-[360deg] scale-110' : 'rotate-0 scale-100 group-hover:rotate-12'}`}
                                     />
                                 </div>
                             </NavLink>

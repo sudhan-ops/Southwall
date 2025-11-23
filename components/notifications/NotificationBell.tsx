@@ -111,9 +111,9 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
 
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:!bg-[#0d1f12] dark:[color-scheme:dark]">
-                            {notifications.filter(n => !n.isRead).length > 0 ? (
+                            {notifications.slice(0, 10).length > 0 ? (
                                 <div className="divide-y divide-gray-100 dark:divide-white/20">
-                                    {notifications.filter(n => !n.isRead).map((notif) => (
+                                    {notifications.slice(0, 10).map((notif) => (
                                         <div
                                             key={notif.id}
                                             onClick={() => handleNotificationClick(notif)}
@@ -146,7 +146,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                                     <div className="w-16 h-16 bg-gray-100 dark:bg-[#1a2e1a] rounded-full flex items-center justify-center mb-4">
                                         <Bell className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                                     </div>
-                                    <h5 className="text-gray-900 dark:text-white font-medium mb-1">No new notifications</h5>
+                                    <h5 className="text-gray-900 dark:text-white font-medium mb-1">No notifications</h5>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
                                         You're all caught up! Check back later.
                                     </p>
