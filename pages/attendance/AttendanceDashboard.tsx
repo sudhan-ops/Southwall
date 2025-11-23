@@ -1383,10 +1383,11 @@ const AttendanceDashboard: React.FC = () => {
 
                     {/* Date Filter */}
                     <div className="bg-card p-3 rounded-xl shadow-sm border border-border flex flex-wrap items-center gap-2">
-                        {['This Month', 'Last 30 Days'].map(filter => (
+                        {['Today', 'This Month', 'Last 30 Days'].map(filter => (
                             <Button
                                 key={filter}
                                 type="button"
+                                variant={activeDateFilter === filter ? 'primary' : 'outline'}
                                 onClick={() => handleSetDateFilter(filter)}
                                 className={activeDateFilter === filter
                                     ? "text-white shadow-md border"
@@ -1398,7 +1399,16 @@ const AttendanceDashboard: React.FC = () => {
                             </Button>
                         ))}
                         <div className="relative" ref={datePickerRef}>
-                            <Button type="button" variant="outline" onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} className="hover:bg-accent-light text-primary-text border-border">
+                            <Button
+                                type="button"
+                                variant={activeDateFilter === 'Custom' ? 'primary' : 'outline'}
+                                onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                                className={activeDateFilter === 'Custom'
+                                    ? "text-white shadow-md border"
+                                    : "bg-card text-primary-text border border-border hover:bg-accent-light"
+                                }
+                                style={activeDateFilter === 'Custom' ? { backgroundColor: '#006B3F', borderColor: '#005632' } : {}}
+                            >
                                 <Calendar className="mr-2 h-4 w-4" />
                                 <span>
                                     {activeDateFilter === 'Custom'
@@ -1407,13 +1417,16 @@ const AttendanceDashboard: React.FC = () => {
                                 </span>
                             </Button>
                             {isDatePickerOpen && (
-                                <div className="absolute top-full left-0 mt-2 z-10 bg-card border border-border rounded-lg shadow-lg">
-                                    <DateRangePicker
-                                        onChange={handleCustomDateChange}
-                                        months={1}
-                                        ranges={dateRangeArray}
-                                        direction="horizontal"
-                                    />
+                                <div className="absolute top-full right-0 mt-2 z-50 bg-white dark:bg-gray-950 border border-border rounded-lg shadow-xl w-[300px] sm:w-auto overflow-hidden">
+                                    <div className="text-gray-900">
+                                        <DateRangePicker
+                                            onChange={handleCustomDateChange}
+                                            months={1}
+                                            ranges={dateRangeArray}
+                                            direction="horizontal"
+                                            maxDate={new Date()}
+                                        />
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -1421,26 +1434,34 @@ const AttendanceDashboard: React.FC = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center">
-                        <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-2"><UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /></div>
-                        <p className="text-xs text-muted font-medium">Present</p>
-                        <p className="text-xl font-bold text-primary-text">{employeeStats.present}</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
+                        <div className="p-4 bg-emerald-600 text-white rounded-full mb-3 shadow-lg shadow-emerald-200 dark:shadow-none">
+                            <UserCheck className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-muted font-medium mb-1">Present</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.present}</p>
                     </div>
-                    <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center">
-                        <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-full mb-2"><UserX className="h-5 w-5 text-rose-600 dark:text-rose-400" /></div>
-                        <p className="text-xs text-muted font-medium">Absent</p>
-                        <p className="text-xl font-bold text-primary-text">{employeeStats.absent}</p>
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
+                        <div className="p-4 bg-rose-600 text-white rounded-full mb-3 shadow-lg shadow-rose-200 dark:shadow-none">
+                            <UserX className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-muted font-medium mb-1">Absent</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.absent}</p>
                     </div>
-                    <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-2"><Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" /></div>
-                        <p className="text-xs text-muted font-medium">Overtime</p>
-                        <p className="text-xl font-bold text-primary-text">{employeeStats.ot}h</p>
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
+                        <div className="p-4 bg-blue-600 text-white rounded-full mb-3 shadow-lg shadow-blue-200 dark:shadow-none">
+                            <Clock className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-muted font-medium mb-1">Overtime</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.ot}h</p>
                     </div>
-                    <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-2"><TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" /></div>
-                        <p className="text-xs text-muted font-medium">Comp Offs</p>
-                        <p className="text-xl font-bold text-primary-text">{employeeStats.compOff}</p>
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow">
+                        <div className="p-4 bg-purple-600 text-white rounded-full mb-3 shadow-lg shadow-purple-200 dark:shadow-none">
+                            <TrendingUp className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-muted font-medium mb-1">Comp Offs</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.compOff}</p>
                     </div>
                 </div>
 
@@ -1454,22 +1475,25 @@ const AttendanceDashboard: React.FC = () => {
                             <div className="p-8 text-center text-muted">No records found for this period.</div>
                         ) : (
                             employeeLogs.map((log, idx) => (
-                                <div key={idx} className="p-4 flex items-center justify-between">
+                                <div key={idx} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                                     <div>
                                         <p className="font-medium text-primary-text">{log.date}</p>
                                         <p className="text-xs text-muted">{log.day}</p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
-                                            ${log.status === 'Present' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                                                log.status === 'Absent' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' :
-                                                    log.status === 'Holiday' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                                                        'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
+                                    <div className="flex flex-col items-end gap-1.5">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm
+                                            ${log.status === 'Present' ? 'bg-emerald-500 text-white dark:bg-emerald-600' :
+                                                log.status === 'Absent' ? 'bg-rose-500 text-white dark:bg-rose-600' :
+                                                    log.status === 'Holiday' ? 'bg-amber-500 text-white dark:bg-amber-600' :
+                                                        log.status === 'Weekend' ? 'bg-indigo-500 text-white dark:bg-indigo-600' :
+                                                            'bg-gray-500 text-white dark:bg-gray-600'}`}>
                                             {log.status}
                                         </span>
-                                        <div className="text-xs text-muted font-medium">
-                                            {log.checkIn} - {log.checkOut}
-                                        </div>
+                                        {(log.checkIn !== '-' || log.checkOut !== '-') && (
+                                            <div className="text-xs text-muted font-medium">
+                                                {log.checkIn} - {log.checkOut}
+                                            </div>
+                                        )}
                                         {log.ot > 0 && (
                                             <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">+{log.ot}h OT</span>
                                         )}
