@@ -175,8 +175,9 @@ export const useAuthStore = create<AuthState>()(
             });
 
             if (error) {
-                set({ error: getFriendlyAuthError(error.message), loading: false });
-                return { error: { message: error.message } };
+                const friendlyError = getFriendlyAuthError(error.message);
+                set({ error: friendlyError, loading: false });
+                return { error: { message: friendlyError } };
             }
             set({ loading: false });
             return { error: null };
@@ -187,8 +188,9 @@ export const useAuthStore = create<AuthState>()(
             const { error } = await authService.signInWithGoogle();
 
             if (error) {
-                set({ error: getFriendlyAuthError(error.message), loading: false });
-                return { error: { message: error.message } };
+                const friendlyError = getFriendlyAuthError(error.message);
+                set({ error: friendlyError, loading: false });
+                return { error: { message: friendlyError } };
             }
 
             // With redirect flow, the user is not returned immediately.
