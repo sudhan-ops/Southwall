@@ -97,30 +97,23 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                             </div>
                             <div className="flex items-center gap-2">
                                 {unreadCount > 0 && (
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
+                                    <span
                                         onClick={handleMarkAll}
-                                        className="text-xs h-8 px-4 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-[#1a4d2e] dark:text-white dark:hover:bg-[#23633b] border border-transparent dark:border-white/10 font-medium shadow-sm transition-colors"
+                                        className="relative isolate overflow-hidden before:!content-none after:!content-none text-xs h-8 px-4 flex items-center justify-center rounded-3xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-[#1a4d2e] dark:text-white dark:hover:bg-[#23633b] cursor-pointer font-medium shadow-sm transition-colors"
+                                        style={{ backgroundImage: 'none' }}
                                     >
-                                        Mark all read
-                                    </Button>
+                                        <span className="relative z-10">Mark all read</span>
+                                    </span>
                                 )}
-                                <button
-                                    onClick={() => setIsOpen(false)}
-                                    className="md:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors"
-                                    aria-label="Close"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
+
                             </div>
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:!bg-[#0d1f12] dark:[color-scheme:dark]">
-                            {notifications.length > 0 ? (
+                            {notifications.filter(n => !n.isRead).length > 0 ? (
                                 <div className="divide-y divide-gray-100 dark:divide-white/20">
-                                    {notifications.map((notif) => (
+                                    {notifications.filter(n => !n.isRead).map((notif) => (
                                         <div
                                             key={notif.id}
                                             onClick={() => handleNotificationClick(notif)}
@@ -153,7 +146,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                                     <div className="w-16 h-16 bg-gray-100 dark:bg-[#1a2e1a] rounded-full flex items-center justify-center mb-4">
                                         <Bell className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                                     </div>
-                                    <h5 className="text-gray-900 dark:text-white font-medium mb-1">No notifications</h5>
+                                    <h5 className="text-gray-900 dark:text-white font-medium mb-1">No new notifications</h5>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
                                         You're all caught up! Check back later.
                                     </p>
