@@ -10,7 +10,6 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-      filename: 'manifest.json',
       devOptions: {
         enabled: true
       },
@@ -51,7 +50,8 @@ export default defineConfig({
     })
   ],
   define: {
-    '__DEFINES__': {}
+    '__DEFINES__': {},
+    '__HMR_CONFIG_NAME__': 'null'
   },
   resolve: {
     alias: {
