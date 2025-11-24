@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, NavLink, Navigate, useLocation } from 'react-router-dom';
-import { ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, ShieldCheck, LayoutDashboard, ClipboardCheck, Map as MapIcon, ClipboardList, User, Briefcase, ListTodo, Building, Users, Shirt, Settings, GitBranch, Calendar, CalendarCheck2, ShieldHalf, FileDigit, GitPullRequest, Home, BriefcaseBusiness, UserPlus, ArrowLeft, IndianRupee, PackagePlus, LifeBuoy, MapPin } from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, ShieldCheck, LayoutDashboard, ClipboardCheck, Map as MapIcon, ClipboardList, User, Briefcase, ListTodo, Building, Users, Shirt, Settings, GitBranch, Calendar, CalendarCheck2, ShieldHalf, FileDigit, GitPullRequest, Home, BriefcaseBusiness, UserPlus, ArrowLeft, IndianRupee, PackagePlus, LifeBuoy, MapPin, X } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import Logo from '../ui/Logo';
@@ -85,15 +85,15 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                     ? 'text-white shadow-sm border'
                                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                                 : isActive
-                                    ? 'bg-white text-[#0d2c18] shadow-md'
-                                    : 'text-gray-400 hover:bg-white/10 hover:text-white'
+                                    ? 'bg-[#1c3a23] text-white shadow-sm border border-white/5'
+                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
                             }`
                         }
                         style={({ isActive }) => {
                             if (!isActive) return {};
                             return mode === 'light'
                                 ? { backgroundColor: '#006B3F', borderColor: '#005632' }
-                                : { backgroundColor: '#ffffff', color: '#0d2c18' };
+                                : {}; // Dark mode bg is handled by class
                         }}
                         title={isCollapsed ? link.label : undefined}
                     >
@@ -102,7 +102,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                 <link.icon
                                     className={`h-5 w-5 flex-shrink-0 transition-colors duration-200 ${mode === 'light'
                                         ? isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'
-                                        : isActive ? 'text-[#0d2c18]' : 'text-gray-400 group-hover:text-white'
+                                        : isActive ? 'text-emerald-400' : 'text-gray-400 group-hover:text-white'
                                         } ${isCollapsed ? '' : 'mr-3'}`}
                                 />
                                 {!isCollapsed && <span>{link.label}</span>}
@@ -230,7 +230,7 @@ const MainLayout: React.FC = () => {
                 <>
                     <div className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden" onClick={() => setIsMobileMenuOpen(false)} aria-hidden="true"></div>
                     <aside
-                        className="fixed inset-y-0 left-0 w-80 bg-[#0d2c18] z-40 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl flex flex-col border-r border-white/10"
+                        className="fixed inset-y-0 left-0 w-80 bg-[#0d1f12] z-40 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl flex flex-col border-r border-white/10"
                         style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)' }}
                     >
                         <div className="p-4 flex justify-center h-20 items-center flex-shrink-0 !bg-white shadow-sm">
@@ -239,13 +239,16 @@ const MainLayout: React.FC = () => {
                         <div className="flex-1 overflow-y-auto py-2 custom-scrollbar">
                             <SidebarContent isCollapsed={false} onLinkClick={() => setIsMobileMenuOpen(false)} hideHeader={true} mode="dark" />
                         </div>
-                        <div className="p-4 border-t border-white/10 mt-auto flex-shrink-0 bg-[#0a2514]">
+                        <div className="p-4 border-t border-white/10 mt-auto flex-shrink-0 bg-[#0a1a10]">
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="w-full flex items-center justify-center p-3.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+                                className="relative w-full flex items-center justify-center p-3.5 rounded-xl text-white/80 hover:text-white hover:bg-white/5 transition-all duration-200 group"
                             >
-                                <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-medium">Close Menu</span>
+                                <div className="flex items-center gap-2">
+                                    <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                                    <span className="font-medium">Close Menu</span>
+                                </div>
+                                <X className="absolute right-3.5 h-5 w-5 text-red-500" />
                             </button>
                         </div>
                     </aside>
@@ -267,12 +270,7 @@ const MainLayout: React.FC = () => {
 
             </div>
             {showMobileNavBar && user && (
-                <MobileNavBar
-                    user={user}
-                    permissions={permissions[user.role] || []}
-                    setIsMobileMenuOpen={setIsMobileMenuOpen}
-                    isMobileMenuOpen={isMobileMenuOpen}
-                />
+                <MobileNavBar />
             )}
             {/* Scroll-to-top/bottom buttons */}
             {showScrollButtons && !isMobile && (

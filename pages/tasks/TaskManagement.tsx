@@ -177,7 +177,7 @@ const TaskManagement: React.FC = () => {
     };
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className={`min-h-screen ${isMobile ? 'bg-[#0d1f12] text-white p-4 pb-24' : 'p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card'}`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             {isFormOpen && (
@@ -207,35 +207,63 @@ const TaskManagement: React.FC = () => {
                 Are you sure you want to delete the task "{currentTask?.name}"?
             </Modal>
 
-            <AdminPageHeader title="Task Management" />
+            <div className="mb-6">
+                <h1 className={`text-2xl font-bold ${isMobile ? 'text-white' : 'text-gray-900'}`}>Task Management</h1>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-end justify-between">
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Select label="Filter by Status" id="status-filter" value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)}>
-                        <option value="all">All Statuses</option>
-                        <option value="To Do">To Do</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Done">Done</option>
-                    </Select>
-                    <Select label="Filter by Priority" id="priority-filter" value={priorityFilter} onChange={e => setPriorityFilter(e.target.value as any)}>
-                        <option value="all">All Priorities</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                    </Select>
-                    <Select label="Filter by Assignee" id="assignee-filter" value={assignedToFilter} onChange={e => setAssignedToFilter(e.target.value)}>
-                        <option value="all">All Users</option>
-                        <option value="unassigned">Unassigned</option>
-                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                    </Select>
+                    <div className="space-y-1">
+                        <label className={`text-sm font-medium ${isMobile ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Status</label>
+                        <select
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            value={statusFilter}
+                            onChange={e => setStatusFilter(e.target.value as any)}
+                        >
+                            <option value="all" className={isMobile ? 'bg-[#0d1f12]' : ''}>All Statuses</option>
+                            <option value="To Do" className={isMobile ? 'bg-[#0d1f12]' : ''}>To Do</option>
+                            <option value="In Progress" className={isMobile ? 'bg-[#0d1f12]' : ''}>In Progress</option>
+                            <option value="Done" className={isMobile ? 'bg-[#0d1f12]' : ''}>Done</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className={`text-sm font-medium ${isMobile ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Priority</label>
+                        <select
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            value={priorityFilter}
+                            onChange={e => setPriorityFilter(e.target.value as any)}
+                        >
+                            <option value="all" className={isMobile ? 'bg-[#0d1f12]' : ''}>All Priorities</option>
+                            <option value="Low" className={isMobile ? 'bg-[#0d1f12]' : ''}>Low</option>
+                            <option value="Medium" className={isMobile ? 'bg-[#0d1f12]' : ''}>Medium</option>
+                            <option value="High" className={isMobile ? 'bg-[#0d1f12]' : ''}>High</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className={`text-sm font-medium ${isMobile ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Assignee</label>
+                        <select
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            value={assignedToFilter}
+                            onChange={e => setAssignedToFilter(e.target.value)}
+                        >
+                            <option value="all" className={isMobile ? 'bg-[#0d1f12]' : ''}>All Users</option>
+                            <option value="unassigned" className={isMobile ? 'bg-[#0d1f12]' : ''}>Unassigned</option>
+                            {users.map(u => <option key={u.id} value={u.id} className={isMobile ? 'bg-[#0d1f12]' : ''}>{u.name}</option>)}
+                        </select>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0 mt-4 md:mt-0">
                     {areFiltersActive && (
-                        <Button variant="secondary" onClick={clearFilters}>
+                        <Button variant="secondary" onClick={clearFilters} className={isMobile ? '!bg-[#152b1b] !text-white !border-white/10' : ''}>
                             <X className="mr-2 h-4 w-4" /> Clear Filters
                         </Button>
                     )}
-                    <Button onClick={handleAdd}><Plus className="mr-2 h-4 w-4" /> Add Task</Button>
+                    <button
+                        onClick={handleAdd}
+                        className={`flex items-center justify-center transition-colors ${isMobile ? '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold !border-none shadow-none text-sm py-3 px-6 rounded-xl' : 'bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg px-6 py-2.5 font-medium'}`}
+                    >
+                        <Plus className="mr-2 h-5 w-5" /> Add Task
+                    </button>
                 </div>
             </div>
 
@@ -243,7 +271,7 @@ const TaskManagement: React.FC = () => {
 
             <div className="overflow-x-auto">
                 <table className="min-w-full responsive-table">
-                    <thead className="bg-page">
+                    <thead className={isMobile ? 'hidden' : 'bg-page'}>
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Task Name</th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Priority</th>
@@ -254,13 +282,47 @@ const TaskManagement: React.FC = () => {
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-border md:bg-card md:divide-y-0">
+                    <tbody className={`divide-y md:divide-y-0 ${isMobile ? 'divide-white/10 space-y-4 block' : 'divide-border md:bg-card'}`}>
                         {isLoading ? (
                             isMobile
                                 ? <tr><td colSpan={7}><TableSkeleton rows={3} cols={7} isMobile /></td></tr>
                                 : <TableSkeleton rows={5} cols={7} />
                         ) : filteredTasks.map((task) => {
                             const { date: nextDueDate, isOverdue } = getNextDueDateInfo(task);
+
+                            if (isMobile) {
+                                return (
+                                    <div key={task.id} className="bg-[#152b1b] p-4 rounded-xl border border-white/5 mb-4">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h3 className="font-semibold text-white text-lg">{task.name}</h3>
+                                                <p className="text-sm text-gray-400 mt-1">Due: <span className={isOverdue ? 'text-red-400 font-bold' : ''}>{nextDueDate || '-'}</span></p>
+                                            </div>
+                                            {getPriorityChip(task.priority)}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+                                            <div>
+                                                <span className="text-gray-500 block text-xs">Assigned To</span>
+                                                <span className="text-gray-300">{task.assignedToName || '-'}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-500 block text-xs">Status</span>
+                                                <span className="text-gray-300">{task.status}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-end gap-2 border-t border-white/10 pt-3">
+                                            <button onClick={() => handleEdit(task)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg"><Edit className="h-4 w-4" /></button>
+                                            <button onClick={() => handleDelete(task)} className="p-2 text-red-400 hover:text-red-300 bg-red-500/10 rounded-lg"><Trash2 className="h-4 w-4" /></button>
+                                            {task.assignedToId === user?.id && task.status !== 'Done' && (
+                                                <button onClick={() => handleComplete(task)} className="flex items-center px-3 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm font-medium">
+                                                    <CheckCircle className="h-4 w-4 mr-1.5" /> Complete
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            }
+
                             return (
                                 <tr key={task.id} className={isOverdue ? 'bg-red-50' : ''}>
                                     <td data-label="Task Name" className="px-6 py-4 font-medium">{task.name}</td>
@@ -287,7 +349,7 @@ const TaskManagement: React.FC = () => {
                 </table>
                 {!isLoading && filteredTasks.length === 0 && (
                     <div className="text-center py-10 text-muted">
-                        <p>No tasks found matching your criteria.</p>
+                        <p className={isMobile ? 'text-gray-400' : ''}>No tasks found matching your criteria.</p>
                         {areFiltersActive && <Button variant="secondary" size="sm" className="mt-2" onClick={clearFilters}>Clear filters</Button>}
                     </div>
                 )}

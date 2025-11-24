@@ -325,9 +325,9 @@ const ProfilePage: React.FC = () => {
                             {isAttendanceLoading ? (
                                 <div className="flex items-center justify-center text-muted h-[56px]"><Loader2 className="h-6 w-6 animate-spin" /></div>
                             ) : isCheckedIn ? (
-                                <Button onClick={handleSlideConfirm} variant="danger" className="w-full !py-4 text-lg font-bold shadow-lg shadow-red-100 hover:shadow-red-200 transition-all rounded-2xl" isLoading={isActionInProgress}><LogOut className="mr-3 h-6 w-6" /> Check Out</Button>
+                                <Button onClick={handleSlideConfirm} variant="danger" className="w-full !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" isLoading={isActionInProgress}><LogOut className="mr-3 h-6 w-6" /> Check Out</Button>
                             ) : (
-                                <Button onClick={handleSlideConfirm} variant="primary" className="w-full !py-4 text-lg font-bold shadow-lg shadow-emerald-100 hover:shadow-emerald-200 transition-all rounded-2xl" isLoading={isActionInProgress}><LogIn className="mr-3 h-6 w-6" /> Check In</Button>
+                                <Button onClick={handleSlideConfirm} variant="primary" className="w-full !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" isLoading={isActionInProgress}><LogIn className="mr-3 h-6 w-6" /> Check In</Button>
                             )}
                         </div>
                     </section>

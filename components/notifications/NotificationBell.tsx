@@ -99,7 +99,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
                                 {unreadCount > 0 && (
                                     <span
                                         onClick={handleMarkAll}
-                                        className="relative isolate overflow-hidden before:!content-none after:!content-none text-xs h-8 px-4 flex items-center justify-center rounded-3xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-[#1a4d2e] dark:text-white dark:hover:bg-[#23633b] cursor-pointer font-medium shadow-sm transition-colors"
+                                        className="relative isolate overflow-hidden before:!content-none after:!content-none text-xs h-8 px-4 flex items-center justify-center rounded-3xl !bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold cursor-pointer transition-colors"
                                         style={{ backgroundImage: 'none' }}
                                     >
                                         <span className="relative z-10">Mark all read</span>

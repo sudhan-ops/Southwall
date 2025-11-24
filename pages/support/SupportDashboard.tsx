@@ -196,9 +196,9 @@ const SupportDashboard: React.FC = () => {
     };
 
     const StatCard: React.FC<{ title: string, value: number, icon: React.ReactNode, colorClass: string }> = ({ title, value, icon, colorClass }) => (
-        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+        <div className="bg-transparent p-5 rounded-2xl flex items-center justify-between transition-all">
             <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+                <p className="text-sm font-medium text-muted mb-1">{title}</p>
                 <p className={`text-3xl font-bold ${colorClass.replace('bg-', 'text-').split(' ')[0]}`}>{value}</p>
             </div>
             <div className={`p-3 rounded-full bg-opacity-10 ${colorClass.replace('text-', 'bg-')} ${colorClass}`}>
@@ -242,17 +242,17 @@ const SupportDashboard: React.FC = () => {
             </Modal>
 
             {/* Header Section */}
-            <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-200 p-6 lg:p-10 shadow-sm transition-all">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50/50 opacity-20 rounded-full blur-3xl -mr-16 -mt-16"></div>
+            <div className="relative overflow-hidden rounded-3xl bg-transparent p-6 lg:p-10 transition-all">
+
                 <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <div className="p-2 bg-emerald-50 rounded-lg backdrop-blur-sm">
                                 <LifeBuoy className="h-6 w-6 text-emerald-600" />
                             </div>
-                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Support & Audit</h2>
+                            <h2 className="text-2xl lg:text-3xl font-bold text-primary-text">Support & Audit</h2>
                         </div>
-                        <p className="text-gray-500 max-w-xl text-sm">
+                        <p className="text-muted max-w-xl text-sm">
                             Track issues, request audits, and connect with support staff in real-time.
                         </p>
                     </div>
@@ -268,7 +268,7 @@ const SupportDashboard: React.FC = () => {
                         )}
                         <span
                             onClick={() => setIsNewTicketModalOpen(true)}
-                            className="flex-1 lg:flex-none cursor-pointer inline-flex items-center justify-center !bg-emerald-600 hover:!bg-emerald-700 !text-white !border-none shadow-md shadow-emerald-200 text-sm py-2 px-4 transition-colors rounded-xl isolate relative before:!content-none after:!content-none"
+                            className="flex-1 lg:flex-none cursor-pointer inline-flex items-center justify-center !bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold !border-none shadow-none text-sm py-3 px-6 transition-colors rounded-xl isolate relative before:!content-none after:!content-none"
                             style={{ backgroundImage: 'none' }}
                         >
                             <Plus className="mr-1.5 h-3.5 w-3.5 relative z-10" />
@@ -303,7 +303,7 @@ const SupportDashboard: React.FC = () => {
             <div className="lg:grid lg:grid-cols-3 lg:gap-8">
                 {/* Main Content - Ticket List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <div className="bg-transparent p-5 rounded-2xl">
                         <div className="flex flex-col sm:flex-row gap-4 mb-6">
                             <div className="relative flex-grow">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

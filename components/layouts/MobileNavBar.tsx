@@ -1,231 +1,127 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Menu, X, ClipboardCheck, LifeBuoy } from 'lucide-react';
-import type { User as AppUser, Permission } from '../../types';
-import { usePermission } from '../../utils/permissions';
-import { useAuthStore } from '../../store/authStore';
-import CameraCaptureModal from '../CameraCaptureModal';
-import PermissionDeniedModal from '../modals/PermissionDeniedModal';
-import Toast from '../ui/Toast';
+import { Home, ClipboardCheck, LifeBuoy } from 'lucide-react';
 
-interface MobileNavBarProps {
-    user: AppUser;
-    permissions: Permission[];
-    setIsMobileMenuOpen: (isOpen: boolean) => void;
-    isMobileMenuOpen: boolean;
-}
+// --- Configuration ---
+const ICON_SIZE = 24;
+const ACTIVE_ICON_SIZE = 24;
+const INDICATOR_SIZE = 56;
 
-const AnimatedMenuIcon: React.FC<{ isOpen: boolean; className?: string }> = ({ isOpen, className }) => {
-    return (
-        <div className={`relative ${className} w-6 h-6 flex items-center justify-center`}>
-            <Menu className={`absolute transition-all duration-300 ease-in-out ${isOpen ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} size={24} />
-            <X className={`absolute transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} size={24} />
-        </div>
-    )
+// --- SVG Path Generator for the "Notch" ---
+const generatePath = (width: number, indicatorLeft: number, indicatorWidth: number): string => {
+    const notchRadius = INDICATOR_SIZE / 2;
+    const barHeight = 64;
+    const cornerRadius = 16;
+    const notchCenter = indicatorLeft + indicatorWidth / 2;
+
+    const notchStart = notchCenter - notchRadius - 8;
+    const notchEnd = notchCenter + notchRadius + 8;
+    const controlPointOffset = notchRadius * 0.8;
+
+    return [
+        `M 0 ${cornerRadius}`,
+        `A ${cornerRadius} ${cornerRadius} 0 0 1 ${cornerRadius} 0`,
+        `L ${notchStart - cornerRadius} 0`,
+        `C ${notchStart - controlPointOffset} 0, ${notchCenter - notchRadius} ${barHeight * 0.6}, ${notchCenter} ${barHeight * 0.6}`,
+        `C ${notchCenter + notchRadius} ${barHeight * 0.6}, ${notchEnd + controlPointOffset} 0, ${notchEnd + cornerRadius} 0`,
+        `L ${width - cornerRadius} 0`,
+        `A ${cornerRadius} ${cornerRadius} 0 0 1 ${width} ${cornerRadius}`,
+        `L ${width} ${barHeight}`,
+        `L 0 ${barHeight}`,
+        `Z`
+    ].join(' ');
 };
 
-const MobileNavBar: React.FC<MobileNavBarProps> = ({ user, permissions, setIsMobileMenuOpen, isMobileMenuOpen }) => {
+const MobileNavBar: React.FC = () => {
     const location = useLocation();
-    const { isCheckedIn, toggleCheckInStatus } = useAuthStore();
+    const navRef = useRef<HTMLElement>(null);
+    const itemRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+    const [pathD, setPathD] = useState('');
+    const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({ opacity: 0, transform: 'translateX(-100px)' });
 
-    const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
-    const [permissionNeeded, setPermissionNeeded] = useState<'Camera' | 'Location'>('Camera');
-    const [currentAction, setCurrentAction] = useState<'check-in' | 'check-out' | null>(null);
-    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    // --- Define Your Navigation Items Here ---
+    const navItems = useMemo(() => [
+        { key: 'tasks', to: '/tasks', label: 'Tasks', icon: ClipboardCheck },
+        { key: 'support', to: '/support', label: 'Support', icon: LifeBuoy },
+        { key: 'home', to: '/profile', label: 'Home', icon: Home, end: true }, // 'end: true' for exact match
+    ], []);
 
-    const locationPermission = usePermission('geolocation');
-    const cameraPermission = usePermission('camera');
-
-    // Keep these handlers in case they are needed later, though buttons are currently removed from nav
-    const handleCheckIn = async () => {
-        if (locationPermission.status === 'denied' || cameraPermission.status === 'denied') {
-            setPermissionNeeded(locationPermission.status === 'denied' ? 'Location' : 'Camera');
-            setIsPermissionModalOpen(true);
-            return;
-        }
-
-        let locGranted = locationPermission.status === 'granted';
-        if (locationPermission.status === 'prompt') {
-            locGranted = await locationPermission.request();
-        }
-
-        if (!locGranted) {
-            setToast({ message: 'Location permission is required to check in.', type: 'error' });
-            return;
-        }
-
-        setCurrentAction('check-in');
-        setIsCameraOpen(true);
-    };
-
-    const handleCheckOut = async () => {
-        if (locationPermission.status === 'denied' || cameraPermission.status === 'denied') {
-            setPermissionNeeded(locationPermission.status === 'denied' ? 'Location' : 'Camera');
-            setIsPermissionModalOpen(true);
-            return;
-        }
-
-        let locGranted = locationPermission.status === 'granted';
-        if (locationPermission.status === 'prompt') {
-            locGranted = await locationPermission.request();
-        }
-
-        if (!locGranted) {
-            setToast({ message: 'Location permission is required to check out.', type: 'error' });
-            return;
-        }
-
-        setCurrentAction('check-out');
-        setIsCameraOpen(true);
-    };
-
-    const handleCapture = async (base64Image: string, mimeType: string) => {
-        setIsCameraOpen(false);
-        try {
-            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0,
-                });
-            });
-
-            const { latitude, longitude } = position.coords;
-            const photo = `data:${mimeType};base64,${base64Image}`;
-
-            if (currentAction === 'check-in') {
-                const { success, message } = await toggleCheckInStatus();
-                setToast({ message, type: success ? 'success' : 'error' });
-            } else if (currentAction === 'check-out') {
-                const { success, message } = await toggleCheckInStatus();
-                setToast({ message, type: success ? 'success' : 'error' });
-            }
-        } catch (err: any) {
-            setToast({ message: err.message || `Failed to ${currentAction}.`, type: 'error' });
-        } finally {
-            setCurrentAction(null);
-        }
-    };
-
-    type NavItem = {
-        key: string;
-        to?: string;
-        onClick?: () => void;
-        label: string;
-        icon: React.ElementType | React.FC<any>;
-        end?: boolean;
-    };
-
-    const navItems = useMemo((): NavItem[] => {
-        const items: NavItem[] = [];
-
-        const tasksLink = permissions.includes('manage_tasks') ? '/tasks' : '/onboarding/tasks';
-        items.push({ key: 'tasks', to: tasksLink, label: 'Tasks', icon: ClipboardCheck, end: false });
-
-        if (permissions.includes('access_support_desk')) {
-            items.push({ key: 'support', to: '/support', label: 'Support', icon: LifeBuoy, end: false });
-        }
-
-        items.push({ key: 'home', to: '/profile', label: 'Home', icon: Home, end: true });
-
-        items.push({
-            key: 'menu',
-            onClick: () => setIsMobileMenuOpen(!isMobileMenuOpen),
-            label: 'Menu',
-            icon: (props: any) => <AnimatedMenuIcon isOpen={isMobileMenuOpen} {...props} />
-        });
-
-        return items;
-    }, [permissions, isMobileMenuOpen, setIsMobileMenuOpen, isCheckedIn]);
-
+    // --- Active Tab Logic ---
     const activeItemPath = useMemo(() => {
         const path = location.pathname;
         const linkItems = navItems.filter(item => item.to);
         const sortedNavItems = [...linkItems].sort((a, b) => b.to!.length - a.to!.length);
-        return sortedNavItems.find(item => {
-            if (item.end) {
-                return path === item.to;
-            }
-            return path.startsWith(item.to!);
-        })?.to;
+        return sortedNavItems.find(item => item.end ? path === item.to : path.startsWith(item.to!))?.to;
     }, [location.pathname, navItems]);
 
+    // --- Animation Effect ---
+    useEffect(() => {
+        const updateActiveState = () => {
+            if (!navRef.current) return;
+            const activeNode = activeItemPath ? itemRefs.current.get(activeItemPath) : null;
+            const navRect = navRef.current.getBoundingClientRect();
+
+            if (!activeNode) {
+                setIndicatorStyle({ opacity: 0, transform: 'translateX(-100px)' });
+                setPathD(generatePath(navRect.width, -100, 0));
+                return;
+            };
+
+            const { offsetLeft, clientWidth } = activeNode;
+            setIndicatorStyle({
+                opacity: 1,
+                width: `${INDICATOR_SIZE}px`,
+                height: `${INDICATOR_SIZE}px`,
+                transform: `translateX(${offsetLeft + clientWidth / 2 - INDICATOR_SIZE / 2}px) translateY(-50%)`,
+            });
+            setPathD(generatePath(navRect.width, offsetLeft, clientWidth));
+        };
+
+        const timer = setTimeout(updateActiveState, 50);
+        window.addEventListener('resize', updateActiveState);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', updateActiveState);
+        };
+    }, [activeItemPath]);
+
     return (
-        <>
-            {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-            <CameraCaptureModal
-                isOpen={isCameraOpen}
-                onClose={() => setIsCameraOpen(false)}
-                onCapture={handleCapture}
-                captureGuidance="profile"
-            />
-            <PermissionDeniedModal
-                isOpen={isPermissionModalOpen}
-                onClose={() => setIsPermissionModalOpen(false)}
-                permissionName={permissionNeeded}
-            />
-            <nav
-                className={`fixed bottom-6 left-6 right-6 z-[100] md:hidden bg-[#0d2c18] !bg-[#0d2c18] border border-white/15 rounded-full shadow-2xl shadow-black/40 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-[150%]' : 'translate-y-0'}`}
-                style={{
-                    height: '64px',
-                }}
-            >
-                <div className="h-full flex justify-around items-center px-2">
+        <nav ref={navRef} className="fixed bottom-0 left-0 right-0 z-50 md:hidden" style={{ height: `calc(4rem + env(safe-area-inset-bottom))` }}>
+            <div className="relative w-full h-full">
+
+                {/* Floating Indicator Circle */}
+                <div style={indicatorStyle} className="absolute top-0 left-0 bg-accent rounded-full transition-all duration-300 ease-in-out shadow-lg">
+                    {navItems.map(item => {
+                        if (!item.to) return null;
+                        const isActive = activeItemPath === item.to;
+                        return (
+                            <div key={`${item.key}-icon`} className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ease-in-out ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+                                <item.icon style={{ width: ACTIVE_ICON_SIZE, height: ACTIVE_ICON_SIZE }} className="text-white" />
+                            </div>
+                        )
+                    })}
+                </div>
+
+                {/* Navigation Links */}
+                <div className="absolute top-0 left-0 right-0 h-16 flex justify-around items-center z-10 !bg-transparent">
                     {navItems.map((item) => {
-                        const isTasksActive = item.key === 'tasks' && location.pathname.startsWith('/tasks');
-                        const isActive = (!!item.to && activeItemPath === item.to) || isTasksActive;
-                        // Menu should not show active background state
-                        const showActive = isActive;
-
-                        // Common container classes for alignment
-                        const containerClasses = "flex flex-col items-center justify-center w-16 h-full transition-transform duration-200";
-
-                        // Icon container classes for the shape and color
-                        const iconContainerClasses = `flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 ${showActive
-                            ? "bg-gradient-to-tr from-emerald-500 to-emerald-400 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] scale-110"
-                            : "text-white/60 hover:text-white hover:bg-white/5"
-                            }`;
-
-                        // Render button for actions (like Menu)
-                        if (item.onClick) {
-                            return (
-                                <button
-                                    key={item.key}
-                                    onClick={item.onClick}
-                                    className={`${containerClasses} group`}
-                                    aria-label={item.label}
-                                >
-                                    <div className={iconContainerClasses}>
-                                        <item.icon
-                                            className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${showActive ? 'rotate-[360deg] scale-110' : 'rotate-0 scale-100 group-hover:rotate-12'}`}
-                                            size={24}
-                                        />
-                                    </div>
-                                </button>
-                            );
-                        }
-
-                        // Render NavLink for navigation items
+                        const isActive = activeItemPath === item.to;
                         return (
                             <NavLink
                                 key={item.key}
                                 to={item.to!}
                                 end={item.end}
-                                className={`${containerClasses} group`}
+                                ref={(el) => { if (el) itemRefs.current.set(item.to!, el); }}
+                                className="flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ease-in-out !bg-transparent !border-none !outline-none"
+                                style={{ transform: isActive ? 'translateY(-8px)' : 'translateY(0)' }}
                             >
-                                <div className={iconContainerClasses}>
-                                    <item.icon
-                                        size={24}
-                                        className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${showActive ? 'rotate-[360deg] scale-110' : 'rotate-0 scale-100 group-hover:rotate-12'}`}
-                                    />
-                                </div>
+                                <item.icon style={{ width: ICON_SIZE, height: ICON_SIZE }} className={`transition-opacity duration-200 ${isActive ? 'opacity-0' : 'opacity-100 text-white'}`} />
                             </NavLink>
-                        );
+                        )
                     })}
                 </div>
-            </nav>
-        </>
+            </div>
+        </nav>
     );
 };
 

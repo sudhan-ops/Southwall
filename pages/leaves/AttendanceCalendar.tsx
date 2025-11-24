@@ -166,7 +166,7 @@ const AttendanceCalendar: React.FC = () => {
     const startDay = getDay(startOfMonth(currentDate)); // 0-6
 
     return (
-        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border border-border bg-white p-3 rounded-xl shadow-sm w-full md:w-full md:max-w-[320px]">
+        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border-none bg-transparent p-3 rounded-xl shadow-none w-full md:w-full md:max-w-[320px]">
             <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-primary-text">Attendance Calendar</h3>
                 <div className="flex items-center gap-1">
