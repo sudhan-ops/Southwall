@@ -20,10 +20,10 @@ type UniformFormData = {
 
 const UniformStatusChip: React.FC<{ status: UniformRequest['status'] }> = ({ status }) => {
     const styles: Record<UniformRequest['status'], string> = {
-      'Pending': 'bg-yellow-100 text-yellow-800',
-      'Approved': 'bg-blue-100 text-blue-800',
-      'Issued': 'bg-green-100 text-green-800',
-      'Rejected': 'bg-red-100 text-red-800',
+        'Pending': 'bg-yellow-100 text-yellow-800',
+        'Approved': 'bg-blue-100 text-blue-800',
+        'Issued': 'bg-green-100 text-green-800',
+        'Rejected': 'bg-red-100 text-red-800',
     };
     return <span className={`px-2 py-0.5 text-xs font-medium rounded-full capitalize ${styles[status]}`}>{status}</span>;
 };
@@ -38,17 +38,17 @@ interface UniformSizeTableProps {
     readOnly?: boolean;
 }
 
-const UniformSizeTable: React.FC<UniformSizeTableProps> = ({ 
-    title, 
-    sizes, 
-    headers, 
-    control, 
+const UniformSizeTable: React.FC<UniformSizeTableProps> = ({
+    title,
+    sizes,
+    headers,
+    control,
     quantityType,
     quantities,
     readOnly = false,
 }) => {
     const fits = Array.from(new Set(sizes.map(s => s.fit)));
-    const sizeKeys = Array.from(new Set(sizes.map(s => s.size))).sort((a,b) => {
+    const sizeKeys = Array.from(new Set(sizes.map(s => s.size))).sort((a, b) => {
         const numA = parseInt(String(a));
         const numB = parseInt(String(b));
         if (!isNaN(numA) && !isNaN(numB)) {
@@ -143,12 +143,12 @@ const UniformRequestForm: React.FC<{
         const site = sites.find(s => s.id === data.siteId);
         if (!site) return;
 
-        const allSizes = gender === 'Gents' 
+        const allSizes = gender === 'Gents'
             ? [...masterUniforms.gents.pants, ...masterUniforms.gents.shirts]
             : [...masterUniforms.ladies.pants, ...masterUniforms.ladies.shirts];
 
         const items: UniformRequestItem[] = [];
-        
+
         for (const [sizeId, quantity] of Object.entries(data.pantsQuantities)) {
             if (quantity && quantity > 0) {
                 const sizeInfo = allSizes.find(s => s.id === sizeId);
@@ -175,8 +175,8 @@ const UniformRequestForm: React.FC<{
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="md:bg-card md:p-6 md:rounded-xl md:shadow-card my-6 animate-fade-in-down">
-             <div className="flex justify-between items-center mb-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card my-6 animate-fade-in-down">
+            <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-primary-text">{initialData ? 'Edit' : 'New'} Uniform Request</h3>
                 <Button type="button" variant="icon" onClick={onCancel} aria-label="Close form"><X /></Button>
             </div>
@@ -191,17 +191,17 @@ const UniformRequestForm: React.FC<{
                         <option>Ladies</option>
                     </Select>
                 </div>
-                
+
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     {gender === 'Gents' ? (
                         <>
-                            <UniformSizeTable title="Gents' Pants" sizes={masterUniforms.gents.pants} headers={[{key:'length',label:'L'},{key:'waist',label:'W'},{key:'hip',label:'H'},{key:'tilesLoose',label:'TL'},{key:'bottomWaist',label:'BW'},{key:'fit',label:'Fit'}]} control={control} quantityType="pantsQuantities" />
-                            <UniformSizeTable title="Gents' Shirts" sizes={masterUniforms.gents.shirts} headers={[{key:'length',label:'L'},{key:'sleeves',label:'S'},{key:'chest',label:'C'},{key:'shoulder',label:'Sh'},{key:'collar',label:'Co'},{key:'fit',label:'Fit'}]} control={control} quantityType="shirtsQuantities" />
+                            <UniformSizeTable title="Gents' Pants" sizes={masterUniforms.gents.pants} headers={[{ key: 'length', label: 'L' }, { key: 'waist', label: 'W' }, { key: 'hip', label: 'H' }, { key: 'tilesLoose', label: 'TL' }, { key: 'bottomWaist', label: 'BW' }, { key: 'fit', label: 'Fit' }]} control={control} quantityType="pantsQuantities" />
+                            <UniformSizeTable title="Gents' Shirts" sizes={masterUniforms.gents.shirts} headers={[{ key: 'length', label: 'L' }, { key: 'sleeves', label: 'S' }, { key: 'chest', label: 'C' }, { key: 'shoulder', label: 'Sh' }, { key: 'collar', label: 'Co' }, { key: 'fit', label: 'Fit' }]} control={control} quantityType="shirtsQuantities" />
                         </>
                     ) : (
-                         <>
-                            <UniformSizeTable title="Ladies' Pants" sizes={masterUniforms.ladies.pants} headers={[{key:'length',label:'L'},{key:'waist',label:'W'},{key:'hip',label:'H'},{key:'fit',label:'Fit'}]} control={control} quantityType="pantsQuantities" />
-                            <UniformSizeTable title="Ladies' Shirts" sizes={masterUniforms.ladies.shirts} headers={[{key:'length',label:'L'},{key:'sleeves',label:'S'},{key:'bust',label:'B'},{key:'shoulder',label:'Sh'},{key:'fit',label:'Fit'}]} control={control} quantityType="shirtsQuantities" />
+                        <>
+                            <UniformSizeTable title="Ladies' Pants" sizes={masterUniforms.ladies.pants} headers={[{ key: 'length', label: 'L' }, { key: 'waist', label: 'W' }, { key: 'hip', label: 'H' }, { key: 'fit', label: 'Fit' }]} control={control} quantityType="pantsQuantities" />
+                            <UniformSizeTable title="Ladies' Shirts" sizes={masterUniforms.ladies.shirts} headers={[{ key: 'length', label: 'L' }, { key: 'sleeves', label: 'S' }, { key: 'bust', label: 'B' }, { key: 'shoulder', label: 'Sh' }, { key: 'fit', label: 'Fit' }]} control={control} quantityType="shirtsQuantities" />
                         </>
                     )}
                 </div>
@@ -233,7 +233,7 @@ const RequestDetailsModal: React.FC<{
         });
         return { pantsQuantities: pants, shirtsQuantities: shirts };
     }, [request.items]);
-    
+
     const currentMaster = request.gender === 'Gents' ? masterUniforms.gents : masterUniforms.ladies;
 
     return (
@@ -244,20 +244,20 @@ const RequestDetailsModal: React.FC<{
                         <h3 className="text-xl font-bold text-primary-text">Uniform Request Details</h3>
                         <p className="text-sm text-muted">{request.siteName} - {format(new Date(request.requestedDate), 'dd MMM, yyyy')}</p>
                     </div>
-                    <Button variant="icon" onClick={onClose}><X className="h-5 w-5"/></Button>
+                    <Button variant="icon" onClick={onClose}><X className="h-5 w-5" /></Button>
                 </div>
 
                 <div className="flex-grow overflow-y-auto p-6">
-                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         {request.gender === 'Gents' ? (
                             <>
-                                <UniformSizeTable readOnly title="Gents' Pants" sizes={currentMaster.pants} headers={[{key:'length',label:'L'},{key:'waist',label:'W'},{key:'hip',label:'H'},{key:'tilesLoose',label:'TL'},{key:'bottomWaist',label:'BW'},{key:'fit',label:'Fit'}]} quantities={pantsQuantities} />
-                                <UniformSizeTable readOnly title="Gents' Shirts" sizes={currentMaster.shirts} headers={[{key:'length',label:'L'},{key:'sleeves',label:'S'},{key:'chest',label:'C'},{key:'shoulder',label:'Sh'},{key:'collar',label:'Co'},{key:'fit',label:'Fit'}]} quantities={shirtsQuantities} />
+                                <UniformSizeTable readOnly title="Gents' Pants" sizes={currentMaster.pants} headers={[{ key: 'length', label: 'L' }, { key: 'waist', label: 'W' }, { key: 'hip', label: 'H' }, { key: 'tilesLoose', label: 'TL' }, { key: 'bottomWaist', label: 'BW' }, { key: 'fit', label: 'Fit' }]} quantities={pantsQuantities} />
+                                <UniformSizeTable readOnly title="Gents' Shirts" sizes={currentMaster.shirts} headers={[{ key: 'length', label: 'L' }, { key: 'sleeves', label: 'S' }, { key: 'chest', label: 'C' }, { key: 'shoulder', label: 'Sh' }, { key: 'collar', label: 'Co' }, { key: 'fit', label: 'Fit' }]} quantities={shirtsQuantities} />
                             </>
                         ) : (
-                             <>
-                                <UniformSizeTable readOnly title="Ladies' Pants" sizes={currentMaster.pants} headers={[{key:'length',label:'L'},{key:'waist',label:'W'},{key:'hip',label:'H'},{key:'fit',label:'Fit'}]} quantities={pantsQuantities} />
-                                <UniformSizeTable readOnly title="Ladies' Shirts" sizes={currentMaster.shirts} headers={[{key:'length',label:'L'},{key:'sleeves',label:'S'},{key:'bust',label:'B'},{key:'shoulder',label:'Sh'},{key:'fit',label:'Fit'}]} quantities={shirtsQuantities} />
+                            <>
+                                <UniformSizeTable readOnly title="Ladies' Pants" sizes={currentMaster.pants} headers={[{ key: 'length', label: 'L' }, { key: 'waist', label: 'W' }, { key: 'hip', label: 'H' }, { key: 'fit', label: 'Fit' }]} quantities={pantsQuantities} />
+                                <UniformSizeTable readOnly title="Ladies' Shirts" sizes={currentMaster.shirts} headers={[{ key: 'length', label: 'L' }, { key: 'sleeves', label: 'S' }, { key: 'bust', label: 'B' }, { key: 'shoulder', label: 'Sh' }, { key: 'fit', label: 'Fit' }]} quantities={shirtsQuantities} />
                             </>
                         )}
                     </div>
@@ -314,7 +314,7 @@ const UniformDashboard: React.FC = () => {
         setEditingRequest(request);
         setView('form');
     };
-    
+
     const handleSave = async (data: UniformRequest) => {
         try {
             if (data.id.startsWith('new_')) {
@@ -327,7 +327,7 @@ const UniformDashboard: React.FC = () => {
             setView('list');
             fetchData();
         } catch (e) {
-             setToast({ message: 'Failed to save request.', type: 'error' });
+            setToast({ message: 'Failed to save request.', type: 'error' });
         }
     };
 
@@ -342,7 +342,7 @@ const UniformDashboard: React.FC = () => {
             setToast({ message: 'Failed to delete request.', type: 'error' });
         }
     };
-    
+
     if (isLoading) {
         return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>;
     }
@@ -350,11 +350,11 @@ const UniformDashboard: React.FC = () => {
     return (
         <div className="p-4 space-y-6">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-             <Modal isOpen={!!deletingRequest} onClose={() => setDeletingRequest(null)} onConfirm={handleConfirmDelete} title="Confirm Deletion">
+            <Modal isOpen={!!deletingRequest} onClose={() => setDeletingRequest(null)} onConfirm={handleConfirmDelete} title="Confirm Deletion">
                 Are you sure you want to delete this uniform request? This cannot be undone.
             </Modal>
             {masterUniforms && <RequestDetailsModal request={viewingRequest} onClose={() => setViewingRequest(null)} masterUniforms={masterUniforms} />}
-            
+
             <div className="bg-card p-4 rounded-2xl">
                 <AdminPageHeader title="Uniform Management">
                     {view === 'list' && <Button onClick={handleNewRequest}><Plus className="mr-2 h-4 w-4" /> New Uniform Request</Button>}
@@ -370,12 +370,12 @@ const UniformDashboard: React.FC = () => {
                     initialData={editingRequest}
                 />
             )}
-            
+
             {view === 'list' && (
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-sm responsive-table">
                         <thead className="bg-page">
-                             <tr>
+                            <tr>
                                 <th className="px-4 py-3 text-left font-medium text-muted">Site / Employee</th>
                                 <th className="px-4 py-3 text-left font-medium text-muted">Gender</th>
                                 <th className="px-4 py-3 text-left font-medium text-muted">Requested By</th>
@@ -411,7 +411,7 @@ const UniformDashboard: React.FC = () => {
                             ))}
                         </tbody>
                     </table>
-                     {requests.length === 0 && <p className="text-center p-8 text-muted">No uniform requests found.</p>}
+                    {requests.length === 0 && <p className="text-center p-8 text-muted">No uniform requests found.</p>}
                 </div>
             )}
         </div>

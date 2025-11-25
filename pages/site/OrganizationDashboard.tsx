@@ -73,7 +73,7 @@ const SiteDashboard: React.FC = () => {
     const filterTabs = ['all', 'pending', 'verified', 'rejected'];
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>

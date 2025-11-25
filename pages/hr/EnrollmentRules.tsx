@@ -79,7 +79,7 @@ const EnrollmentRules: React.FC = () => {
                 <Button type="submit" disabled={!isDirty}><Save className="mr-2 h-4 w-4" /> Save Rules</Button>
             </AdminPageHeader>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6">
                     <div className="p-3 rounded-full bg-accent-light mr-4"><FileText className="h-6 w-6 text-accent-dark" /></div>
                     <div className="flex-grow">
@@ -125,7 +125,7 @@ const EnrollmentRules: React.FC = () => {
                 </div>
             </div>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6">
                     <div className="p-3 rounded-full bg-accent-light mr-4"><IndianRupee className="h-6 w-6 text-accent-dark" /></div>
                     <div className="flex-grow"><h2 className="text-xl font-bold">ESI Eligibility</h2><p className="text-muted">Define salary threshold for statutory insurance.</p></div>
@@ -134,7 +134,7 @@ const EnrollmentRules: React.FC = () => {
                 <div className={`transition-opacity ${isEsiRuleEnabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}><div className="max-w-sm"><Input label="ESI Eligibility Gross Salary Threshold" id="esiCtcThreshold" type="number" registration={register('esiCtcThreshold', { valueAsNumber: true })} disabled={!isEsiRuleEnabled} /><p className="text-xs text-muted mt-2">Employees at or below this amount are eligible for ESI. Those above are eligible for GMC.</p></div></div>
             </div>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6">
                     <div className="p-3 rounded-full bg-accent-light mr-4"><IndianRupee className="h-6 w-6 text-accent-dark" /></div>
                     <div className="flex-grow"><h2 className="text-xl font-bold">GMC/Insurance Policy Rules</h2><p className="text-muted">Set default GMC policies.</p></div>
@@ -149,7 +149,7 @@ const EnrollmentRules: React.FC = () => {
                 </div>
             </div>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6"><div className="p-3 rounded-full bg-accent-light mr-4"><Users className="h-6 w-6 text-accent-dark" /></div><div><h2 className="text-xl font-bold">Manpower Allocation</h2><p className="text-muted">Set rules for enrolling based on approved manpower.</p></div></div>
                 <div className="space-y-4">
                     <Controller name="enforceManpowerLimit" control={control} render={({ field }) => <Checkbox id="enforceManpowerLimit" label="Enforce Manpower Allocation Limits" description="Check new enrollments against the approved manpower count for the site." checked={field.value} onChange={field.onChange} />} />
@@ -161,12 +161,12 @@ const EnrollmentRules: React.FC = () => {
                 </div>
             </div>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6"><div className="p-3 rounded-full bg-accent-light mr-4"><Edit className="h-6 w-6 text-accent-dark" /></div><div><h2 className="text-xl font-bold">Field Officer Permissions</h2><p className="text-muted">Control what field officers can do during enrollment.</p></div></div>
                 <div className="space-y-4"><Controller name="allowSalaryEdit" control={control} render={({ field }) => <Checkbox id="allowSalaryEdit" label="Allow Salary Editing" description="Permit field officers to edit default salary, triggering an approval workflow." checked={field.value ?? false} onChange={field.onChange} />} /></div>
             </div>
 
-            <div className="md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
                 <div className="flex items-start mb-6"><div className="p-3 rounded-full bg-accent-light mr-4"><UserCheck className="h-6 w-6 text-accent-dark" /></div><div><h2 className="text-xl font-bold">Family Details Validation</h2><p className="text-muted">Set rules for validating family member details.</p></div></div>
                 <div className="space-y-4"><Controller name="enforceFamilyValidation" control={control} render={({ field }) => <Checkbox id="enforceFamilyValidation" label="Enforce Strict Family Validation" description="Enable checks for duplicates, age, and gender based on relationship." checked={field.value ?? false} onChange={field.onChange} />} /></div>
             </div>

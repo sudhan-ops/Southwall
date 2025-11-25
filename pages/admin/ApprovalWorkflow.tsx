@@ -61,7 +61,7 @@ const ApprovalWorkflow: React.FC = () => {
     };
 
     return (
-        <div className="p-4 md:bg-card md:p-8 md:rounded-xl md:shadow-card">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-8 md:rounded-xl md:shadow-card">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             <AdminPageHeader title="Leave Approval Settings">
@@ -72,7 +72,7 @@ const ApprovalWorkflow: React.FC = () => {
                 <h3 className="text-xl font-bold text-primary-text mb-2">Final Confirmation Step</h3>
                 <p className="text-sm text-muted mb-4">Select the role responsible for the final confirmation of a leave request after it has been approved by the reporting manager chain.</p>
                 <div className="max-w-xs">
-                     <Select
+                    <Select
                         label="Final Confirmation Role"
                         id="final-approver"
                         value={finalConfirmationRole}
@@ -84,10 +84,10 @@ const ApprovalWorkflow: React.FC = () => {
             </section>
 
             <section>
-                 <h3 className="text-lg font-semibold text-primary-text mb-2">Reporting Structure</h3>
-                 <p className="text-sm text-muted mb-4">For each employee, assign a reporting manager. Leave requests will be sent to this manager for first-level approval.</p>
+                <h3 className="text-lg font-semibold text-primary-text mb-2">Reporting Structure</h3>
+                <p className="text-sm text-muted mb-4">For each employee, assign a reporting manager. Leave requests will be sent to this manager for first-level approval.</p>
                 {isLoading ? (
-                    <div className="flex justify-center items-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted"/></div>
+                    <div className="flex justify-center items-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted" /></div>
                 ) : (
                     <>
                         <div className="overflow-x-auto hidden md:block border border-border rounded-lg">

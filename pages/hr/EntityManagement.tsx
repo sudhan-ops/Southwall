@@ -519,7 +519,7 @@ const EntityManagement: React.FC = () => {
         switch (activeSubcategory) {
             case 'client_structure':
                 return (
-                    <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+                    <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
                             <Button onClick={() => setNameModalState({ isOpen: true, mode: 'add', type: 'group', title: 'Add New Group', label: 'Group Name' })} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Plus className="mr-2 h-4" />Add Group</Button>
                             <div className="flex items-center gap-2 flex-wrap">
@@ -585,7 +585,7 @@ const EntityManagement: React.FC = () => {
                 );
             case 'site_configuration':
                 return (
-                    <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+                    <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
                             <h4 className="text-lg font-semibold text-primary-text">Sites Configuration</h4>
                             <div className="flex items-center gap-2 flex-wrap">

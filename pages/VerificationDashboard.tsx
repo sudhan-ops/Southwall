@@ -15,25 +15,25 @@ const VerificationChecks: React.FC<{ submission: OnboardingData; isSyncing: bool
     if (isSyncing) {
         return <div className="flex items-center gap-2 text-sm text-muted"><Loader2 className="h-4 w-4 animate-spin" /> Syncing...</div>;
     }
-    
+
     const isUanApplicable = submission.uan?.hasPreviousPf;
-    
+
     const checks = [
         { label: 'Aadhaar', verified: submission.personal?.verifiedStatus?.idProofNumber },
         { label: 'Bank', verified: submission.bank?.verifiedStatus?.accountNumber },
         ...(isUanApplicable ? [{ label: 'UAN', verified: submission.uan?.verifiedStatus?.uanNumber }] : [])
     ];
-    
+
     const hasSyncedOrFailed = submission.portalSyncStatus === 'synced' || submission.portalSyncStatus === 'failed';
 
-    const CheckItem: React.FC<{label: string, status: boolean | null | undefined}> = ({label, status}) => {
+    const CheckItem: React.FC<{ label: string, status: boolean | null | undefined }> = ({ label, status }) => {
         const isChecked = hasSyncedOrFailed && status === true;
         const isFailed = hasSyncedOrFailed && status === false;
 
         const Icon = isChecked ? CheckSquare : (isFailed ? XSquare : Square);
         const color = isChecked ? 'text-green-600' : (isFailed ? 'text-red-600' : 'text-muted');
         const title = isChecked ? 'Verified' : (isFailed ? 'Failed' : 'Pending Verification');
-        
+
         return (
             <div className={`flex items-center gap-1.5 text-xs font-medium ${color}`} title={title}>
                 <Icon className="h-4 w-4" />
@@ -45,7 +45,7 @@ const VerificationChecks: React.FC<{ submission: OnboardingData; isSyncing: bool
     return (
         <div className="flex flex-row gap-3 items-center">
             {checks.map(check => (
-                 <CheckItem key={check.label} label={check.label} status={check.verified} />
+                <CheckItem key={check.label} label={check.label} status={check.verified} />
             ))}
         </div>
     );
@@ -79,16 +79,16 @@ const VerificationDashboard: React.FC = () => {
 
     const filteredSubmissions = useMemo(() => {
         return submissions.filter(s =>
-            (s.personal.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             s.personal.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             s.personal.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             s.organizationName?.toLowerCase().includes(searchTerm.toLowerCase()))
+        (s.personal.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            s.personal.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            s.personal.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            s.organizationName?.toLowerCase().includes(searchTerm.toLowerCase()))
         );
     }, [submissions, searchTerm]);
-    
+
     const handleAction = async (action: 'approve' | 'reject', id: string) => {
         const originalSubmissions = [...submissions];
-        
+
         setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status: action === 'approve' ? 'verified' : 'rejected', portalSyncStatus: action === 'approve' ? 'pending_sync' : undefined } : s));
 
         try {
@@ -109,12 +109,12 @@ const VerificationDashboard: React.FC = () => {
             const updatedSubmission = await api.syncPortals(id);
             setSubmissions(prev => prev.map(s => s.id === id ? updatedSubmission : s));
             if (updatedSubmission.portalSyncStatus === 'synced') {
-                 setToast({ message: 'Portals synced successfully!', type: 'success' });
+                setToast({ message: 'Portals synced successfully!', type: 'success' });
             } else {
-                 setToast({ message: 'Portal sync failed. Check details.', type: 'error' });
+                setToast({ message: 'Portal sync failed. Check details.', type: 'error' });
             }
         } catch (error) {
-             setToast({ message: 'An error occurred during sync.', type: 'error' });
+            setToast({ message: 'An error occurred during sync.', type: 'error' });
         } finally {
             setSyncingId(null);
         }
@@ -124,7 +124,7 @@ const VerificationDashboard: React.FC = () => {
     const colSpan = statusFilter === 'verified' ? 4 : 5;
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <h2 className="text-2xl font-semibold text-primary-text mb-6">Onboarding Forms</h2>
 
@@ -132,17 +132,16 @@ const VerificationDashboard: React.FC = () => {
                 <div className="w-full sm:w-auto border-b border-border">
                     <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                         {filterTabs.map(tab => (
-                             <button
+                            <button
                                 key={tab}
                                 onClick={() => setStatusFilter(tab)}
-                                className={`${
-                                statusFilter === tab
-                                    ? 'border-accent text-accent-dark'
-                                    : 'border-transparent text-muted hover:text-accent-dark hover:border-accent'
-                                } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm capitalize`}
-                             >
+                                className={`${statusFilter === tab
+                                        ? 'border-accent text-accent-dark'
+                                        : 'border-transparent text-muted hover:text-accent-dark hover:border-accent'
+                                    } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm capitalize`}
+                            >
                                 {tab}
-                             </button>
+                            </button>
                         ))}
                     </nav>
                 </div>
@@ -177,7 +176,7 @@ const VerificationDashboard: React.FC = () => {
                         {isLoading ? (
                             <tr><td colSpan={colSpan} className="text-center py-10 text-muted">Loading submissions...</td></tr>
                         ) : filteredSubmissions.length === 0 ? (
-                             <tr><td colSpan={colSpan} className="text-center py-10 text-muted">No submissions found.</td></tr>
+                            <tr><td colSpan={colSpan} className="text-center py-10 text-muted">No submissions found.</td></tr>
                         ) : (
                             filteredSubmissions.map((s) => (
                                 <tr key={s.id} className={s.requiresManualVerification ? 'bg-orange-50' : ''}>
@@ -209,13 +208,13 @@ const VerificationDashboard: React.FC = () => {
                                             <Button variant="icon" size="sm" onClick={() => navigate(`/onboarding/pdf/${s.id}`)} title="Download Forms" aria-label={`Download forms for ${s.personal.firstName}`}><FileText className="h-4 w-4" /></Button>
                                             {s.status === 'pending' && (
                                                 <>
-                                                 <Button variant="icon" size="sm" onClick={() => handleAction('approve', s.id!)} title="Verify" aria-label={`Verify submission for ${s.personal.firstName}`}><CheckSquare className="h-4 w-4 text-green-600"/></Button>
-                                                 <Button variant="icon" size="sm" onClick={() => handleAction('reject', s.id!)} title="Request Changes" aria-label={`Request changes for ${s.personal.firstName}`}><XSquare className="h-4 w-4 text-red-600"/></Button>
+                                                    <Button variant="icon" size="sm" onClick={() => handleAction('approve', s.id!)} title="Verify" aria-label={`Verify submission for ${s.personal.firstName}`}><CheckSquare className="h-4 w-4 text-green-600" /></Button>
+                                                    <Button variant="icon" size="sm" onClick={() => handleAction('reject', s.id!)} title="Request Changes" aria-label={`Request changes for ${s.personal.firstName}`}><XSquare className="h-4 w-4 text-red-600" /></Button>
                                                 </>
                                             )}
                                             {s.status === 'verified' && (s.portalSyncStatus === 'pending_sync' || s.portalSyncStatus === 'failed') && (
-                                                 <Button variant="outline" size="sm" onClick={() => handleSync(s.id!)} isLoading={syncingId === s.id} title="Push data to government portals">
-                                                    {syncingId !== s.id && <Send className="h-4 w-4 mr-1"/>}
+                                                <Button variant="outline" size="sm" onClick={() => handleSync(s.id!)} isLoading={syncingId === s.id} title="Push data to government portals">
+                                                    {syncingId !== s.id && <Send className="h-4 w-4 mr-1" />}
                                                     Sync Portals
                                                 </Button>
                                             )}

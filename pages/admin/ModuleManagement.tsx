@@ -13,7 +13,7 @@ const ModuleManagement: React.FC = () => {
   const [modules, setModules] = useState<AppModule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
-  
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentModule, setCurrentModule] = useState<AppModule | null>(null);
@@ -41,17 +41,17 @@ const ModuleManagement: React.FC = () => {
     } else {
       newModules.push(moduleData);
     }
-    
+
     try {
       await api.saveModules(newModules);
-      setModules(newModules.sort((a,b) => a.name.localeCompare(b.name)));
+      setModules(newModules.sort((a, b) => a.name.localeCompare(b.name)));
       setToast({ message: `Module '${moduleData.name}' saved.`, type: 'success' });
       setIsFormOpen(false);
     } catch (e) {
       setToast({ message: 'Failed to save module.', type: 'error' });
     }
   };
-  
+
   const handleDelete = async () => {
     if (!currentModule) return;
     const newModules = modules.filter(m => m.id !== currentModule.id);
@@ -66,7 +66,7 @@ const ModuleManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+    <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
       <ModuleFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSave={handleSave} initialData={currentModule} />
       <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={handleDelete} title="Confirm Deletion">
@@ -74,7 +74,7 @@ const ModuleManagement: React.FC = () => {
       </Modal>
 
       <AdminPageHeader title="Module Management">
-        <Button onClick={() => { setCurrentModule(null); setIsFormOpen(true); }}><Plus className="mr-2 h-4"/> Add Module</Button>
+        <Button onClick={() => { setCurrentModule(null); setIsFormOpen(true); }}><Plus className="mr-2 h-4" /> Add Module</Button>
       </AdminPageHeader>
 
       {isLoading ? (
@@ -85,15 +85,15 @@ const ModuleManagement: React.FC = () => {
             <div key={module.id} className="bg-page p-4 rounded-lg border border-border flex flex-col">
               <div className="flex-grow">
                 <div className="flex items-center gap-3 mb-2">
-                  <Package className="h-5 w-5 text-accent"/>
+                  <Package className="h-5 w-5 text-accent" />
                   <h4 className="font-bold text-primary-text">{module.name}</h4>
                 </div>
                 <p className="text-sm text-muted mb-3">{module.description}</p>
                 <p className="text-xs font-semibold text-muted">{module.permissions.length} permissions</p>
               </div>
               <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2">
-                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsFormOpen(true); }} title={`Edit ${module.name}`}><Edit className="h-4 w-4"/></Button>
-                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsDeleteModalOpen(true); }} title={`Delete ${module.name}`}><Trash2 className="h-4 w-4 text-red-500"/></Button>
+                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsFormOpen(true); }} title={`Edit ${module.name}`}><Edit className="h-4 w-4" /></Button>
+                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsDeleteModalOpen(true); }} title={`Delete ${module.name}`}><Trash2 className="h-4 w-4 text-red-500" /></Button>
               </div>
             </div>
           ))}

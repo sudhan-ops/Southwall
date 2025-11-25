@@ -12,17 +12,17 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 // New component for status chip
 type InvoiceStatus = 'Not Generated' | 'Generated' | 'Sent' | 'Paid';
 const InvoiceStatusChip: React.FC<{ status?: InvoiceStatus }> = ({ status }) => {
-  if (!status) return <span className="text-xs text-muted">-</span>;
-  // Updated styles for better contrast and UI consistency based on screenshot and UX principles
-  const statusStyles: Record<InvoiceStatus, string> = {
-    'Not Generated': 'bg-slate-700 text-white dark:bg-slate-600 dark:text-slate-200',
-    'Generated': 'bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300',
-    'Sent': 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300',
-    'Paid': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300',
-  };
-  return (
-    <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[status]}`}>{status}</span>
-  );
+    if (!status) return <span className="text-xs text-muted">-</span>;
+    // Updated styles for better contrast and UI consistency based on screenshot and UX principles
+    const statusStyles: Record<InvoiceStatus, string> = {
+        'Not Generated': 'bg-slate-700 text-white dark:bg-slate-600 dark:text-slate-200',
+        'Generated': 'bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300',
+        'Sent': 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300',
+        'Paid': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300',
+    };
+    return (
+        <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[status]}`}>{status}</span>
+    );
 };
 
 // New component for the invoice modal content
@@ -33,7 +33,7 @@ const InvoiceContent: React.FC<{
     roundOff: number,
     setRoundOff: (r: number) => void
 }> = ({ invoiceData, discount, setDiscount, roundOff, setRoundOff }) => {
-    
+
     const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 
     const calculations = useMemo(() => {
@@ -53,7 +53,7 @@ const InvoiceContent: React.FC<{
     if (!calculations) return null;
 
     return (
-         <div className="p-4 bg-white text-black text-[10px] printable-area">
+        <div className="p-4 bg-white text-black text-[10px] printable-area">
             <div className="grid grid-cols-2">
                 <div>
                     <p>Name : {invoiceData.siteName}</p>
@@ -69,7 +69,7 @@ const InvoiceContent: React.FC<{
                         <div className="p-1 border-r border-b border-black">Date</div>
                         <div className="p-1 border-b border-black">{invoiceData.invoiceDate}</div>
                     </div>
-                     <div className="grid grid-cols-2">
+                    <div className="grid grid-cols-2">
                         <div className="p-1 border-r border-b border-black">Month</div>
                         <div className="p-1 border-b border-black">{invoiceData.statementMonth.split('-')[0]}</div>
                     </div>
@@ -79,13 +79,13 @@ const InvoiceContent: React.FC<{
                     </div>
                 </div>
             </div>
-            
+
             <div className="my-4 flex justify-center">
-                <Logo className="h-10"/>
+                <Logo className="h-10" />
             </div>
-            
+
             <h2 className="text-center font-bold text-sm underline mb-2">{invoiceData.siteName} Summary Statement for the month of {invoiceData.statementMonth}</h2>
-            
+
             <table className="w-full border-collapse border border-black">
                 <thead>
                     <tr className="font-bold bg-gray-200">
@@ -99,7 +99,7 @@ const InvoiceContent: React.FC<{
                     </tr>
                 </thead>
                 <tbody>
-                     <tr>
+                    <tr>
                         <td className="border p-1 border-black font-bold" colSpan={7}>SERVICES (01/{format(new Date(invoiceData.statementMonth), 'MM/yyyy')} to {format(new Date(invoiceData.invoiceDate), 'dd/MM/yyyy')})</td>
                     </tr>
                     {invoiceData.lineItems.map((item, index) => {
@@ -107,17 +107,18 @@ const InvoiceContent: React.FC<{
                         const isDeduction = item.description.toLowerCase().includes('deduction');
                         const isSpecial = item.deployment === 0;
                         return (
-                        <tr key={item.id}>
-                            <td className="border p-1 border-black text-center">{index + 1}</td>
-                            <td className={`border p-1 border-black ${isDeduction ? 'text-red-600' : ''}`}>{item.description}</td>
-                            <td className="border p-1 border-black text-center">{isSpecial ? '-' : item.deployment}</td>
-                            <td className="border p-1 border-black text-center">{isSpecial ? '-' : item.noOfDays}</td>
-                            <td className="border p-1 border-black text-right">{isSpecial ? '-' : formatCurrency(item.ratePerDay)}</td>
-                            <td className="border p-1 border-black text-right">{isSpecial ? '-' : formatCurrency(item.ratePerMonth)}</td>
-                            <td className={`border p-1 border-black text-right ${isDeduction ? 'text-red-600' : ''}`}>{formatCurrency(amount)}</td>
-                        </tr>
-                    )})}
-                    {Array.from({length: Math.max(0, 10 - invoiceData.lineItems.length)}).map((_, i) => (
+                            <tr key={item.id}>
+                                <td className="border p-1 border-black text-center">{index + 1}</td>
+                                <td className={`border p-1 border-black ${isDeduction ? 'text-red-600' : ''}`}>{item.description}</td>
+                                <td className="border p-1 border-black text-center">{isSpecial ? '-' : item.deployment}</td>
+                                <td className="border p-1 border-black text-center">{isSpecial ? '-' : item.noOfDays}</td>
+                                <td className="border p-1 border-black text-right">{isSpecial ? '-' : formatCurrency(item.ratePerDay)}</td>
+                                <td className="border p-1 border-black text-right">{isSpecial ? '-' : formatCurrency(item.ratePerMonth)}</td>
+                                <td className={`border p-1 border-black text-right ${isDeduction ? 'text-red-600' : ''}`}>{formatCurrency(amount)}</td>
+                            </tr>
+                        )
+                    })}
+                    {Array.from({ length: Math.max(0, 10 - invoiceData.lineItems.length) }).map((_, i) => (
                         <tr key={`spacer-${i}`}><td className="border p-1 border-black h-6" colSpan={7}></td></tr>
                     ))}
                 </tbody>
@@ -126,38 +127,38 @@ const InvoiceContent: React.FC<{
                         <td colSpan={5} className="border p-1 border-black font-bold">Sub Total</td>
                         <td colSpan={2} className="border p-1 border-black text-right font-bold">{formatCurrency(calculations.subTotal)}</td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td colSpan={5} className="border p-1 border-black">Admin,Overheads and Service Charges 10% on Sub Total</td>
                         <td colSpan={2} className="border p-1 border-black text-right">{formatCurrency(calculations.serviceCharge)}</td>
                     </tr>
-                     <tr className="no-print">
+                    <tr className="no-print">
                         <td colSpan={5} className="border p-1 border-black font-bold text-red-600">Discount</td>
                         <td colSpan={2} className="border p-1 border-black text-right">
                             <Input type="number" value={discount} onChange={e => setDiscount(parseFloat(e.target.value) || 0)} className="text-right !p-1" />
                         </td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td colSpan={5} className="border p-1 border-black font-bold">Grand Total</td>
                         <td colSpan={2} className="border p-1 border-black text-right font-bold">{formatCurrency(calculations.grandTotal)}</td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td colSpan={3} className="border p-1 border-black">Central GST</td>
                         <td colSpan={2} className="border p-1 border-black text-center">9.00%</td>
                         <td colSpan={2} className="border p-1 border-black text-right">{formatCurrency(calculations.gst)}</td>
                     </tr>
-                      <tr>
+                    <tr>
                         <td colSpan={3} className="border p-1 border-black">State GST</td>
                         <td colSpan={2} className="border p-1 border-black text-center">9.00%</td>
                         <td colSpan={2} className="border p-1 border-black text-right">{formatCurrency(calculations.gst)}</td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td colSpan={5} className="border p-1 border-black">Round off</td>
                         <td colSpan={2} className="border p-1 border-black text-right">
-                           <span className="print-only">{formatCurrency(roundOff)}</span>
-                           <span className="no-print"><Input type="number" step="0.01" value={roundOff} onChange={e => setRoundOff(parseFloat(e.target.value) || 0)} className="text-right !p-1" /></span>
+                            <span className="print-only">{formatCurrency(roundOff)}</span>
+                            <span className="no-print"><Input type="number" step="0.01" value={roundOff} onChange={e => setRoundOff(parseFloat(e.target.value) || 0)} className="text-right !p-1" /></span>
                         </td>
-                     </tr>
-                     <tr className="bg-gray-200 font-bold text-base">
+                    </tr>
+                    <tr className="bg-gray-200 font-bold text-base">
                         <td colSpan={5} className="border p-2 border-black">Payable for Services rendered</td>
                         <td colSpan={2} className="border p-2 border-black text-right">{formatCurrency(calculations.finalTotal)}</td>
                     </tr>
@@ -172,10 +173,10 @@ const InvoiceSummary: React.FC = () => {
     const [sites, setSites] = useState<Organization[]>([]);
     const [isLoadingSites, setIsLoadingSites] = useState(true);
     const [isLoadingStatuses, setIsLoadingStatuses] = useState(false);
-    
+
     const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
     const [statuses, setStatuses] = useState<Record<string, InvoiceStatus>>({});
-    
+
     // Modal State
     const [modalState, setModalState] = useState<{
         isOpen: boolean;
@@ -186,14 +187,14 @@ const InvoiceSummary: React.FC = () => {
 
     const [discount, setDiscount] = useState(0);
     const [roundOff, setRoundOff] = useState(0.20);
-    
+
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const pdfRef = useRef<HTMLDivElement>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
         api.getOrganizations()
-            .then(orgs => setSites(orgs.sort((a,b) => a.shortName.localeCompare(b.shortName))))
+            .then(orgs => setSites(orgs.sort((a, b) => a.shortName.localeCompare(b.shortName))))
             .catch(() => setToast({ message: "Failed to load sites.", type: 'error' }))
             .finally(() => setIsLoadingSites(false));
     }, []);
@@ -235,13 +236,13 @@ const InvoiceSummary: React.FC = () => {
             setToast({ message: 'Could not find invoice to export.', type: 'error' });
             return;
         }
-        
+
         setIsGenerating(true);
         try {
             const htmlContent = element.outerHTML;
             const opt = {
                 margin: 0.25,
-                filename: `Invoice_${modalState.invoiceData.siteName.replace(' ','_')}_${modalState.invoiceData.statementMonth}.pdf`,
+                filename: `Invoice_${modalState.invoiceData.siteName.replace(' ', '_')}_${modalState.invoiceData.statementMonth}.pdf`,
                 image: { type: 'jpeg' as const, quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' as const }
@@ -263,14 +264,14 @@ const InvoiceSummary: React.FC = () => {
     };
 
     if (isLoadingSites) {
-        return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-accent"/></div>;
+        return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>;
     }
 
     return (
         <div className="p-4 md:p-0">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-            
-             <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+
+            <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                 <AdminPageHeader title="Invoice Summary" />
 
                 <div className="space-y-6">
@@ -320,11 +321,11 @@ const InvoiceSummary: React.FC = () => {
                     <div className="bg-card rounded-xl shadow-card w-full max-w-4xl m-4 animate-fade-in-scale flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="p-4 border-b flex justify-between items-center no-print">
                             <h3 className="text-lg font-bold text-primary-text">Invoice for {modalState.site?.shortName}</h3>
-                            <Button variant="icon" onClick={closeModal}><X className="h-5 w-5"/></Button>
+                            <Button variant="icon" onClick={closeModal}><X className="h-5 w-5" /></Button>
                         </div>
                         <div className="flex-grow overflow-y-auto p-4 max-h-[70vh]">
                             {modalState.isLoading ? (
-                                <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-accent"/></div>
+                                <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
                             ) : modalState.invoiceData ? (
                                 <div ref={pdfRef}>
                                     <InvoiceContent invoiceData={modalState.invoiceData} discount={discount} setDiscount={setDiscount} roundOff={roundOff} setRoundOff={setRoundOff} />
@@ -333,9 +334,9 @@ const InvoiceSummary: React.FC = () => {
                                 <p className="text-center text-muted">No data to display.</p>
                             )}
                         </div>
-                         <div className="p-4 border-t flex justify-end no-print">
+                        <div className="p-4 border-t flex justify-end no-print">
                             <Button onClick={handleModalDownload} disabled={!modalState.invoiceData || isGenerating}>
-                                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4"/>}
+                                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                                 {isGenerating ? 'Generating...' : 'Download PDF'}
                             </Button>
                         </div>

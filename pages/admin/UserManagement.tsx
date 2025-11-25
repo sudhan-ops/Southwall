@@ -20,11 +20,11 @@ const UserManagement: React.FC = () => {
     const [isUserFormOpen, setIsUserFormOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
-    
+
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const isMobile = useMediaQuery('(max-width: 767px)');
-    
+
     const fetchUsers = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -40,7 +40,7 @@ const UserManagement: React.FC = () => {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
-    
+
     const handleAdd = () => {
         setCurrentUser(null);
         setIsUserFormOpen(true);
@@ -96,7 +96,7 @@ const UserManagement: React.FC = () => {
             setIsSaving(false);
         }
     };
-    
+
     const handleConfirmApproval = async (userId: string, newRole: string) => {
         setIsSaving(true);
         try {
@@ -110,7 +110,7 @@ const UserManagement: React.FC = () => {
             setIsSaving(false);
         }
     };
-    
+
     const handleConfirmDelete = async () => {
         if (currentUser) {
             setIsSaving(true);
@@ -132,9 +132,9 @@ const UserManagement: React.FC = () => {
     }
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-            
+
             <UserForm
                 isOpen={isUserFormOpen}
                 onClose={() => setIsUserFormOpen(false)}
@@ -160,9 +160,9 @@ const UserManagement: React.FC = () => {
             >
                 Are you sure you want to delete the user "{currentUser?.name}"? This action cannot be undone.
             </Modal>
-            
+
             <AdminPageHeader title="User Management">
-                 <Button onClick={handleAdd}><Plus className="mr-2 h-4 w-4" /> Add User</Button>
+                <Button onClick={handleAdd}><Plus className="mr-2 h-4 w-4" /> Add User</Button>
             </AdminPageHeader>
 
             <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg text-sm">
@@ -171,10 +171,10 @@ const UserManagement: React.FC = () => {
                     <div>
                         <h4 className="font-semibold">Adding New Users</h4>
                         <p className="mt-1">
-                          Use the <strong>Add User</strong> button below to create a new user. Provide their name, email, role and a temporary password. The system will automatically provision their login, send them a verification email and create their profile.
+                            Use the <strong>Add User</strong> button below to create a new user. Provide their name, email, role and a temporary password. The system will automatically provision their login, send them a verification email and create their profile.
                         </p>
                         <p className="mt-2">
-                          Once they confirm their email they can sign in using the password you set. You can edit or delete users at any time from this page.
+                            Once they confirm their email they can sign in using the password you set. You can edit or delete users at any time from this page.
                         </p>
                     </div>
                 </div>

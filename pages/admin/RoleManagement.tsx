@@ -36,7 +36,7 @@ export const allPermissions: { key: Permission; name: string; description: strin
     { key: 'view_invoice_summary', name: 'View Invoice Summary', description: 'View and generate monthly invoices for sites.' },
     { key: 'view_own_attendance', name: 'View Own Attendance', description: 'Allows users to see their own attendance records.' },
     { key: 'view_verification_costing', name: 'View Verification Costing', description: 'Analyze costs associated with third-party document verifications.' },
-] as const].sort((a,b) => a.name.localeCompare(b.name));
+] as const].sort((a, b) => a.name.localeCompare(b.name));
 
 const RoleManagement: React.FC = () => {
     const { permissions, setRolePermissions, addRolePermissionEntry, removeRolePermissionEntry, renameRolePermissionEntry } = usePermissionsStore();
@@ -107,7 +107,7 @@ const RoleManagement: React.FC = () => {
             renameRolePermissionEntry(currentRole.id, newId);
             setToast({ message: "Role renamed.", type: 'success' });
         } else {
-             if (roles.some(r => r.id === newId)) {
+            if (roles.some(r => r.id === newId)) {
                 setToast({ message: `A role with ID '${newId}' already exists.`, type: 'error' });
                 return;
             }
@@ -119,10 +119,10 @@ const RoleManagement: React.FC = () => {
             setToast({ message: "Role added successfully.", type: 'success' });
         }
     };
-    
+
     const handleDeleteRole = async () => {
         if (!currentRole || currentRole.id === 'admin') {
-             setToast({ message: "This role cannot be deleted.", type: 'error' });
+            setToast({ message: "This role cannot be deleted.", type: 'error' });
             setIsDeleteModalOpen(false);
             return;
         }
@@ -139,7 +139,7 @@ const RoleManagement: React.FC = () => {
         const assigned = new Set(modules.flatMap(m => m.permissions));
         return allPermissions.filter(p => !assigned.has(p.key));
     }, [modules]);
-    
+
     const renderPermissionRow = (permInfo: { key: Permission; name: string; description: string; }) => (
         <tr key={permInfo.key}>
             <td data-label="Permission" className="px-4 py-4">
@@ -169,7 +169,7 @@ const RoleManagement: React.FC = () => {
     );
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <RoleNameModal
                 isOpen={isNameModalOpen}
@@ -195,7 +195,7 @@ const RoleManagement: React.FC = () => {
             <p className="text-muted text-sm -mt-4 mb-6">
                 Assign permissions to user roles. Changes are saved automatically.
             </p>
-            
+
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm responsive-table">
                     <thead className="bg-page">
@@ -212,8 +212,8 @@ const RoleManagement: React.FC = () => {
                                                 </button>
                                                 {activeDropdown === role.id && (
                                                     <div ref={dropdownRef} className="absolute right-0 mt-2 w-32 bg-card border rounded-md shadow-lg z-10">
-                                                        <button onClick={() => { setIsEditing(true); setCurrentRole(role); setIsNameModalOpen(true); setActiveDropdown(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-page flex items-center"><Edit className="mr-2 h-4 w-4"/>Rename</button>
-                                                        <button onClick={() => { setCurrentRole(role); setIsDeleteModalOpen(true); setActiveDropdown(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-page flex items-center text-red-600"><Trash2 className="mr-2 h-4 w-4"/>Delete</button>
+                                                        <button onClick={() => { setIsEditing(true); setCurrentRole(role); setIsNameModalOpen(true); setActiveDropdown(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-page flex items-center"><Edit className="mr-2 h-4 w-4" />Rename</button>
+                                                        <button onClick={() => { setCurrentRole(role); setIsDeleteModalOpen(true); setActiveDropdown(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-page flex items-center text-red-600"><Trash2 className="mr-2 h-4 w-4" />Delete</button>
                                                     </div>
                                                 )}
                                             </div>
@@ -235,22 +235,22 @@ const RoleManagement: React.FC = () => {
                             {modules.map(module => (
                                 <tbody key={module.id} className="divide-y divide-border">
                                     <tr className="bg-page/50">
-                                      <td colSpan={roles.length + 1} className="p-2 font-bold text-primary-text">{module.name}</td>
+                                        <td colSpan={roles.length + 1} className="p-2 font-bold text-primary-text">{module.name}</td>
                                     </tr>
                                     {module.permissions.map(permKey => {
-                                      const permInfo = allPermissionDetailsMap.get(permKey);
-                                      return permInfo ? renderPermissionRow(permInfo) : null;
+                                        const permInfo = allPermissionDetailsMap.get(permKey);
+                                        return permInfo ? renderPermissionRow(permInfo) : null;
                                     })}
                                 </tbody>
-                              ))}
-                              {unassignedPermissions.length > 0 && (
+                            ))}
+                            {unassignedPermissions.length > 0 && (
                                 <tbody className="divide-y divide-border">
                                     <tr className="bg-page/50">
-                                      <td colSpan={roles.length + 1} className="p-2 font-bold text-primary-text">Uncategorized</td>
+                                        <td colSpan={roles.length + 1} className="p-2 font-bold text-primary-text">Uncategorized</td>
                                     </tr>
                                     {unassignedPermissions.map(renderPermissionRow)}
                                 </tbody>
-                              )}
+                            )}
                         </>
                     )}
                 </table>

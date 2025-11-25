@@ -84,7 +84,7 @@ const AttendanceSettings: React.FC = () => {
     };
 
     return (
-        <div className="p-4 md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full">
+        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             <AdminPageHeader title="Attendance & Leave Rules">

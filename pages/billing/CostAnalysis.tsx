@@ -73,7 +73,7 @@ const CostAnalysis: React.FC = () => {
 
     const [editableCosts, setEditableCosts] = useState<VerificationCosts>(costsFromStore);
     const [isConfigDirty, setIsConfigDirty] = useState(false);
-    
+
     const [dateRange, setDateRange] = useState<Range[]>([{
         startDate: subDays(new Date(), 29), // Default to Last 30 days
         endDate: new Date(),
@@ -82,7 +82,7 @@ const CostAnalysis: React.FC = () => {
     const [activeDateFilter, setActiveDateFilter] = useState('Last 30 Days');
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const datePickerRef = useRef<HTMLDivElement>(null);
-    
+
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const pdfRef = useRef<HTMLDivElement>(null);
     const isMobile = useMediaQuery('(max-width: 767px)');
@@ -122,7 +122,7 @@ const CostAnalysis: React.FC = () => {
     useEffect(() => {
         setEditableCosts(costsFromStore);
     }, [costsFromStore]);
-    
+
     useEffect(() => {
         setIsConfigDirty(JSON.stringify(editableCosts) !== JSON.stringify(costsFromStore));
     }, [editableCosts, costsFromStore]);
@@ -152,7 +152,7 @@ const CostAnalysis: React.FC = () => {
         updateVerificationCosts(editableCosts);
         setToast({ message: 'Costs updated successfully!', type: 'success' });
     };
-    
+
     const processedData = useMemo(() => {
         const costsMap = new Map(costsFromStore.map(c => [c.name, c.cost]));
         return data.map(submission => {
@@ -179,7 +179,7 @@ const CostAnalysis: React.FC = () => {
 
     const verificationUsageBreakdown = useMemo(() => {
         const usage: { [key: string]: { count: number; total: number } } = {};
-        
+
         processedData.forEach(sub => {
             sub.breakdown.forEach(item => {
                 if (!usage[item.name]) {
@@ -224,13 +224,13 @@ const CostAnalysis: React.FC = () => {
         }
         // CSV logic would go here if implemented
     };
-    
+
     const dateFilters = [
         { label: 'Today', value: 'Today' },
         { label: 'Last 7 Days', value: 'Last 7 Days' },
         { label: 'Last 30 Days', value: 'Last 30 Days' },
     ];
-    
+
     const handleSetDateFilter = (filter: string) => {
         const end = new Date();
         let start = new Date();
@@ -253,9 +253,9 @@ const CostAnalysis: React.FC = () => {
     return (
         <div className="p-4 space-y-6">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-            
+
             <AdminPageHeader title="Verification Costing">
-                 <div className="w-full sm:w-auto">
+                <div className="w-full sm:w-auto">
                     <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:flex-wrap">
                         <Button onClick={() => handleExport('pdf')} variant="outline" size="sm" disabled={isGenerating || isLoading || processedData.length === 0}>
                             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
@@ -267,9 +267,9 @@ const CostAnalysis: React.FC = () => {
                             </Button>
                         ))}
                         <div className="relative" ref={datePickerRef}>
-                            <Button 
-                                variant={activeDateFilter === 'Custom' ? 'outline' : 'secondary'} 
-                                size="sm" 
+                            <Button
+                                variant={activeDateFilter === 'Custom' ? 'outline' : 'secondary'}
+                                size="sm"
                                 onClick={() => { setIsDatePickerOpen(prev => !prev); setActiveDateFilter('Custom'); }}
                                 className="w-full justify-center"
                             >
@@ -294,11 +294,11 @@ const CostAnalysis: React.FC = () => {
             <div className="bg-card p-4 md:p-6 rounded-xl shadow-card">
                 <details className="group">
                     <summary className="cursor-pointer flex justify-between items-center list-none">
-                        <h3 className="text-lg font-semibold flex items-center gap-2 text-primary-text"><Settings className="h-5 w-5 text-muted"/> Cost Configuration</h3>
+                        <h3 className="text-lg font-semibold flex items-center gap-2 text-primary-text"><Settings className="h-5 w-5 text-muted" /> Cost Configuration</h3>
                         <ChevronDown className="transition-transform group-open:rotate-180" />
                     </summary>
                     <div className="mt-4 pt-4 border-t">
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             {editableCosts.map((item) => (
                                 <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
                                     <div className="col-span-12 sm:col-span-6">
@@ -331,22 +331,22 @@ const CostAnalysis: React.FC = () => {
                             <Button type="button" variant="outline" size="sm" onClick={handleAddItem}>
                                 <Plus className="mr-2 h-4" /> Add Cost Item
                             </Button>
-                            <Button onClick={handleSaveCosts} disabled={!isConfigDirty}><Save className="mr-2 h-4"/> Save Costs</Button>
+                            <Button onClick={handleSaveCosts} disabled={!isConfigDirty}><Save className="mr-2 h-4" /> Save Costs</Button>
                         </div>
                     </div>
                 </details>
             </div>
-            
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <StatCard title="Total Verification Cost" value={`₹${summaryStats.totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={IndianRupee} />
                 <StatCard title="Total Verified Employees" value={summaryStats.totalEmployees} icon={Users} />
                 <StatCard title="Avg. Cost Per Employee" value={`₹${summaryStats.averageCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={IndianRupee} />
             </div>
 
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+            <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                 <h3 className="text-lg font-semibold mb-4 text-primary-text">Verification Usage Breakdown</h3>
                 {isLoading ? (
-                    <div className="flex justify-center items-center h-24"><Loader2 className="h-6 w-6 animate-spin text-muted"/></div>
+                    <div className="flex justify-center items-center h-24"><Loader2 className="h-6 w-6 animate-spin text-muted" /></div>
                 ) : verificationUsageBreakdown.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {verificationUsageBreakdown.map(item => (
@@ -361,18 +361,18 @@ const CostAnalysis: React.FC = () => {
                     <p className="text-center text-muted py-8">No verification data for this period.</p>
                 )}
             </div>
-            
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+
+            <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                 <div className="flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-primary-text">Detailed Report</h3>
                 </div>
-                 <div ref={pdfRef} className="mt-4 pt-4 border-t border-border">
+                <div ref={pdfRef} className="mt-4 pt-4 border-t border-border">
                     {isMobile ? (
                         isLoading ? <MobileReportSkeleton /> :
-                        processedData.length === 0 ? <p className="text-center text-muted py-8">No report data for this period.</p> :
-                        <div className="space-y-4">
-                            {processedData.map(item => <CostReportCard key={item.id} item={item} />)}
-                        </div>
+                            processedData.length === 0 ? <p className="text-center text-muted py-8">No report data for this period.</p> :
+                                <div className="space-y-4">
+                                    {processedData.map(item => <CostReportCard key={item.id} item={item} />)}
+                                </div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-border responsive-table">
@@ -386,7 +386,7 @@ const CostAnalysis: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     {isLoading ? (
-                                        <tr><td colSpan={4} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted mx-auto"/></td></tr>
+                                        <tr><td colSpan={4} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin text-muted mx-auto" /></td></tr>
                                     ) : processedData.length === 0 ? (
                                         <tr><td colSpan={4} className="text-center py-10 text-muted">No report data for this period.</td></tr>
                                     ) : (

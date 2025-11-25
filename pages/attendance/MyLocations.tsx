@@ -286,7 +286,7 @@ const MyLocations: React.FC = () => {
     <div className="p-4 md:p-6 w-full">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
-      <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+      <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
         <h2 className="text-2xl font-bold mb-4 flex items-center">
           <MapPin className="h-6 w-6 mr-2" /> My Locations
         </h2>

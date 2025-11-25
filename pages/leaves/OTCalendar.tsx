@@ -73,7 +73,7 @@ const OTCalendar: React.FC = () => {
     const startDay = getDay(startOfMonth(currentDate)); // 0-6
 
     return (
-        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border border-border bg-white p-3 rounded-xl shadow-sm w-full">
+        <div className="md:bg-card md:p-3 md:rounded-xl md:shadow-card border-0 bg-transparent p-3 rounded-xl shadow-none w-full">
             <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-primary-text">OT Calendar</h3>
                 <div className="flex items-center gap-1">

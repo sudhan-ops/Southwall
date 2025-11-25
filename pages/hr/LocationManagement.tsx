@@ -239,7 +239,7 @@ const LocationManagement: React.FC = () => {
   return (
     <div className="p-4 md:p-6 w-full">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-      <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+      <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
         <AdminPageHeader title="Location Management" />
         <p className="text-muted -mt-4 mb-6">Define geofenced locations and assign them to staff. Only check‑ins within these locations will be accepted.</p>
       </div>

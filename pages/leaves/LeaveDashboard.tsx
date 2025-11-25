@@ -322,7 +322,7 @@ const LeaveDashboard: React.FC = () => {
                 </div>
             )}
 
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
+            <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
                 <div className="mb-6">
                     <div className="w-full sm:w-auto md:border-b border-border">
                         <nav className="flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" aria-label="Tabs">
@@ -373,7 +373,7 @@ const LeaveDashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div className="md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
+            <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card w-full md:w-full">
                 <h3 className="text-lg font-semibold mb-4 text-primary-text">Compensatory Off Tracker</h3>
                 {isCompOffHistoryDisabled ? (
                     <div className="text-center py-10 text-muted bg-page rounded-lg">
