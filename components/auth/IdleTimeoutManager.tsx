@@ -7,8 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { ShieldAlert } from 'lucide-react';
 
-const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-const PROMPT_TIMEOUT = 60 * 1000; // 60 seconds
+// Desktop/Web: 30 minutes of inactivity before showing warning
+const IDLE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+// User has 2 minutes to respond to the warning before auto-logout
+const PROMPT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
 export const IdleTimeoutManager: React.FC = () => {
     const { logout } = useAuthStore();

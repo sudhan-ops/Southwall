@@ -324,10 +324,31 @@ const ProfilePage: React.FC = () => {
 
                             {isAttendanceLoading ? (
                                 <div className="flex items-center justify-center text-muted h-[56px]"><Loader2 className="h-6 w-6 animate-spin" /></div>
-                            ) : isCheckedIn ? (
-                                <Button onClick={handleSlideConfirm} variant="danger" className="w-full !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" isLoading={isActionInProgress}><LogOut className="mr-3 h-6 w-6" /> Check Out</Button>
                             ) : (
-                                <Button onClick={handleSlideConfirm} variant="primary" className="w-full !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" isLoading={isActionInProgress}><LogIn className="mr-3 h-6 w-6" /> Check In</Button>
+                                <div className="flex gap-3">
+                                    <Button 
+                                        onClick={() => {
+                                            setConfirmationAction('check-in');
+                                            setIsConfirmationModalOpen(true);
+                                        }} 
+                                        variant="primary" 
+                                        className="flex-1 !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" 
+                                        disabled={isCheckedIn || isActionInProgress}
+                                    >
+                                        <LogIn className="mr-3 h-6 w-6" /> Check In
+                                    </Button>
+                                    <Button 
+                                        onClick={() => {
+                                            setConfirmationAction('check-out');
+                                            setIsConfirmationModalOpen(true);
+                                        }} 
+                                        variant="danger" 
+                                        className="flex-1 !py-4 text-lg font-bold shadow-lg transition-all rounded-2xl" 
+                                        disabled={!isCheckedIn || isActionInProgress}
+                                    >
+                                        <LogOut className="mr-3 h-6 w-6" /> Check Out
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </section>
@@ -427,10 +448,31 @@ const ProfilePage: React.FC = () => {
 
                             {isAttendanceLoading ? (
                                 <div className="flex items-center justify-center h-[56px] bg-gray-50 rounded-xl"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div>
-                            ) : isCheckedIn ? (
-                                <Button onClick={handleAttendanceAction} variant="danger" className="w-full !py-3 text-base md:text-lg shadow-lg shadow-red-100 hover:shadow-red-200 transition-all" isLoading={isActionInProgress}><LogOut className="mr-2 h-5 w-5" /> Check Out</Button>
                             ) : (
-                                <Button onClick={handleAttendanceAction} variant="primary" className="w-full !py-3 text-base md:text-lg shadow-lg shadow-emerald-100 hover:shadow-emerald-200 transition-all" isLoading={isActionInProgress}><LogIn className="mr-2 h-5 w-5" /> Check In</Button>
+                                <div className="flex gap-4">
+                                    <Button 
+                                        onClick={() => {
+                                            setConfirmationAction('check-in');
+                                            setIsConfirmationModalOpen(true);
+                                        }} 
+                                        variant="primary" 
+                                        className="flex-1 !py-3 text-base md:text-lg shadow-lg shadow-emerald-100 hover:shadow-emerald-200 transition-all" 
+                                        disabled={isCheckedIn || isActionInProgress}
+                                    >
+                                        <LogIn className="mr-2 h-5 w-5" /> Check In
+                                    </Button>
+                                    <Button 
+                                        onClick={() => {
+                                            setConfirmationAction('check-out');
+                                            setIsConfirmationModalOpen(true);
+                                        }} 
+                                        variant="danger" 
+                                        className="flex-1 !py-3 text-base md:text-lg shadow-lg shadow-red-100 hover:shadow-red-200 transition-all" 
+                                        disabled={!isCheckedIn || isActionInProgress}
+                                    >
+                                        <LogOut className="mr-2 h-5 w-5" /> Check Out
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </div>

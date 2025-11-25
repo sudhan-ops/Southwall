@@ -19,6 +19,22 @@ import { useAuthStore } from '../../store/authStore';
  * Locations can then be assigned to specific users so check‑ins/out only occur
  * when within range.  All existing locations are listed in a table for review.
  */
+
+// Helper function to calculate distance between two coordinates in meters
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371e3; // Earth radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+};
 const LocationManagement: React.FC = () => {
   const { user } = useAuthStore();
   const [locations, setLocations] = useState<Location[]>([]);
@@ -111,6 +127,20 @@ const LocationManagement: React.FC = () => {
     }
     try {
       const address = newAddress || (await reverseGeocode(latNum, lonNum));
+
+      if (!editingLocationId) {
+        // Check for duplicate location before creating (within 10 meters)
+        const isDuplicate = locations.some(loc => {
+          const distance = calculateDistance(latNum, lonNum, loc.latitude, loc.longitude);
+          return distance < 10; // Consider as duplicate if within 10 meters
+        });
+
+        if (isDuplicate) {
+          setToast({ message: 'A location already exists at these coordinates. Please use a different location.', type: 'error' });
+          return;
+        }
+      }
+
       if (editingLocationId) {
         // Editing existing location
         await api.updateLocation(editingLocationId, {
@@ -141,9 +171,10 @@ const LocationManagement: React.FC = () => {
       setNewLongitude('');
       setNewAddress('');
       await refreshLocations();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setToast({ message: editingLocationId ? 'Failed to update location.' : 'Failed to create location.', type: 'error' });
+      const errorMessage = err?.message || (editingLocationId ? 'Failed to update location.' : 'Failed to create location.');
+      setToast({ message: errorMessage, type: 'error' });
     }
   };
 
@@ -165,7 +196,7 @@ const LocationManagement: React.FC = () => {
     }
   };
 
-  // Begin editing a location: populate form fields with its values
+  // Begin editing a location: populate form fields with its values and scroll to form
   const handleEditLocation = (loc: Location) => {
     setEditingLocationId(loc.id);
     setNewName(loc.name || '');
@@ -173,6 +204,9 @@ const LocationManagement: React.FC = () => {
     setNewLatitude(loc.latitude.toString());
     setNewLongitude(loc.longitude.toString());
     setNewAddress(loc.address || '');
+
+    // Scroll to the top of the page to show the edit form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Cancel editing and reset form fields
@@ -186,15 +220,19 @@ const LocationManagement: React.FC = () => {
   };
 
   // Delete a location after confirming
+  // This will also remove the location from all users who have it assigned
   const handleDeleteLocation = async (locId: string) => {
-    if (!window.confirm('Are you sure you want to delete this location?')) return;
+    if (!window.confirm('Are you sure you want to delete this location? This will remove it from all users and the database.')) return;
     try {
+      // The API deleteLocation should cascade delete from user_locations table
+      // If it doesn't, we need to manually remove user assignments first
       await api.deleteLocation(locId);
-      setToast({ message: 'Location deleted.', type: 'success' });
+      setToast({ message: 'Location deleted successfully from all users and database.', type: 'success' });
       await refreshLocations();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setToast({ message: 'Failed to delete location.', type: 'error' });
+      const errorMessage = err?.message || 'Failed to delete location.';
+      setToast({ message: errorMessage, type: 'error' });
     }
   };
 

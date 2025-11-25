@@ -17,15 +17,16 @@ import UploadDocument from '../../components/UploadDocument';
 import AttendanceCalendar from './AttendanceCalendar';
 import CompOffCalendar from './CompOffCalendar';
 import OTCalendar from './OTCalendar';
+import EmployeeLog from './EmployeeLog';
 
 // --- Reusable Components ---
 
 const LeaveBalanceCard: React.FC<{ title: string; value: string; icon: React.ElementType }> = ({ title, value, icon: Icon }) => (
-    <div className="bg-card p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 border border-border text-left">
-        <div className="bg-accent-light p-2 md:p-3 rounded-full">
+    <div className="bg-card p-3 md:p-4 rounded-xl flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4 border border-border text-center md:text-left w-full">
+        <div className="bg-accent-light p-2 md:p-3 rounded-full flex-shrink-0">
             <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent-dark" />
         </div>
-        <div>
+        <div className="flex-1">
             <p className="text-xs md:text-sm text-muted font-medium">{title}</p>
             <p className="text-lg md:text-2xl font-bold text-primary-text">{value}</p>
         </div>
@@ -297,7 +298,7 @@ const LeaveDashboard: React.FC = () => {
                 )}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center md:justify-items-start">
                 {balanceCards.map(b => <LeaveBalanceCard key={b.title} {...b} />)}
                 {/* Show Overtime card only for field officers */}
                 {user?.role === 'field_officer' && (
@@ -415,6 +416,9 @@ const LeaveDashboard: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Employee Attendance Log */}
+            <EmployeeLog />
         </div>
     );
 };
