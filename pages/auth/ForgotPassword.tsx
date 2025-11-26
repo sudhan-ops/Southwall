@@ -48,7 +48,7 @@ const ForgotPassword = () => {
         if (resetError) {
             // For security, Supabase often returns a generic success message even if the user doesn't exist.
             // But we handle specific errors if they occur.
-             if (resetError.message.includes('rate limit')) {
+            if (resetError.message.includes('rate limit')) {
                 setError('Too many requests. Please wait a while before trying again.');
             } else {
                 // Show a generic success message to prevent user enumeration
@@ -74,8 +74,8 @@ const ForgotPassword = () => {
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                 <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none z-10" />
                     <Input
                         id="email"
                         type="email"
@@ -83,10 +83,10 @@ const ForgotPassword = () => {
                         placeholder="Email Address"
                         registration={register('email')}
                         error={errors.email?.message}
-                        className="pl-11 !bg-white/10 !text-white !border-white/20 placeholder:!text-gray-300"
+                        className="!pl-12 !bg-white/10 !text-white !border-white/20 placeholder:!text-gray-400 focus:!border-[#22c55e] !py-3 !rounded-xl transition-all"
                     />
                 </div>
-                
+
                 {error && <p className="text-sm text-red-400 text-center">{error}</p>}
 
                 <div>

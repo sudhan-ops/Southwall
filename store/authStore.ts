@@ -23,7 +23,7 @@ const getFriendlyAuthError = (errorMessage: string): string => {
         return 'Network issue please check your network';
     }
     if (errorMessage.includes('Invalid login credentials')) {
-        return 'Invalid email or password. If you signed up with Google, please use the "Sign in with Google" button.';
+        return 'Invalid email or password. If you signed up with Google and haven\'t set a password yet, please use "Forgot password" to set one, or sign in with Google.';
     }
     if (errorMessage.includes('User already registered')) {
         return 'An account with this email address already exists. Please sign in or reset your password.';
