@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, NavLink, Navigate, useLocation } from 'react-router-dom';
-import { ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, ShieldCheck, LayoutDashboard, ClipboardCheck, Map as MapIcon, ClipboardList, User, Briefcase, ListTodo, Building, Users, Shirt, Settings, GitBranch, Calendar, CalendarCheck2, ShieldHalf, FileDigit, GitPullRequest, Home, BriefcaseBusiness, UserPlus, IndianRupee, PackagePlus, LifeBuoy, MapPin, ArrowLeft } from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, ChevronDown, ChevronUp, ShieldCheck, LayoutDashboard, ClipboardCheck, Map as MapIcon, ClipboardList, User, Briefcase, ListTodo, Building, Users, Shirt, Settings, GitBranch, Calendar, CalendarCheck2, ShieldHalf, FileDigit, GitPullRequest, Home, BriefcaseBusiness, UserPlus, IndianRupee, PackagePlus, LifeBuoy, MapPin, ArrowLeft, Navigation } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import Logo from '../ui/Logo';
@@ -48,17 +48,31 @@ export const allNavLinks: NavLinkConfig[] = [
     // Manage geofenced locations for attendance
     { to: '/hr/locations', label: 'Geo Locations', icon: MapPin, permission: 'manage_attendance_rules' },
     // User‑specific geofencing management
-    { to: '/attendance/locations', label: 'My Locations', icon: MapPin, permission: 'view_own_attendance' },
+    { to: '/attendance/locations', label: 'My Locations', icon: Navigation, permission: 'view_own_attendance' },
 ];
 
 
-const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void, hideHeader?: boolean, mode?: 'light' | 'dark' }> = ({ isCollapsed, onLinkClick, hideHeader = false, mode = 'light' }) => {
+const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void, onExpand?: () => void, hideHeader?: boolean, mode?: 'light' | 'dark', isMobile?: boolean }> = ({ isCollapsed, onLinkClick, onExpand, hideHeader = false, mode = 'light', isMobile = false }) => {
     const { user } = useAuthStore();
     const { permissions } = usePermissionsStore();
     const availableNavLinks = user ? allNavLinks
         .filter(link => permissions[user.role]?.includes(link.permission))
         .sort((a, b) => a.label.localeCompare(b.label))
         : [];
+
+    const handleLinkClick = (e: React.MouseEvent) => {
+        // On mobile, if collapsed, clicking an icon should expand the sidebar instead of navigating
+        if (isMobile && isCollapsed && onExpand) {
+            e.preventDefault();
+            onExpand();
+            return;
+        }
+
+        // Otherwise (expanded or desktop), proceed with navigation and trigger onLinkClick (which collapses on mobile)
+        if (onLinkClick) {
+            onLinkClick();
+        }
+    };
 
     return (
         <div className="flex flex-col">
@@ -78,7 +92,9 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
             {!hideHeader && (
                 <div className="p-4 border-b border-gray-200 bg-white flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0">
                     {isCollapsed ? (
-                        <ShieldCheck className="h-8 w-8 text-accent" />
+                        <div className="h-8 w-8 overflow-hidden">
+                            <Logo className="h-8 max-w-none object-left object-cover" />
+                        </div>
                     ) : (
                         <Logo />
                     )}
@@ -89,7 +105,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                     <NavLink
                         key={link.to}
                         to={link.to}
-                        onClick={onLinkClick}
+                        onClick={handleLinkClick}
                         className={({ isActive }) =>
                             `group flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out ${isCollapsed ? 'justify-center' : ''} ${mode === 'light'
                                 ? isActive
@@ -106,7 +122,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                 ? { backgroundColor: '#006B3F', borderColor: '#005632' }
                                 : {}; // Dark mode bg is handled by class
                         }}
-                        title={isCollapsed ? link.label : undefined}
+                        title={link.label}
                     >
                         {({ isActive }) => (
                             <>
@@ -133,15 +149,21 @@ const MainLayout: React.FC = () => {
     const { permissions } = usePermissionsStore();
     const { autoScrollOnHover } = useUiSettingsStore();
     const location = useLocation();
+    const isMobile = useMediaQuery('(max-width: 767px)');
 
     const mainContentRef = useRef<HTMLDivElement>(null);
     const pageScrollIntervalRef = useRef<number | null>(null);
 
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    // Initialize sidebar state based on device type. 
+    // On mobile, start collapsed (true). On desktop, start expanded (false).
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Default to true to prevent flash
     const [scrollPosition, setScrollPosition] = useState(0);
     const [showScrollButtons, setShowScrollButtons] = useState(false);
 
-    const isMobile = useMediaQuery('(max-width: 767px)');
+    // Update sidebar state when switching between mobile/desktop
+    useEffect(() => {
+        setIsSidebarCollapsed(isMobile);
+    }, [isMobile]);
 
     const stopPageScrolling = useCallback(() => {
         if (pageScrollIntervalRef.current !== null) {
@@ -213,13 +235,15 @@ const MainLayout: React.FC = () => {
             )}
 
             {/* Sidebar - Overlay on mobile, fixed on desktop */}
-            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? 'bg-[#041b0f] border-r border-[#1f3d2b]' : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-30' : ''}`}>
+            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? 'bg-[#041b0f] border-r border-[#1f3d2b]' : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarContent
                         isCollapsed={isSidebarCollapsed}
                         mode={isMobile ? "dark" : "light"}
                         onLinkClick={isMobile ? () => setIsSidebarCollapsed(true) : undefined}
+                        onExpand={() => setIsSidebarCollapsed(false)}
                         hideHeader={isMobile}
+                        isMobile={isMobile}
                     />
                 </div>
                 <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? 'border-t border-[#1f3d2b]' : 'border-t border-border'}`}>

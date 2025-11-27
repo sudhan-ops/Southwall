@@ -41,6 +41,7 @@ import RoleManagement from './pages/admin/RoleManagement';
 import ModuleManagement from './pages/admin/ModuleManagement';
 import { ApiSettings } from './pages/developer/ApiSettings';
 import OperationsDashboard from './pages/operations/OperationsDashboard';
+import TeamActivity from './pages/operations/TeamActivity';
 // FIX: The file 'pages/site/SiteDashboard.tsx' is empty and not a module. The correct component is in 'pages/site/OrganizationDashboard.tsx'.
 import SiteDashboard from './pages/site/OrganizationDashboard';
 import ProfilePage from './pages/profile/ProfilePage';
@@ -85,6 +86,7 @@ import Review from './pages/onboarding/Review';
 // Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { IdleTimeoutManager } from './components/auth/IdleTimeoutManager';
+import ScrollToTop from './components/ScrollToTop';
 
 // Theme Manager
 const ThemeManager: React.FC = () => {
@@ -401,6 +403,7 @@ const App: React.FC = () => {
   // Once initialized, render the main application structure.
   return (
     <>
+      <ScrollToTop />
       <ThemeManager />
       {user && <IdleTimeoutManager />}
       <Routes>
@@ -486,6 +489,7 @@ const App: React.FC = () => {
           {/* Operations & Site */}
           <Route element={<ProtectedRoute requiredPermission="view_operations_dashboard" />}>
             <Route path="operations/dashboard" element={<OperationsDashboard />} />
+            <Route path="operations/team-activity" element={<TeamActivity />} />
           </Route>
           <Route element={<ProtectedRoute requiredPermission="view_site_dashboard" />}>
             <Route path="site/dashboard" element={<SiteDashboard />} />

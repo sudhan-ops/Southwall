@@ -49,6 +49,10 @@ export interface Organization {
   address: string;
   manpowerApprovedCount?: number;
   provisionalCreationDate?: string;
+  reportingManagerName?: string;
+  managerName?: string;
+  fieldOfficerNames?: string[];
+  backendFieldOfficerNames?: string[];
 }
 
 export interface User {

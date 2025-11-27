@@ -386,7 +386,6 @@ export const api = {
       console.warn('Failed to compute user availability:', e);
     }
     return allUsers
-      .filter(u => ['hr', 'operation_manager', 'admin', 'developer', 'site_manager'].includes(u.role))
       .map(u => ({ ...u, isAvailable: availability[u.id] ?? false }));
   },
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../../services/api';
 import type { Organization, SiteConfiguration, Entity, ManpowerDetail, SiteStaffDesignation } from '../../types';
 import Button from '../../components/ui/Button';
-import { Plus, Edit, Trash2, Eye, Loader2, Upload, Download, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Loader2, Upload, Download, CheckCircle, AlertCircle, Building, Users, Settings } from 'lucide-react';
 import AddSiteFromClientForm from '../../components/admin/AddSiteFromClientForm';
 import Modal from '../../components/ui/Modal';
 import Toast from '../../components/ui/Toast';
@@ -18,13 +18,18 @@ import { useSettingsStore } from '../../store/settingsStore';
 import { differenceInDays } from 'date-fns';
 import Input from '../../components/ui/Input';
 
-const siteCsvColumns = ['id', 'shortName', 'fullName', 'address', 'manpowerApprovedCount'];
+const siteCsvColumns = ['id', 'shortName', 'fullName', 'address', 'manpowerApprovedCount', 'reportingManagerName', 'managerName', 'fieldOfficerNames', 'backendFieldOfficerNames'];
 
 const toCSV = (data: Record<string, any>[], columns: string[]): string => {
     const header = columns.join(',');
     const rows = data.map(row =>
         columns.map(col => {
-            const val = row[col] === null || row[col] === undefined ? '' : String(row[col]);
+            let val = row[col];
+            // Handle array fields (like fieldOfficerNames)
+            if (Array.isArray(val)) {
+                val = val.join(';');
+            }
+            val = val === null || val === undefined ? '' : String(val);
             if (val.includes(',') || val.includes('"') || val.includes('\n')) {
                 return `"${val.replace(/"/g, '""')}"`;
             }
@@ -178,10 +183,13 @@ export const SiteManagement: React.FC = () => {
             await api.createOrganization(newSite);
             setToast({ message: `Provisional site '${name}' created.`, type: 'success' });
             fetchData();
-        } catch (e) {
-            setToast({ message: 'Failed to create site.', type: 'error' });
+        } catch (e: any) {
+            console.error('Error creating site:', e);
+            const errorMessage = e?.message || e?.error?.message || 'Failed to create site.';
+            setToast({ message: `Failed to create site: ${errorMessage}`, type: 'error' });
         }
     };
+
 
     const handleAddSite = (client: Entity, manpowerCount: number) => {
         if (organizations.some(org => org.id === client.organizationId)) {
@@ -293,6 +301,10 @@ export const SiteManagement: React.FC = () => {
                     fullName: row.fullName,
                     address: row.address,
                     manpowerApprovedCount: parseFloat(row.manpowerApprovedCount) || 0,
+                    reportingManagerName: row.reportingManagerName || undefined,
+                    managerName: row.managerName || undefined,
+                    fieldOfficerNames: row.fieldOfficerNames ? row.fieldOfficerNames.split(';').map((s: string) => s.trim()).filter((s: string) => s) : undefined,
+                    backendFieldOfficerNames: row.backendFieldOfficerNames ? row.backendFieldOfficerNames.split(';').map((s: string) => s.trim()).filter((s: string) => s) : undefined,
                 }));
 
                 const { count } = await api.bulkUploadOrganizations(newOrgs);
@@ -402,6 +414,130 @@ export const SiteManagement: React.FC = () => {
                                 Export
                             </Button>
                         </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Organizations Table */}
+            <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+                {isLoading ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <tbody className="divide-y divide-border">
+                                <TableSkeleton cols={5} rows={5} />
+                            </tbody>
+                        </table>
+                    </div>
+                ) : organizations.length === 0 ? (
+                    <div className="p-8 text-center text-muted">
+                        <Building className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                        <p>No sites found. Add a new site to get started.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-muted/50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Site Name</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Location</th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium text-muted uppercase tracking-wider">Manpower</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Key Staff</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {organizations.map((org) => {
+                                    const config = siteConfigs.find(c => c.organizationId === org.id);
+                                    const isProvisional = !!org.provisionalCreationDate;
+                                    const daysLeft = isProvisional && org.provisionalCreationDate
+                                        ? 90 - differenceInDays(new Date(), new Date(org.provisionalCreationDate))
+                                        : 0;
+
+                                    return (
+                                        <tr key={org.id} className="hover:bg-muted/5 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center">
+                                                    <div>
+                                                        <div className="font-medium text-primary-text">{org.shortName}</div>
+                                                        <div className="text-xs text-muted">{org.fullName}</div>
+                                                        {isProvisional && (
+                                                            <div className={`mt-1 text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${daysLeft > 30 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                                                                <AlertCircle className="w-3 h-3" />
+                                                                {daysLeft > 0 ? `${daysLeft} days left` : 'Expired'}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-primary-text max-w-xs truncate" title={org.address}>
+                                                    {org.address}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {org.manpowerApprovedCount || 0}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-xs space-y-1">
+                                                    {org.reportingManagerName && (
+                                                        <div className="flex items-center gap-1" title="Reporting Manager">
+                                                            <span className="font-semibold text-primary-text">RM:</span> {org.reportingManagerName}
+                                                        </div>
+                                                    )}
+                                                    {org.managerName && (
+                                                        <div className="flex items-center gap-1" title="Site Manager">
+                                                            <span className="font-semibold text-primary-text">SM:</span> {org.managerName}
+                                                        </div>
+                                                    )}
+                                                    {org.fieldOfficerNames && org.fieldOfficerNames.length > 0 && (
+                                                        <div className="flex items-start gap-1" title="Field Officers">
+                                                            <span className="font-semibold text-primary-text whitespace-nowrap">FO:</span>
+                                                            <span className="truncate max-w-[150px]">{org.fieldOfficerNames.join(', ')}</span>
+                                                        </div>
+                                                    )}
+                                                    {org.backendFieldOfficerNames && org.backendFieldOfficerNames.length > 0 && (
+                                                        <div className="flex items-start gap-1" title="Backend Field Officers">
+                                                            <span className="font-semibold text-primary-text whitespace-nowrap">BFO:</span>
+                                                            <span className="truncate max-w-[150px]">{org.backendFieldOfficerNames.join(', ')}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right whitespace-nowrap">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="icon"
+                                                        size="sm"
+                                                        onClick={() => handleViewDetails(org)}
+                                                        title="Manpower Details"
+                                                    >
+                                                        <Users className="w-4 h-4 text-blue-600" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="icon"
+                                                        size="sm"
+                                                        onClick={() => handleEdit(org)}
+                                                        title="Configure Site"
+                                                    >
+                                                        <Settings className="w-4 h-4 text-gray-600" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="icon"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(org)}
+                                                        title="Delete Site"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-red-600" />
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>
