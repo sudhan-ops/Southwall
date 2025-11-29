@@ -206,14 +206,14 @@ const ApprovalWorkflow: React.FC = () => {
 
                         {/* 2D Workflow Chart */}
                         {activeTab === '2d' && (
-                            <div className="border border-border rounded-lg overflow-hidden bg-white" style={{ height: '700px' }}>
+                            <div className="border border-border rounded-lg overflow-auto bg-white h-[618px] w-full relative">
                                 <WorkflowChart2D users={users} />
                             </div>
                         )}
 
                         {/* 3D Workflow Chart */}
                         {activeTab === '3d' && (
-                            <div className="border border-border rounded-lg overflow-hidden bg-white" style={{ height: '700px' }}>
+                            <div className="border border-border rounded-lg overflow-auto bg-white h-[618px] w-full relative">
                                 <WorkflowChart3D users={users} />
                             </div>
                         )}

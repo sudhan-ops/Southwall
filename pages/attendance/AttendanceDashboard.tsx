@@ -836,7 +836,8 @@ const AttendanceDashboard: React.FC = () => {
                         // Sort events
                         dayEvents.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
                         const checkInEvent = dayEvents.find(e => e.type === 'check-in');
-                        const checkOutEvent = dayEvents.find(e => e.type === 'check-out');
+                        // Use the last check-out of the day to capture full duration
+                        const checkOutEvent = [...dayEvents].reverse().find(e => e.type === 'check-out');
 
                         if (checkInEvent) checkIn = format(new Date(checkInEvent.timestamp), 'hh:mm a');
                         if (checkOutEvent) {
@@ -987,7 +988,8 @@ const AttendanceDashboard: React.FC = () => {
                 Object.values(userEvents).forEach(ue => {
                     ue.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
                     const checkIn = ue.find(e => e.type === 'check-in');
-                    const checkOut = ue.find(e => e.type === 'check-out');
+                    // Use the last check-out of the day
+                    const checkOut = [...ue].reverse().find(e => e.type === 'check-out');
 
                     if (checkIn && checkOut) {
                         const diff = differenceInMinutes(new Date(checkOut.timestamp), new Date(checkIn.timestamp));
@@ -1166,7 +1168,8 @@ const AttendanceDashboard: React.FC = () => {
                     const sortedEvents = [...dayEvents].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
                     const checkInEvent = sortedEvents.find(e => e.type === 'check-in');
-                    const checkOutEvent = sortedEvents.find(e => e.type === 'check-out');
+                    // Use the last check-out of the day
+                    const checkOutEvent = [...sortedEvents].reverse().find(e => e.type === 'check-out');
 
                     if (checkInEvent) {
                         status = 'Present';
