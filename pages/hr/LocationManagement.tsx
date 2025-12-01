@@ -342,7 +342,7 @@ const LocationManagement: React.FC = () => {
                       </div>
                       <div className="flex gap-2">
                         <button type="button" className="text-blue-500 hover:text-blue-700 p-1" title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-5 w-5" /></button>
-                        <button type="button" className="text-red-500 hover:text-red-700 p-1" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-5 w-5" /></button>
+                        <button type="button" className="p-2 hover:bg-red-500/10 rounded-full transition-colors" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-5 w-5 text-red-500" /></button>
                       </div>
                     </div>
                     <div className="mt-4 pt-4 border-t border-border grid grid-cols-2 gap-4 text-sm">
@@ -380,7 +380,7 @@ const LocationManagement: React.FC = () => {
                         <td className="p-3">{loc.createdAt ? new Date(loc.createdAt).toLocaleString() : '-'}</td>
                         <td className="p-3 whitespace-nowrap">
                           <button type="button" className="text-blue-600 hover:text-blue-800 mr-3" title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-4 w-4" /></button>
-                          <button type="button" className="text-red-600 hover:text-red-800" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-4 w-4" /></button>
+                          <button type="button" className="p-2 hover:bg-red-500/10 rounded-full transition-colors" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-5 w-5 text-red-500" /></button>
                         </td>
                       </tr>
                     ))}

@@ -216,30 +216,32 @@ const AttendanceSettings: React.FC = () => {
                                 } catch (error) {
                                     setToast({ message: 'Failed to add recurring holiday.', type: 'error' });
                                 }
-                            }} size="sm" className="w-auto"><Plus className="mr-2 h-4 w-4" /> Add Rule</Button>
+                            }} size="sm" className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> Add Rule</Button>
                         </div>
                     </div>
                     <div className="mt-4 space-y-2">
                         {recurringHolidays
                             .filter(rule => (rule.type || 'office') === activeTab)
                             .map((rule, index) => (
-                                <div key={rule.id || index} className="flex justify-between items-center p-3 border border-border rounded-lg">
-                                    <div>
-                                        <p className="font-medium">{rule.n === 1 ? '1st' : rule.n === 2 ? '2nd' : rule.n === 3 ? '3rd' : rule.n + 'th'} {rule.day}</p>
+                                <div key={rule.id || index} className="flex justify-between items-start p-4 pr-6 border border-white/10 rounded-lg bg-white/5 mb-2">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-primary-text truncate">{rule.n === 1 ? '1st' : rule.n === 2 ? '2nd' : rule.n === 3 ? '3rd' : rule.n + 'th'} {rule.day}</p>
                                         <p className="text-sm text-muted">Repeats every month</p>
                                     </div>
-                                    <Button variant="icon" size="sm" onClick={async () => {
-                                        if (rule.id) {
-                                            try {
-                                                await removeRecurringHoliday(rule.id);
-                                                setToast({ message: 'Recurring holiday removed successfully.', type: 'success' });
-                                            } catch (error) {
-                                                setToast({ message: 'Failed to remove recurring holiday.', type: 'error' });
+                                    <div className="ml-4 shrink-0">
+                                        <Button variant="icon" onClick={async () => {
+                                            if (rule.id) {
+                                                try {
+                                                    await removeRecurringHoliday(rule.id);
+                                                    setToast({ message: 'Recurring holiday removed successfully.', type: 'success' });
+                                                } catch (error) {
+                                                    setToast({ message: 'Failed to remove recurring holiday.', type: 'error' });
+                                                }
                                             }
-                                        }
-                                    }}>
-                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                    </Button>
+                                        }} className="p-2 hover:bg-red-500/10 rounded-full transition-colors">
+                                            <Trash2 className="h-5 w-5 text-red-500" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))}
                         {recurringHolidays.filter(rule => (rule.type || 'office') === activeTab).length === 0 && (
@@ -255,20 +257,22 @@ const AttendanceSettings: React.FC = () => {
                         <form onSubmit={handleAddHoliday} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                             <Input label="Holiday Name" id="holidayName" value={newHolidayName} onChange={e => setNewHolidayName(e.target.value)} />
                             <DatePicker label="Date" id="holidayDate" value={newHolidayDate} onChange={setNewHolidayDate} />
-                            <Button type="submit" size="sm" className="w-auto"><Plus className="mr-2 h-4 w-4" /> Add</Button>
+                            <Button type="submit" size="sm" className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> Add</Button>
                         </form>
                     </div>
                     <div className="mt-4 space-y-2">
                         {currentHolidays.length > 0 ? (
                             currentHolidays.map(holiday => (
-                                <div key={holiday.id} className="flex justify-between items-center p-3 border border-border rounded-lg">
-                                    <div>
-                                        <p className="font-medium">{holiday.name}</p>
+                                <div key={holiday.id} className="flex justify-between items-start p-4 pr-6 border border-white/10 rounded-lg bg-white/5 mb-2">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-primary-text truncate">{holiday.name}</p>
                                         <p className="text-sm text-muted">{new Date(holiday.date.replace(/-/g, '/')).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                     </div>
-                                    <Button variant="icon" size="sm" onClick={() => removeHoliday(activeTab, holiday.id)} aria-label={`Remove ${holiday.name}`}>
-                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                    </Button>
+                                    <div className="ml-4 shrink-0">
+                                        <Button variant="icon" onClick={() => removeHoliday(activeTab, holiday.id)} aria-label={`Remove ${holiday.name}`} className="p-2 hover:bg-red-500/10 rounded-full transition-colors">
+                                            <Trash2 className="h-5 w-5 text-red-500" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))
                         ) : (

@@ -92,8 +92,8 @@ const ModuleManagement: React.FC = () => {
                 <p className="text-xs font-semibold text-muted">{module.permissions.length} permissions</p>
               </div>
               <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2">
-                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsFormOpen(true); }} title={`Edit ${module.name}`}><Edit className="h-4 w-4" /></Button>
-                <Button variant="icon" size="sm" onClick={() => { setCurrentModule(module); setIsDeleteModalOpen(true); }} title={`Delete ${module.name}`}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                <Button variant="icon" onClick={() => { setCurrentModule(module); setIsFormOpen(true); }} title={`Edit ${module.name}`} className="p-2 hover:bg-blue-500/10 rounded-full transition-colors"><Edit className="h-5 w-5" /></Button>
+                <Button variant="icon" onClick={() => { setCurrentModule(module); setIsDeleteModalOpen(true); }} title={`Delete ${module.name}`} className="p-2 hover:bg-red-500/10 rounded-full transition-colors"><Trash2 className="h-5 w-5 text-red-500" /></Button>
               </div>
             </div>
           ))}

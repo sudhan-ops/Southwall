@@ -541,8 +541,8 @@ const EntityManagement: React.FC = () => {
                                             <Button size="sm" className="!p-1.5" onClick={() => setNameModalState({ isOpen: true, mode: 'add', type: 'company', groupId: group.id, title: `Add Company to ${group.name}`, label: 'Company Name' })} title="Add Company">
                                                 <Plus className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="icon" size="sm" onClick={() => setNameModalState({ isOpen: true, mode: 'edit', type: 'group', id: group.id, initialName: group.name, title: 'Edit Group Name', label: 'Group Name' })} title="Edit group name"><Edit className="h-4 w-4" /></Button>
-                                            <Button variant="icon" size="sm" onClick={() => handleDeleteClick('group', group.id, group.name)} title="Delete group"><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                                            <Button variant="icon" onClick={() => setNameModalState({ isOpen: true, mode: 'edit', type: 'group', id: group.id, initialName: group.name, title: 'Edit Group Name', label: 'Group Name' })} title="Edit group name" className="p-2 hover:bg-blue-500/10 rounded-full transition-colors"><Edit className="h-5 w-5" /></Button>
+                                            <Button variant="icon" onClick={() => handleDeleteClick('group', group.id, group.name)} title="Delete group" className="p-2 hover:bg-red-500/10 rounded-full transition-colors"><Trash2 className="h-5 w-5 text-red-500" /></Button>
                                         </div>
                                     </div>
                                     {expanded[group.id] && (
@@ -557,8 +557,8 @@ const EntityManagement: React.FC = () => {
                                                         <div className="flex items-center gap-2">
                                                             <Button variant="icon" size="sm" title={`View ${company.entities.length} clients`} onClick={() => setViewingClients({ companyName: company.name, clients: company.entities })}><Eye className="h-4 w-4" /></Button>
                                                             <Button variant="icon" size="sm" onClick={() => handleAddClient(company.name)} title="Add client"><Plus className="h-4 w-4" /></Button>
-                                                            <Button variant="icon" size="sm" onClick={() => setNameModalState({ isOpen: true, mode: 'edit', type: 'company', id: company.id, groupId: group.id, initialName: company.name, title: 'Edit Company Name', label: 'Company Name' })} title="Edit company name"><Edit className="h-4 w-4" /></Button>
-                                                            <Button variant="icon" size="sm" onClick={() => handleDeleteClick('company', company.id, company.name)} title="Delete company"><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                                                            <Button variant="icon" onClick={() => setNameModalState({ isOpen: true, mode: 'edit', type: 'company', id: company.id, groupId: group.id, initialName: company.name, title: 'Edit Company Name', label: 'Company Name' })} title="Edit company name" className="p-2 hover:bg-blue-500/10 rounded-full transition-colors"><Edit className="h-5 w-5" /></Button>
+                                                            <Button variant="icon" onClick={() => handleDeleteClick('company', company.id, company.name)} title="Delete company" className="p-2 hover:bg-red-500/10 rounded-full transition-colors"><Trash2 className="h-5 w-5 text-red-500" /></Button>
                                                         </div>
                                                     </div>
                                                     {expanded[company.id] && (
@@ -567,8 +567,8 @@ const EntityManagement: React.FC = () => {
                                                                 <div key={client.id} className="p-2 flex items-center justify-between hover:bg-page rounded">
                                                                     <span>{client.name}</span>
                                                                     <div className="flex items-center gap-1">
-                                                                        <Button variant="icon" size="sm" onClick={() => handleEditClient(client, company.name)}><Edit className="h-4 w-4" /></Button>
-                                                                        <Button variant="icon" size="sm" onClick={() => handleDeleteClick('client', client.id, client.name)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                                                                        <Button variant="icon" onClick={() => handleEditClient(client, company.name)} className="p-2 hover:bg-blue-500/10 rounded-full transition-colors"><Edit className="h-5 w-5" /></Button>
+                                                                        <Button variant="icon" onClick={() => handleDeleteClick('client', client.id, client.name)} className="p-2 hover:bg-red-500/10 rounded-full transition-colors"><Trash2 className="h-5 w-5 text-red-500" /></Button>
                                                                     </div>
                                                                 </div>
                                                             ))}
