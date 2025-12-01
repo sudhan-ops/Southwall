@@ -25,8 +25,8 @@ const MobileHome: React.FC = () => {
 
     return (
         <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4">
-            {/* Header Section */}
-            <div className="bg-[#0d2818] p-6 rounded-3xl shadow-lg -mx-4 -mt-2 pt-8 mb-6">
+            {/* Header Section - No negative margin since main Header is hidden */}
+            <div className="bg-[#0d2818] p-6 rounded-3xl shadow-lg -mx-4 mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className="h-14 w-14 rounded-full border-2 border-[#22c55e]" />

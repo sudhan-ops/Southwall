@@ -37,33 +37,30 @@ const BottomNav: React.FC = () => {
             label: 'Profile',
             icon: User,
             show: true
-        },
+        }
     ];
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-[#0d2818] border-t border-[#1f3d2b] pb-safe z-50">
-            <div className="flex justify-around items-center h-16 px-2">
-                {navItems.filter(item => item.show).slice(0, 5).map((item) => (
+        <nav
+            className="fixed bottom-0 left-0 right-0 bg-[#0d2818] border-t border-[#1f3d2b] z-40"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+            <div className="flex justify-around items-center h-16">
+                {navItems.filter(item => item.show).map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}
                         className={({ isActive }) =>
-                            `flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-white' : 'text-gray-400 hover:text-gray-200'
+                            `flex flex-col items-center justify-center flex-1 h-full transition-colors ${isActive ? 'text-[#22c55e]' : 'text-gray-400'
                             }`
                         }
                     >
-                        {({ isActive }) => (
-                            <>
-                                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-[#006B3F]' : 'bg-transparent'}`}>
-                                    <item.icon className="w-6 h-6" />
-                                </div>
-                                <span className="text-[10px] font-medium">{item.label}</span>
-                            </>
-                        )}
+                        <item.icon className="w-6 h-6" />
+                        <span className="text-xs mt-1">{item.label}</span>
                     </NavLink>
                 ))}
             </div>
-        </div>
+        </nav>
     );
 };
 
