@@ -42,7 +42,7 @@ const Tasks: React.FC = () => {
         };
         fetchData();
     }, [user]);
-    
+
     // In a real app, 'assignedBy' would be part of the Task model.
     // Here, we simulate it for demonstration.
     const getAssignedBy = (taskId: string) => {
@@ -52,12 +52,12 @@ const Tasks: React.FC = () => {
 
     return (
         <div>
-            <header className="p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 bg-[#0f1f0f]/80 backdrop-blur-sm z-10 border-b border-[#374151]">
+            <header className="p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 bg-[#041b0f]/80 backdrop-blur-sm z-10 border-b border-[#374151]">
                 <h1>Tasks</h1>
             </header>
 
             <div className="flex-shrink-0 p-4">
-                 <div className="fo-tabs-container">
+                <div className="fo-tabs-container">
                     <button
                         onClick={() => setActiveTab('tasks')}
                         className={`fo-tab-button ${activeTab === 'tasks' ? 'active' : ''}`}
@@ -102,7 +102,7 @@ const Tasks: React.FC = () => {
                         </div>
                     )
                 ) : (
-                     notifications.length > 0 ? (
+                    notifications.length > 0 ? (
                         <div className="divide-y divide-border">
                             {notifications.map(notif => (
                                 <div key={notif.id} className="fo-notification-item">

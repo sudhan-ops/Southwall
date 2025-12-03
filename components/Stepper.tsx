@@ -30,12 +30,12 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStepIndex, onStepClick,
   const handlePrevPage = () => {
     setCurrentPage(prev => Math.max(prev - 1, 0));
   };
-  
+
   const visibleStepIndices = useMemo(() => {
-      if (!isMobileOptimized) return [];
-      const start = currentPage * itemsPerPage;
-      const end = start + itemsPerPage;
-      return Array.from({ length: steps.length }, (_, i) => i).slice(start, end);
+    if (!isMobileOptimized) return [];
+    const start = currentPage * itemsPerPage;
+    const end = start + itemsPerPage;
+    return Array.from({ length: steps.length }, (_, i) => i).slice(start, end);
   }, [currentPage, itemsPerPage, steps.length, isMobileOptimized]);
 
   if (!isMobileOptimized) {
@@ -43,59 +43,59 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStepIndex, onStepClick,
     const itemSlotPercent = 100 / steps.length;
     const marginPercent = itemSlotPercent / 2;
     return (
-        <nav aria-label="Onboarding Progress" className="py-4">
-            <div className="relative">
-                <div className="absolute top-4 h-1" style={{ left: `${marginPercent}%`, right: `${marginPercent}%` }}>
-                    <div className="w-full h-full bg-border rounded-full" />
-                    <div className="absolute top-0 left-0 h-full bg-accent rounded-full transition-all duration-500 ease-in-out" style={{ width: `${progressPercentage}%` }} />
-                </div>
-                <ol role="list" className="relative flex items-center">
-                    {steps.map((step, index) => {
-                        const isComplete = index < currentStepIndex;
-                        const isCurrent = index === currentStepIndex;
-                        const canClick = index <= highestStepReached;
+      <nav aria-label="Onboarding Progress" className="py-4">
+        <div className="relative">
+          <div className="absolute top-4 h-1" style={{ left: `${marginPercent}%`, right: `${marginPercent}%` }}>
+            <div className="w-full h-full bg-border rounded-full" />
+            <div className="absolute top-0 left-0 h-full bg-accent rounded-full transition-all duration-500 ease-in-out" style={{ width: `${progressPercentage}%` }} />
+          </div>
+          <ol role="list" className="relative flex items-center">
+            {steps.map((step, index) => {
+              const isComplete = index < currentStepIndex;
+              const isCurrent = index === currentStepIndex;
+              const canClick = index <= highestStepReached;
 
-                        return (
-                            <li key={step.key} className="flex-1">
-                                <div className="relative flex flex-col items-center group">
-                                    <button
-                                        type="button"
-                                        onClick={() => canClick && onStepClick(index)}
-                                        disabled={!canClick}
-                                        className="flex flex-col items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent-dark rounded-full disabled:cursor-not-allowed"
-                                        aria-current={isCurrent ? 'step' : undefined}
-                                        title={step.label}
-                                    >
-                                        <div className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 border-2 z-10 ${isComplete ? 'bg-accent border-accent text-white' : ''} ${isCurrent ? 'bg-card border-accent text-accent scale-110' : ''} ${!isComplete && !isCurrent ? 'bg-card border-border text-muted' : ''} ${canClick ? 'group-hover:border-accent-dark' : ''}`}>
-                                            {isComplete ? <Check className="w-5 h-5" /> : React.createElement(step.icon, { className: 'w-5 h-5' })}
-                                        </div>
-                                    </button>
-                                    <span className={`hidden sm:block absolute top-12 w-24 text-center text-xs transition-colors duration-300 ${isCurrent ? 'text-accent font-bold' : 'text-muted'} ${canClick ? 'group-hover:text-primary-text' : ''}`}>{step.label}</span>
-                                </div>
-                            </li>
-                        );
-                    })}
-                </ol>
-            </div>
-        </nav>
+              return (
+                <li key={step.key} className="flex-1">
+                  <div className="relative flex flex-col items-center group">
+                    <button
+                      type="button"
+                      onClick={() => canClick && onStepClick(index)}
+                      disabled={!canClick}
+                      className="flex flex-col items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent-dark rounded-full disabled:cursor-not-allowed"
+                      aria-current={isCurrent ? 'step' : undefined}
+                      title={step.label}
+                    >
+                      <div className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 border-2 z-10 ${isComplete ? 'bg-accent border-accent text-white' : ''} ${isCurrent ? 'bg-card border-accent text-accent scale-110' : ''} ${!isComplete && !isCurrent ? 'bg-card border-border text-muted' : ''} ${canClick ? 'group-hover:border-accent-dark' : ''}`}>
+                        {isComplete ? <Check className="w-5 h-5" /> : React.createElement(step.icon, { className: 'w-5 h-5' })}
+                      </div>
+                    </button>
+                    <span className={`hidden sm:block absolute top-12 w-24 text-center text-xs transition-colors duration-300 ${isCurrent ? 'text-accent font-bold' : 'text-muted'} ${canClick ? 'group-hover:text-primary-text' : ''}`}>{step.label}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </nav>
     );
   }
-  
+
   return (
     <nav aria-label="Onboarding Progress" className="bg-card rounded-2xl mx-4 my-2 p-2 flex items-center gap-1">
-       <button
-          type="button"
-          onClick={handlePrevPage}
-          disabled={currentPage === 0}
-          className="p-2 rounded-full disabled:opacity-30 disabled:cursor-not-allowed text-white hover:bg-white/10"
-          aria-label="Previous steps"
+      <button
+        type="button"
+        onClick={handlePrevPage}
+        disabled={currentPage === 0}
+        className="p-2 rounded-full disabled:opacity-30 disabled:cursor-not-allowed text-white hover:bg-white/10"
+        aria-label="Previous steps"
       >
-          <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-6 w-6" />
       </button>
 
       <div className="flex-1 overflow-hidden">
         <ol role="list" className="flex items-center justify-around">
-            {visibleStepIndices.map(index => {
+          {visibleStepIndices.map(index => {
             const step = steps[index];
             const isComplete = index < currentStepIndex;
             const isCurrent = index === currentStepIndex;
@@ -108,7 +108,7 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStepIndex, onStepClick,
                     type="button"
                     onClick={() => canClick && onStepClick(index)}
                     disabled={!canClick}
-                    className="flex flex-col items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1f0f] focus-visible:ring-emerald-400 rounded-full disabled:cursor-not-allowed"
+                    className="flex flex-col items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-full disabled:cursor-not-allowed"
                     aria-current={isCurrent ? 'step' : undefined}
                     title={step.label}
                   >
@@ -123,18 +123,18 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStepIndex, onStepClick,
                 </div>
               </li>
             );
-            })}
+          })}
         </ol>
       </div>
-      
+
       <button
-          type="button"
-          onClick={handleNextPage}
-          disabled={currentPage >= totalPages - 1}
-          className="p-2 rounded-full disabled:opacity-30 disabled:cursor-not-allowed text-white hover:bg-white/10"
-          aria-label="Next steps"
+        type="button"
+        onClick={handleNextPage}
+        disabled={currentPage >= totalPages - 1}
+        className="p-2 rounded-full disabled:opacity-30 disabled:cursor-not-allowed text-white hover:bg-white/10"
+        aria-label="Next steps"
       >
-          <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-6 w-6" />
       </button>
     </nav>
   );

@@ -24,9 +24,9 @@ const MobileHome: React.FC = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4">
+        <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4 bg-[#041b0f]">
             {/* Header Section - No negative margin since main Header is hidden */}
-            <div className="bg-[#0d2818] p-6 rounded-3xl shadow-lg -mx-4 mb-6">
+            <div className="bg-[#041b0f] p-6 rounded-3xl shadow-lg -mx-4 mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className="h-14 w-14 rounded-full border-2 border-[#22c55e]" />
@@ -48,7 +48,7 @@ const MobileHome: React.FC = () => {
                             onClick={() => navigate(link.to)}
                             className="flex flex-col items-center justify-center p-4 bg-[#041b0f] border border-[#1f3d2b] rounded-2xl active:scale-95 transition-transform duration-150 shadow-md min-h-[110px]"
                         >
-                            <div className="p-3 bg-[#0d2818] rounded-full mb-2 text-[#22c55e]">
+                            <div className="p-3 bg-[#041b0f] rounded-full mb-2 text-[#22c55e]">
                                 <link.icon className="w-7 h-7" />
                             </div>
                             <span className="text-xs text-center text-gray-300 font-medium leading-tight">{link.label}</span>

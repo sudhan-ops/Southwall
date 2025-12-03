@@ -48,18 +48,18 @@ const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }
             esiGmc: esiGmcComplete,
         };
     }, [submission, esiCtcThreshold]);
-    
+
     return (
-        <Link to={`/onboarding/add/personal?id=${submission.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1f0f] focus-visible:ring-emerald-400 rounded-xl">
-            <div className="bg-[#243524] p-3 rounded-xl flex gap-4 items-start border border-transparent hover:border-emerald-500 transition-colors duration-200">
+        <Link to={`/onboarding/add/personal?id=${submission.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-xl">
+            <div className="bg-[#041b0f] md:bg-[#243524] p-3 rounded-xl flex gap-4 items-start border border-transparent hover:border-emerald-500 transition-colors duration-200">
                 <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-600">
                     <ProfilePlaceholder photoUrl={submission.personal.photo?.preview} seed={submission.id} />
                 </div>
                 <div className="flex-grow">
-                     <div className="flex justify-between items-start gap-2">
+                    <div className="flex justify-between items-start gap-2">
                         <p className="font-semibold text-green-400">{`${submission.personal.firstName} ${submission.personal.lastName}`}</p>
                         <div className="flex-shrink-0">
-                           <StatusChip status={submission.status} />
+                            <StatusChip status={submission.status} />
                         </div>
                     </div>
                     <p className="text-sm text-gray-400">{submission.personal.mobile}</p>
@@ -118,7 +118,7 @@ const MySubmissions: React.FC = () => {
     const handleAddNew = () => {
         navigate('/onboarding/select-organization');
     };
-    
+
     const handleSearchIconClick = () => {
         searchInputRef.current?.focus();
     };
@@ -129,10 +129,10 @@ const MySubmissions: React.FC = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col bg-[#0f1f0f] text-white">
+        <div className="h-full flex flex-col bg-[#041b0f] text-white">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-            
-            <header className="p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 bg-[#0f1f0f]/80 backdrop-blur-sm border-b border-[#374151]">
+
+            <header className="p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 bg-[#041b0f]/80 backdrop-blur-sm border-b border-[#374151]">
                 <button onClick={() => navigate('/onboarding')} aria-label="Go back" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
                     <ArrowLeft className="h-6 w-6" />
                 </button>
@@ -149,18 +149,17 @@ const MySubmissions: React.FC = () => {
                     </button>
                 </div>
             </header>
-            
+
             <div className="px-4 pt-4 pb-3 flex-shrink-0">
                 <div className="flex">
                     {filterTabs.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setStatusFilter(tab.key)}
-                            className={`flex-1 py-2 text-sm font-semibold uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1f0f] focus-visible:ring-emerald-400 rounded-sm ${
-                                statusFilter === tab.key
-                                    ? 'border-b-2 border-emerald-400 text-emerald-400'
-                                    : 'border-b-2 border-transparent text-gray-400 hover:text-white'
-                            }`}
+                            className={`flex-1 py-2 text-sm font-semibold uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-sm ${statusFilter === tab.key
+                                ? 'border-b-2 border-emerald-400 text-emerald-400'
+                                : 'border-b-2 border-transparent text-gray-400 hover:text-white'
+                                }`}
                         >
                             {tab.label}
                         </button>
@@ -188,7 +187,7 @@ const MySubmissions: React.FC = () => {
                 ) : filteredSubmissions.length > 0 ? (
                     <div className="space-y-2.5">
                         {filteredSubmissions.map(s => (
-                           <SubmissionCard key={s.id} submission={s} />
+                            <SubmissionCard key={s.id} submission={s} />
                         ))}
                     </div>
                 ) : (

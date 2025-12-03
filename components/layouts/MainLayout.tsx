@@ -224,7 +224,7 @@ const MainLayout: React.FC = () => {
         // `p-8 gap-8`, which caused the sidebar and main content to squeeze on narrow viewports. Now we apply
         // progressively larger spacing on wider screens while keeping things compact on mobile. The `min-h-screen`
         // ensures the container grows as needed instead of forcing a fixed height.
-        <div className={`flex min-h-screen bg-page ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}>
+        <div className={`flex min-h-screen ${isMobile ? 'bg-[#041b0f]' : 'bg-page'} ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}>
 
             {/* Backdrop for mobile when sidebar is expanded */}
             {isMobile && !isSidebarCollapsed && (

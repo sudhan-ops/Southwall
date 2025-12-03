@@ -214,7 +214,7 @@ const ProfilePage: React.FC = () => {
 
     if (isMobileView) {
         return (
-            <div className="p-4 space-y-8">
+            <div className="p-4 space-y-8 md:bg-transparent bg-[#041b0f]">
                 {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
                 {/* Logout Modal removed */}
                 {/* Attendance Confirmation Modal removed */}
@@ -240,7 +240,7 @@ const ProfilePage: React.FC = () => {
 
                     <section className="hidden md:block">
                         <h3 className="fo-section-title mb-4">Appearance</h3>
-                        <div className="p-4 rounded-lg bg-[#243524] border border-[#374151] space-y-4">
+                        <div className="p-4 rounded-lg bg-[#041b0f] md:bg-[#243524] border border-[#374151] space-y-4">
                             <Checkbox
                                 id="theme-automatic-mobile"
                                 label="Automatic"

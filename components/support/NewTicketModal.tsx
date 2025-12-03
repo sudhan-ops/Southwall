@@ -100,13 +100,13 @@ const NewTicketModal: React.FC<NewTicketModalProps> = ({ isOpen, onClose, onSucc
   // Mobile Full-Screen View
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col bg-[#0f1f0f] animate-fade-in-scale">
-        <header className="p-4 flex-shrink-0 flex items-center gap-4 border-b border-[#1f3d2b] bg-[#0d2818]">
+      <div className="fixed inset-0 z-[999] flex flex-col bg-[#041b0f] animate-fade-in-scale">
+        <header className="p-4 flex-shrink-0 flex items-center gap-4 border-b border-[#1f3d2b] bg-[#041b0f]">
           <Button variant="icon" onClick={onClose} aria-label="Close form"><ArrowLeft className="h-6 w-6 text-white" /></Button>
           <h3 className="text-lg font-semibold text-white">Create New Post</h3>
         </header>
 
-        <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0f1f0f]">
+        <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#041b0f]">
           <Input placeholder="Title / Subject" {...register('title')} error={errors.title?.message} className="form-input" />
           <textarea placeholder="Description" {...register('description')} rows={5} className={`form-input ${errors.description ? 'form-input--error' : ''}`} />
 
@@ -150,7 +150,7 @@ const NewTicketModal: React.FC<NewTicketModalProps> = ({ isOpen, onClose, onSucc
           />
         </form>
 
-        <footer className="p-4 flex-shrink-0 flex items-center justify-end gap-3 border-t border-[#1f3d2b] bg-[#0d2818]">
+        <footer className="p-4 flex-shrink-0 flex items-center justify-end gap-3 border-t border-[#1f3d2b] bg-[#041b0f]">
           <Button type="button" onClick={onClose} variant="secondary">Cancel</Button>
           <Button type="submit" form={formId} isLoading={isSubmitting}>Create Post</Button>
         </footer>

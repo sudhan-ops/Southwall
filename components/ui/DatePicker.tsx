@@ -70,7 +70,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, id, error, value, onChan
           <CalendarIcon className="h-4 w-4 text-muted" />
         </div>
         {isOpen && (
-          <div className={`absolute z-50 mt-1 rounded-lg shadow-lg overflow-hidden ${isDark ? 'dark-calendar bg-[#0d2818] border border-[#1f3d2b]' : 'bg-white border border-gray-200'}`}>
+          <div className={`absolute z-50 mt-1 rounded-lg shadow-lg overflow-hidden ${isDark ? 'dark-calendar bg-[#041b0f] border border-[#1f3d2b]' : 'bg-white border border-gray-200'}`}>
             <Calendar
               date={selectedDate}
               onChange={handleDateChange}

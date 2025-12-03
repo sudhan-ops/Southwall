@@ -42,7 +42,7 @@ const BottomNav: React.FC = () => {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 bg-[#0d2818] border-t border-[#1f3d2b] z-40"
+            className="fixed bottom-0 left-0 right-0 bg-[#041b0f] border-t border-[#1f3d2b] z-40"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
             <div className="flex justify-around items-center h-16">

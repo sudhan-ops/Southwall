@@ -35,7 +35,7 @@ const MobileLayout: React.FC = () => {
     }, []);
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#0f1f0f]">
+        <div className="flex flex-col min-h-screen bg-[#041b0f]">
             {/* Mobile Header - Auto-hide on scroll (FAST) */}
             <div
                 className={`sticky top-0 z-50 transition-transform duration-200 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'

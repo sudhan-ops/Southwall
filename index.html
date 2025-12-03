@@ -447,6 +447,8 @@
     }
 
     @media (max-width: 768px) {
+
+      html,
       body {
         background-color: #041b0f !important;
       }
@@ -454,6 +456,12 @@
 
     #root {
       min-height: 143vh;
+    }
+
+    @media (max-width: 768px) {
+      #root {
+        background-color: #041b0f !important;
+      }
     }
 
     /* Override Tailwind's screen height utilities to account for zoom */
@@ -853,14 +861,14 @@
       main,
       [class*="page"],
       [class*="container"] {
-        background-color: #0f1f0f !important;
+        background-color: #041b0f !important;
       }
 
       /* Light gray backgrounds to dark green */
       .bg-gray-50,
       .bg-gray-100,
       .bg-page {
-        background-color: #0f1f0f !important;
+        background-color: #041b0f !important;
       }
 
       /* Remove shadows on mobile */
@@ -1872,7 +1880,7 @@
     }
 
     .pro-dark-theme .fo-attendance-card {
-      background-color: #243524;
+      background-color: #041b0f;
       border: 1px solid #374151;
       border-radius: 12px;
       padding: 1rem;

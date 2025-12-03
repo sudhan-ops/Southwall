@@ -1400,7 +1400,7 @@ const AttendanceDashboard: React.FC = () => {
 
     if (isEmployeeView) {
         return (
-            <div className="p-4 space-y-6 pb-24">
+            <div className="p-4 space-y-6 pb-24 md:bg-transparent bg-[#041b0f]">
                 <div className="flex flex-col gap-4">
                     <h2 className="text-2xl font-bold text-primary-text">My Attendance</h2>
 
