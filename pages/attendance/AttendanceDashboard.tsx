@@ -757,6 +757,7 @@ const AttendanceDashboard: React.FC = () => {
 
     const [selectedUser, setSelectedUser] = useState<string>('all');
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [selectedRecordType, setSelectedRecordType] = useState<string>('all');
     const [reportType, setReportType] = useState<'basic' | 'log' | 'monthly'>('basic');
     const [isDownloading, setIsDownloading] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -1203,12 +1204,33 @@ const AttendanceDashboard: React.FC = () => {
         });
 
         // Apply status filter
-        const filteredData = selectedStatus === 'all'
+        let filteredData = selectedStatus === 'all'
             ? data
             : data.filter(row => row.status === selectedStatus);
 
+        // Apply record type filter
+        if (selectedRecordType !== 'all') {
+            filteredData = filteredData.filter(row => {
+                const hasCheckIn = row.checkIn && row.checkIn !== '-' && row.checkIn !== '';
+                const hasCheckOut = row.checkOut && row.checkOut !== '-' && row.checkOut !== '';
+
+                switch (selectedRecordType) {
+                    case 'complete':
+                        return hasCheckIn && hasCheckOut;
+                    case 'missing_checkout':
+                        return hasCheckIn && !hasCheckOut;
+                    case 'missing_checkin':
+                        return !hasCheckIn && hasCheckOut;
+                    case 'incomplete':
+                        return !hasCheckIn || !hasCheckOut;
+                    default:
+                        return true;
+                }
+            });
+        }
+
         return filteredData;
-    }, [users, attendanceEvents, dateRange, selectedUser, selectedStatus, recurringHolidays]);
+    }, [users, attendanceEvents, dateRange, selectedUser, selectedStatus, selectedRecordType, recurringHolidays]);
 
     // 2. Attendance Log Data (Raw Events)
     const attendanceLogData: AttendanceLogDataRow[] = useMemo(() => {
@@ -1660,6 +1682,21 @@ const AttendanceDashboard: React.FC = () => {
                             <option value="On Leave (Half)">On Leave (Half)</option>
                             <option value="Holiday">Holiday</option>
                             <option value="Weekend">Weekend</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Record Type</label>
+                        <select
+                            className="border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-green-500 outline-none max-w-[200px]"
+                            value={selectedRecordType}
+                            onChange={(e) => setSelectedRecordType(e.target.value)}
+                        >
+                            <option value="all">All Records</option>
+                            <option value="complete">Complete (Check-in & Check-out)</option>
+                            <option value="missing_checkout">Missing Check-out</option>
+                            <option value="missing_checkin">Missing Check-in</option>
+                            <option value="incomplete">Incomplete (Any Missing)</option>
                         </select>
                     </div>
                 </div>
