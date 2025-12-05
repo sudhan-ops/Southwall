@@ -202,7 +202,7 @@ const AddTaskPage: React.FC = () => {
                                         control={control}
                                         render={({ field }) => (
                                             <DatePicker
-                                                label={isDark ? "" : "Due Date"}
+                                                label=""
                                                 id="dueDate"
                                                 value={field.value}
                                                 onChange={field.onChange}
@@ -216,7 +216,7 @@ const AddTaskPage: React.FC = () => {
 
                                 <div>
                                     <label htmlFor="priority" className={labelStyle}>Priority</label>
-                                    <Select label={isDark ? undefined : "Priority"} id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
+                                    <Select id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
                                         <option value="Low" className={isDark ? "bg-[#041b0f]" : ""}>Low</option>
                                         <option value="Medium" className={isDark ? "bg-[#041b0f]" : ""}>Medium</option>
                                         <option value="High" className={isDark ? "bg-[#041b0f]" : ""}>High</option>
@@ -225,7 +225,7 @@ const AddTaskPage: React.FC = () => {
 
                                 <div>
                                     <label htmlFor="assignedToId" className={labelStyle}>Assign To</label>
-                                    <Select label={isDark ? undefined : "Assign To"} id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
+                                    <Select id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
                                         <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
                                         {users.map(user => (
                                             <option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
@@ -301,7 +301,7 @@ const AddTaskPage: React.FC = () => {
                                 control={control}
                                 render={({ field }) => (
                                     <DatePicker
-                                        label={isDark ? "" : "Due Date"}
+                                        label=""
                                         id="dueDate"
                                         value={field.value}
                                         onChange={field.onChange}
@@ -315,7 +315,7 @@ const AddTaskPage: React.FC = () => {
 
                         <div>
                             <label htmlFor="priority" className={labelStyle}>Priority</label>
-                            <Select label={isDark ? undefined : "Priority"} id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
+                            <Select id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
                                 <option value="Low" className={isDark ? "bg-[#041b0f]" : ""}>Low</option>
                                 <option value="Medium" className={isDark ? "bg-[#041b0f]" : ""}>Medium</option>
                                 <option value="High" className={isDark ? "bg-[#041b0f]" : ""}>High</option>
@@ -324,7 +324,7 @@ const AddTaskPage: React.FC = () => {
 
                         <div className="md:col-span-2">
                             <label htmlFor="assignedToId" className={labelStyle}>Assign To</label>
-                            <Select label={isDark ? undefined : "Assign To"} id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
+                            <Select id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
                                 <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
                                 {users.map(user => (
                                     <option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
@@ -340,7 +340,7 @@ const AddTaskPage: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label htmlFor="escalationLevel1UserId" className={labelStyle}>Escalation Level 1</label>
-                                <Select label={isDark ? undefined : "Escalation Level 1"} id="escalationLevel1UserId" registration={register('escalationLevel1UserId')} error={errors.escalationLevel1UserId?.message} className={inputStyle}>
+                                <Select id="escalationLevel1UserId" registration={register('escalationLevel1UserId')} error={errors.escalationLevel1UserId?.message} className={inputStyle}>
                                     <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
                                     {users.map(user => (<option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name}</option>))}
                                 </Select>
@@ -349,13 +349,13 @@ const AddTaskPage: React.FC = () => {
                             {watchEscalationL1User && (
                                 <div>
                                     <label htmlFor="escalationLevel1DurationDays" className={labelStyle}>Days until L1 Escalation</label>
-                                    <Input label={isDark ? undefined : "Days until L1 Escalation"} id="escalationLevel1DurationDays" type="number" registration={register('escalationLevel1DurationDays')} error={errors.escalationLevel1DurationDays?.message} className={inputStyle} />
+                                    <Input id="escalationLevel1DurationDays" type="number" registration={register('escalationLevel1DurationDays')} error={errors.escalationLevel1DurationDays?.message} className={inputStyle} />
                                 </div>
                             )}
 
                             <div>
                                 <label htmlFor="escalationLevel2UserId" className={labelStyle}>Escalation Level 2</label>
-                                <Select label={isDark ? undefined : "Escalation Level 2"} id="escalationLevel2UserId" registration={register('escalationLevel2UserId')} error={errors.escalationLevel2UserId?.message} className={inputStyle}>
+                                <Select id="escalationLevel2UserId" registration={register('escalationLevel2UserId')} error={errors.escalationLevel2UserId?.message} className={inputStyle}>
                                     <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
                                     {users.map(user => (<option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name}</option>))}
                                 </Select>
@@ -364,19 +364,19 @@ const AddTaskPage: React.FC = () => {
                             {watchEscalationL2User && (
                                 <div>
                                     <label htmlFor="escalationLevel2DurationDays" className={labelStyle}>Days until L2 Escalation</label>
-                                    <Input label={isDark ? undefined : "Days until L2 Escalation"} id="escalationLevel2DurationDays" type="number" registration={register('escalationLevel2DurationDays')} error={errors.escalationLevel2DurationDays?.message} className={inputStyle} />
+                                    <Input id="escalationLevel2DurationDays" type="number" registration={register('escalationLevel2DurationDays')} error={errors.escalationLevel2DurationDays?.message} className={inputStyle} />
                                 </div>
                             )}
 
                             <div className="md:col-span-2">
                                 <label htmlFor="escalationEmail" className={labelStyle}>Final Escalation Email</label>
-                                <Input label={isDark ? undefined : "Final Escalation Email"} id="escalationEmail" type="email" registration={register('escalationEmail')} error={errors.escalationEmail?.message} className={inputStyle} placeholder={isDark ? "Enter email address" : ""} />
+                                <Input id="escalationEmail" type="email" registration={register('escalationEmail')} error={errors.escalationEmail?.message} className={inputStyle} placeholder={isDark ? "Enter email address" : ""} />
                             </div>
 
                             {watchEscalationEmail && (
                                 <div className="md:col-span-2">
                                     <label htmlFor="escalationEmailDurationDays" className={labelStyle}>Days until Final Escalation</label>
-                                    <Input label={isDark ? undefined : "Days until Final Escalation"} id="escalationEmailDurationDays" type="number" registration={register('escalationEmailDurationDays')} error={errors.escalationEmailDurationDays?.message} className={inputStyle} />
+                                    <Input id="escalationEmailDurationDays" type="number" registration={register('escalationEmailDurationDays')} error={errors.escalationEmailDurationDays?.message} className={inputStyle} />
                                 </div>
                             )}
                         </div>
