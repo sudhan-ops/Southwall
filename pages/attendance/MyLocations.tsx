@@ -327,6 +327,12 @@ const MyLocations: React.FC = () => {
     setEditingLocationId(null);
   };
 
+  // Filter unique locations by address for display (show only one entry per unique address)
+  const uniqueLocations = locations.filter((loc, index, self) => {
+    if (!loc.address) return true;
+    return index === self.findIndex((t) => t.address === loc.address);
+  });
+
   return (
     <div className="p-4 md:p-6 w-full">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
@@ -507,7 +513,7 @@ const MyLocations: React.FC = () => {
           <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-1 md:gap-4">
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
-              {locations.map((loc) => (
+              {uniqueLocations.map((loc) => (
                 <div key={loc.id} className="bg-card rounded-lg shadow-card p-4 border border-border">
                   <div className="flex justify-between items-start">
                     <div>
@@ -564,7 +570,7 @@ const MyLocations: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {locations.map((loc) => (
+                  {uniqueLocations.map((loc) => (
                     <tr key={loc.id} className="border-b border-border">
                       <td className="p-3">{loc.name || '-'}</td>
                       <td className="p-3">{loc.radius}</td>

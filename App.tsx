@@ -55,6 +55,7 @@ import AttendanceSettings from './pages/hr/AttendanceSettings';
 import LeaveDashboard from './pages/leaves/LeaveDashboard';
 import LeaveManagement from './pages/hr/LeaveManagement';
 import ApprovalWorkflow from './pages/admin/ApprovalWorkflow';
+import WorkflowChartFullScreen from './pages/admin/WorkflowChartFullScreen';
 import TaskManagement from './pages/tasks/TaskManagement';
 import EntityManagement from './pages/hr/EntityManagement';
 import PoliciesAndInsurance from './pages/hr/PoliciesAndInsurance';
@@ -507,6 +508,7 @@ const App: React.FC = () => {
           </Route>
           <Route element={<ProtectedRoute requiredPermission="manage_approval_workflow" />}>
             <Route path="admin/approval-workflow" element={<ApprovalWorkflow />} />
+            <Route path="admin/approval-workflow/chart" element={<WorkflowChartFullScreen />} />
           </Route>
 
           {/* Developer */}

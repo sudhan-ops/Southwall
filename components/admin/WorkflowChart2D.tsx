@@ -70,21 +70,23 @@ const WorkflowChart2D: React.FC<WorkflowChart2DProps> = ({ users }) => {
     };
 
     // Calculate tree layout (top-down hierarchical) with better spacing
+    // Calculate tree layout (Left-to-Right hierarchical)
     const calculateLayout = (
         nodes: WorkflowNode[],
-        startX = 0,
-        startY = 150,
+        startX = 50,
+        startY = 50,
         level = 0
     ): {
-        width: number;
+        height: number;
         nodes: WorkflowNode[];
         bounds: { minX: number; maxX: number; minY: number; maxY: number };
     } => {
-        const HORIZONTAL_SPACING = 250; // Increased from 200
-        const VERTICAL_SPACING = 200; // Increased from 180
+        const HORIZONTAL_SPACING = 200;
+        const VERTICAL_SPACING = 40; // Spacing between siblings vertically
+        const NODE_HEIGHT = 120;
         const NODE_WIDTH = 180;
 
-        let currentX = startX;
+        let currentY = startY;
         const allNodes: WorkflowNode[] = [];
         let minX = Infinity,
             maxX = -Infinity,
@@ -95,44 +97,44 @@ const WorkflowChart2D: React.FC<WorkflowChart2DProps> = ({ users }) => {
             node.level = level;
 
             if (node.children && node.children.length > 0) {
-                const childLayout = calculateLayout(node.children, currentX, startY + VERTICAL_SPACING, level + 1);
+                const childLayout = calculateLayout(node.children, startX + NODE_WIDTH + HORIZONTAL_SPACING, currentY, level + 1);
 
-                // Center parent above children
-                const childrenWidth = childLayout.width;
-                const parentX = currentX + childrenWidth / 2 - NODE_WIDTH / 2;
+                // Center parent vertically relative to children
+                const childrenHeight = childLayout.height;
+                const parentY = currentY + childrenHeight / 2 - NODE_HEIGHT / 2;
 
-                node.x = parentX;
-                node.y = startY;
+                node.x = startX;
+                node.y = parentY;
 
                 allNodes.push(node);
                 allNodes.push(...childLayout.nodes);
 
                 // Update bounds
-                minX = Math.min(minX, parentX, childLayout.bounds.minX);
-                maxX = Math.max(maxX, parentX + NODE_WIDTH, childLayout.bounds.maxX);
-                minY = Math.min(minY, startY, childLayout.bounds.minY);
-                maxY = Math.max(maxY, startY + 120, childLayout.bounds.maxY);
+                minX = Math.min(minX, startX, childLayout.bounds.minX);
+                maxX = Math.max(maxX, startX + NODE_WIDTH, childLayout.bounds.maxX);
+                minY = Math.min(minY, parentY, childLayout.bounds.minY);
+                maxY = Math.max(maxY, parentY + NODE_HEIGHT, childLayout.bounds.maxY);
 
-                currentX += childrenWidth + HORIZONTAL_SPACING;
+                currentY += childrenHeight + VERTICAL_SPACING;
             } else {
                 // Leaf node
-                node.x = currentX;
-                node.y = startY;
+                node.x = startX;
+                node.y = currentY;
                 allNodes.push(node);
 
                 // Update bounds
-                minX = Math.min(minX, currentX);
-                maxX = Math.max(maxX, currentX + NODE_WIDTH);
-                minY = Math.min(minY, startY);
-                maxY = Math.max(maxY, startY + 120);
+                minX = Math.min(minX, startX);
+                maxX = Math.max(maxX, startX + NODE_WIDTH);
+                minY = Math.min(minY, currentY);
+                maxY = Math.max(maxY, currentY + NODE_HEIGHT);
 
-                currentX += NODE_WIDTH + HORIZONTAL_SPACING;
+                currentY += NODE_HEIGHT + VERTICAL_SPACING;
             }
         });
 
-        const totalWidth = Math.max(0, currentX - startX - HORIZONTAL_SPACING);
+        const totalHeight = Math.max(0, currentY - startY - VERTICAL_SPACING);
         return {
-            width: Math.max(totalWidth, NODE_WIDTH),
+            height: Math.max(totalHeight, NODE_HEIGHT),
             nodes: allNodes,
             bounds: { minX: isFinite(minX) ? minX : 0, maxX: isFinite(maxX) ? maxX : NODE_WIDTH, minY: isFinite(minY) ? minY : 0, maxY: isFinite(maxY) ? maxY : 300 },
         };
@@ -142,10 +144,10 @@ const WorkflowChart2D: React.FC<WorkflowChart2DProps> = ({ users }) => {
     const drawConnection = (ctx: CanvasRenderingContext2D, from: WorkflowNode, to: WorkflowNode, time: number) => {
         if (from.x === undefined || from.y === undefined || to.x === undefined || to.y === undefined) return;
 
-        const fromX = (from.x + 90) * zoom + offset.x;
-        const fromY = (from.y + 60) * zoom + offset.y;
-        const toX = (to.x + 90) * zoom + offset.x;
-        const toY = (to.y - 10) * zoom + offset.y;
+        const fromX = (from.x + 180) * zoom + offset.x; // Right side of parent
+        const fromY = (from.y + 60) * zoom + offset.y;  // Center Y
+        const toX = (to.x) * zoom + offset.x;           // Left side of child
+        const toY = (to.y + 60) * zoom + offset.y;      // Center Y
 
         // Animated gradient
         const gradient = ctx.createLinearGradient(fromX, fromY, toX, toY);
@@ -164,8 +166,8 @@ const WorkflowChart2D: React.FC<WorkflowChart2DProps> = ({ users }) => {
         // Draw smooth curved connection
         ctx.beginPath();
         ctx.moveTo(fromX, fromY);
-        const midY = (fromY + toY) / 2;
-        ctx.bezierCurveTo(fromX, midY, toX, midY, toX, toY);
+        const midX = (fromX + toX) / 2;
+        ctx.bezierCurveTo(midX, fromY, midX, toY, toX, toY);
         ctx.stroke();
         ctx.restore();
 
@@ -174,8 +176,8 @@ const WorkflowChart2D: React.FC<WorkflowChart2DProps> = ({ users }) => {
         const t = flowT;
 
         const p0 = { x: fromX, y: fromY };
-        const p1 = { x: fromX, y: midY };
-        const p2 = { x: toX, y: midY };
+        const p1 = { x: (fromX + toX) / 2, y: fromY };
+        const p2 = { x: (fromX + toX) / 2, y: toY };
         const p3 = { x: toX, y: toY };
 
         // Cubic bezier interpolation

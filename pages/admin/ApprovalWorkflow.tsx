@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import type { User, UserRole, Role } from '../../types';
-import { Loader2, Save, Table, Network, Box } from 'lucide-react';
+import { Loader2, Save, Table, Network, Maximize2 } from 'lucide-react';
 import Select from '../../components/ui/Select';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import WorkflowChart2D from '../../components/admin/WorkflowChart2D';
-// @ts-ignore - TS Language Server cache issue, file exists and works at runtime
-import WorkflowChart3D from '../../components/admin/WorkflowChart3D';
+
 
 type UserWithManager = User & { managerName?: string };
 
-type ViewTab = 'table' | '2d' | '3d';
+type ViewTab = 'table' | '2d';
 
 const ApprovalWorkflow: React.FC = () => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState<UserWithManager[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [finalConfirmationRole, setFinalConfirmationRole] = useState<UserRole>('hr');
@@ -120,16 +121,7 @@ const ApprovalWorkflow: React.FC = () => {
                             <Network className="w-4 h-4" />
                             2D Workflow Chart
                         </button>
-                        <button
-                            onClick={() => setActiveTab('3d')}
-                            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${activeTab === '3d'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-muted hover:text-primary-text hover:border-border'
-                                }`}
-                        >
-                            <Box className="w-4 h-4" />
-                            3D Workflow Chart
-                        </button>
+
                     </div>
                 </div>
 
@@ -206,17 +198,24 @@ const ApprovalWorkflow: React.FC = () => {
 
                         {/* 2D Workflow Chart */}
                         {activeTab === '2d' && (
-                            <div className="border border-border rounded-lg overflow-auto bg-white h-[618px] w-full relative">
-                                <WorkflowChart2D users={users} />
+                            <div className="relative">
+                                <div className="absolute top-4 right-4 z-10">
+                                    <Button
+                                        onClick={() => navigate('/admin/approval-workflow/chart')}
+                                        variant="secondary"
+                                        className="shadow-md bg-white/90 hover:bg-white"
+                                    >
+                                        <Maximize2 className="w-4 h-4 mr-2" />
+                                        Full Screen View
+                                    </Button>
+                                </div>
+                                <div className="mx-auto border border-border rounded-lg overflow-hidden bg-white h-[1940px] w-[1240px] relative">
+                                    <WorkflowChart2D users={users} />
+                                </div>
                             </div>
                         )}
 
-                        {/* 3D Workflow Chart */}
-                        {activeTab === '3d' && (
-                            <div className="border border-border rounded-lg overflow-auto bg-white h-[618px] w-full relative">
-                                <WorkflowChart3D users={users} />
-                            </div>
-                        )}
+
                     </>
                 )}
             </section>
