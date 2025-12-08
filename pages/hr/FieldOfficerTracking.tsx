@@ -26,124 +26,8 @@ const MapView: React.FC<{ events: (AttendanceEvent & { userName: string })[], us
             markersRef.current.addTo(mapRef.current);
             L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
         }
-
-        // Route View Component
-        // Displays a polyline connecting all attendance events for the selected user across the
-        // current date range.  Also draws a bounding rectangle around the path to
-        // visually indicate the area covered.  If no events are available for the
-        // selected user, a message is displayed instead of a map.
-        const RouteView: React.FC<{ events: (AttendanceEvent & { userName: string })[], selectedUser: string }> = ({ events, selectedUser }) => {
-            const mapRef = useRef<L.Map | null>(null);
-            const mapContainerRef = useRef<HTMLDivElement>(null);
-            const polylineRef = useRef<L.Polyline | null>(null);
-            const rectangleRef = useRef<L.Rectangle | null>(null);
-            const markersRef = useRef<L.LayerGroup>(L.layerGroup());
-            const tileLayerRef = useRef<L.TileLayer | null>(null);
-            const { theme } = useThemeStore();
-
-            // Filter events belonging to the selected user and with valid coordinates
-            const userEvents = useMemo(() => {
-                return events
-                    .filter(e => e.userId === selectedUser && e.latitude && e.longitude)
-                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-            }, [events, selectedUser]);
-
-            // Initialise the map once
-            useEffect(() => {
-                if (mapContainerRef.current && !mapRef.current) {
-                    mapRef.current = L.map(mapContainerRef.current, { zoomControl: false }).setView([12.9716, 77.5946], 12);
-                    markersRef.current.addTo(mapRef.current);
-                    L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
-                }
-                // Force resize for proper rendering
-                setTimeout(() => mapRef.current?.invalidateSize(), 100);
-            }, []);
-
-            // Update tile layer on theme change
-            useEffect(() => {
-                if (!mapRef.current) return;
-                const isDark = theme === 'dark';
-                const lightTile = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-                const tileUrl = isDark ? darkTile : lightTile;
-                const attribution = isDark
-                    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-                if (tileLayerRef.current) {
-                    tileLayerRef.current.setUrl(tileUrl);
-                    mapRef.current.attributionControl.setPrefix(attribution);
-                } else {
-                    tileLayerRef.current = L.tileLayer(tileUrl, { attribution }).addTo(mapRef.current);
-                }
-            }, [theme]);
-
-            // Update the route polyline and bounding rectangle when userEvents changes
-            useEffect(() => {
-                if (!mapRef.current) return;
-                // Clear previous layers
-                markersRef.current.clearLayers();
-                if (polylineRef.current) {
-                    mapRef.current.removeLayer(polylineRef.current);
-                    polylineRef.current = null;
-                }
-                if (rectangleRef.current) {
-                    mapRef.current.removeLayer(rectangleRef.current);
-                    rectangleRef.current = null;
-                }
-
-                if (userEvents.length === 0) {
-                    // No events: centre map on Bangalore and return
-                    mapRef.current.setView([12.9716, 77.5946], 12);
-                    return;
-                }
-
-                // Build LatLng array for polyline
-                const latLngs: L.LatLngTuple[] = userEvents.map(e => [e.latitude as number, e.longitude as number]);
-                // Create polyline
-                polylineRef.current = L.polyline(latLngs, { color: '#00BFA6', weight: 4 }).addTo(mapRef.current);
-                // Add markers at start and end points
-                const start = latLngs[0];
-                const end = latLngs[latLngs.length - 1];
-                // Create simple circle markers for start and end points using inline styles.  A green circle for start and red circle for end.
-                const startMarker = L.marker(start, {
-                    icon: L.divIcon({
-                        className: '',
-                        html: '<div style="width:16px;height:16px;border-radius:50%;background-color:#00BFA6;border:2px solid white;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    })
-                });
-                const endMarker = L.marker(end, {
-                    icon: L.divIcon({
-                        className: '',
-                        html: '<div style="width:16px;height:16px;border-radius:50%;background-color:#EF4444;border:2px solid white;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    })
-                });
-                markersRef.current.addLayer(startMarker);
-                markersRef.current.addLayer(endMarker);
-                // Compute bounding box
-                let minLat = latLngs[0][0], maxLat = latLngs[0][0];
-                let minLon = latLngs[0][1], maxLon = latLngs[0][1];
-                latLngs.forEach(([lat, lon]) => {
-                    minLat = Math.min(minLat, lat);
-                    maxLat = Math.max(maxLat, lat);
-                    minLon = Math.min(minLon, lon);
-                    maxLon = Math.max(maxLon, lon);
-                });
-                const southWest: L.LatLngTuple = [minLat, minLon];
-                const northEast: L.LatLngTuple = [maxLat, maxLon];
-                rectangleRef.current = L.rectangle([southWest, northEast], { color: '#FFB700', weight: 2, fillOpacity: 0.1 }).addTo(mapRef.current);
-                // Fit map to rectangle bounds with padding
-                const bounds = L.latLngBounds(southWest, northEast);
-                mapRef.current.fitBounds(bounds.pad(0.2));
-            }, [userEvents]);
-
-            return <div ref={mapContainerRef} style={{ height: '600px', width: '100%', borderRadius: '1rem', zIndex: 0 }} />;
-        };
+        // Force resize for proper rendering
         setTimeout(() => mapRef.current?.invalidateSize(), 100);
-
     }, []);
 
     useEffect(() => {
@@ -215,6 +99,121 @@ const MapView: React.FC<{ events: (AttendanceEvent & { userName: string })[], us
         }
 
     }, [events, users]);
+
+
+    return <div ref={mapContainerRef} style={{ height: '600px', width: '100%', borderRadius: '1rem', zIndex: 0 }} />;
+};
+
+// Route View Component
+// Displays a polyline connecting all attendance events for the selected user across the current date range
+const RouteView: React.FC<{ events: (AttendanceEvent & { userName: string })[], selectedUser: string }> = ({ events, selectedUser }) => {
+    const mapRef = useRef<L.Map | null>(null);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const polylineRef = useRef<L.Polyline | null>(null);
+    const rectangleRef = useRef<L.Rectangle | null>(null);
+    const markersRef = useRef<L.LayerGroup>(L.layerGroup());
+    const tileLayerRef = useRef<L.TileLayer | null>(null);
+    const { theme } = useThemeStore();
+
+    // Filter events belonging to the selected user and with valid coordinates
+    const userEvents = useMemo(() => {
+        return events
+            .filter(e => e.userId === selectedUser && e.latitude && e.longitude)
+            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    }, [events, selectedUser]);
+
+    // Initialise the map once
+    useEffect(() => {
+        if (mapContainerRef.current && !mapRef.current) {
+            mapRef.current = L.map(mapContainerRef.current, { zoomControl: false }).setView([12.9716, 77.5946], 12);
+            markersRef.current.addTo(mapRef.current);
+            L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
+        }
+        // Force resize for proper rendering
+        setTimeout(() => mapRef.current?.invalidateSize(), 100);
+    }, []);
+
+    // Update tile layer on theme change
+    useEffect(() => {
+        if (!mapRef.current) return;
+        const isDark = theme === 'dark';
+        const lightTile = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        const tileUrl = isDark ? darkTile : lightTile;
+        const attribution = isDark
+            ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+        if (tileLayerRef.current) {
+            tileLayerRef.current.setUrl(tileUrl);
+            mapRef.current.attributionControl.setPrefix(attribution);
+        } else {
+            tileLayerRef.current = L.tileLayer(tileUrl, { attribution }).addTo(mapRef.current);
+        }
+    }, [theme]);
+
+    // Update the route polyline and bounding rectangle when userEvents changes
+    useEffect(() => {
+        if (!mapRef.current) return;
+        // Clear previous layers
+        markersRef.current.clearLayers();
+        if (polylineRef.current) {
+            mapRef.current.removeLayer(polylineRef.current);
+            polylineRef.current = null;
+        }
+        if (rectangleRef.current) {
+            mapRef.current.removeLayer(rectangleRef.current);
+            rectangleRef.current = null;
+        }
+
+        if (userEvents.length === 0) {
+            // No events: centre map on Bangalore and return
+            mapRef.current.setView([12.9716, 77.5946], 12);
+            return;
+        }
+
+        // Build LatLng array for polyline
+        const latLngs: L.LatLngTuple[] = userEvents.map(e => [e.latitude as number, e.longitude as number]);
+        // Create polyline
+        polylineRef.current = L.polyline(latLngs, { color: '#00BFA6', weight: 4 }).addTo(mapRef.current);
+        // Add markers at start and end points
+        const start = latLngs[0];
+        const end = latLngs[latLngs.length - 1];
+        // Create simple circle markers for start and end points
+        const startMarker = L.marker(start, {
+            icon: L.divIcon({
+                className: '',
+                html: '<div style="width:16px;height:16px;border-radius:50%;background-color:#00BFA6;border:2px solid white;"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            })
+        });
+        const endMarker = L.marker(end, {
+            icon: L.divIcon({
+                className: '',
+                html: '<div style="width:16px;height:16px;border-radius:50%;background-color:#EF4444;border:2px solid white;"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            })
+        });
+        markersRef.current.addLayer(startMarker);
+        markersRef.current.addLayer(endMarker);
+        // Compute bounding box
+        let minLat = latLngs[0][0], maxLat = latLngs[0][0];
+        let minLon = latLngs[0][1], maxLon = latLngs[0][1];
+        latLngs.forEach(([lat, lon]) => {
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLon = Math.min(minLon, lon);
+            maxLon = Math.max(maxLon, lon);
+        });
+        const southWest: L.LatLngTuple = [minLat, minLon];
+        const northEast: L.LatLngTuple = [maxLat, maxLon];
+        rectangleRef.current = L.rectangle([southWest, northEast], { color: '#FFB700', weight: 2, fillOpacity: 0.1 }).addTo(mapRef.current);
+        // Fit map to rectangle bounds with padding
+        const bounds = L.latLngBounds(southWest, northEast);
+        mapRef.current.fitBounds(bounds.pad(0.2));
+    }, [userEvents]);
 
     return <div ref={mapContainerRef} style={{ height: '600px', width: '100%', borderRadius: '1rem', zIndex: 0 }} />;
 };
