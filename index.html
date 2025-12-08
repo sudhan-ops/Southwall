@@ -741,6 +741,80 @@
         min-width: auto !important;
       }
 
+      /* CRITICAL: Force icon buttons in tables to NEVER have green background */
+      table button.btn-icon,
+      table button[class*="btn-icon"],
+      td button.btn-icon,
+      td button[class*="btn-icon"],
+      [data-label="Actions"] button,
+      [data-label="Actions"] .btn,
+      [data-label="Actions"] button.btn-icon,
+      .responsive-table button.btn-icon,
+      .responsive-table td button {
+        background-color: transparent !important;
+        color: inherit !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 8px !important;
+        border-radius: 9999px !important;
+        min-width: auto !important;
+        width: auto !important;
+      }
+
+      /* Force flex containers in Actions column to have no background BUT maintain flex layout */
+      [data-label="Actions"] .flex,
+      [data-label="Actions"] div,
+      td[data-label="Actions"]>div,
+      .responsive-table td[data-label="Actions"]>div,
+      .responsive-table tbody tr td[data-label="Actions"]>div,
+      table.responsive-table td[data-label="Actions"] .flex {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        /* CRITICAL: Ensure proper flex layout for horizontal button spacing */
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        /* Increased to 12px for better visibility */
+        flex-wrap: nowrap !important;
+        justify-content: flex-end !important;
+      }
+
+      /* Additional specificity for buttons themselves to prevent overlap */
+      [data-label="Actions"] button,
+      td[data-label="Actions"]>div>button,
+      .responsive-table td[data-label="Actions"] button {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        position: relative !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* CRITICAL: Remove green background from ALL delete/trash icon buttons globally */
+      button:has(svg.text-red-500),
+      .btn-icon:has(svg.text-red-500),
+      button.btn-icon,
+      button[aria-label*="Delete"],
+      button[aria-label*="Remove"],
+      button[title*="Delete"],
+      button[title*="Remove"] {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 8px !important;
+        min-width: auto !important;
+        width: auto !important;
+      }
+
+      /* Ensure trash icon buttons keep hover effect but no green background */
+      button:has(svg.text-red-500):hover,
+      .btn-icon:has(svg.text-red-500):hover {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
       /* Specific fix for avatar delete button to keep it white/red */
       #avatar-delete-button {
         background-color: #ffffff !important;
@@ -1195,6 +1269,62 @@
       select {
         border: 1px solid rgba(34, 197, 94, 0.2) !important;
       }
+
+      /* Remove borders and backgrounds from table action buttons */
+      table button,
+      table .btn,
+      table button[class*="btn"],
+      td button,
+      td .btn,
+      [data-label="Actions"] button,
+      [data-label="Actions"] .btn {
+        border: none !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        padding: 8px !important;
+      }
+
+      /* Keep icon buttons transparent in tables */
+      table .btn-icon,
+      td .btn-icon {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 8px !important;
+      }
+
+      /* Specific fixes for delete buttons in tables - keep red color */
+      table button:has(svg.text-red-500),
+      td button:has(svg.text-red-500),
+      [data-label="Actions"] button:has(svg.text-red-500) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 8px !important;
+      }
+
+      /* Hover state for delete icon buttons in tables */
+      table button:has(svg.text-red-500):hover,
+      td button:has(svg.text-red-500):hover {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border: none !important;
+      }
+
+      /* Edit icon buttons in tables */
+      table button:has(.h-4.w-4),
+      td button.btn-icon {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      /* Override any remaining button styles in Actions column */
+      [data-label="Actions"] *,
+      [data-label="Actions"] button *,
+      [data-label="Actions"] .btn * {
+        border: none !important;
+      }
+
 
       /* Remove borders from specific common elements */
       div,
@@ -2059,6 +2189,11 @@
       border-radius: 1.5rem;
       padding: 0;
       margin-bottom: 1rem;
+    }
+
+    .pro-dark-theme .responsive-table td:not([colSpan]) {
+      background-color: #0d2c18;
+      /* Match TR background to prevent green box effect */
     }
 
     .pro-dark-theme .responsive-table td:not([colSpan])+td:not([colSpan]) {
