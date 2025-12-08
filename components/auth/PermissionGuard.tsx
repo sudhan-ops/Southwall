@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { Camera } from '@capacitor/camera';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Filesystem } from '@capacitor/filesystem';
 import { App } from '@capacitor/app';
+
+interface SecurityCheckPlugin {
+    getSecurityStatus(): Promise<{ developerMode: boolean }>;
+}
+
+const SecurityCheck = registerPlugin<SecurityCheckPlugin>('SecurityCheck');
 
 interface PermissionGuardProps {
     children: React.ReactNode;
@@ -47,17 +53,10 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
             // 0. Security Checks (Custom Native Plugin)
             let devMode = false;
             try {
-                const { SecurityCheck } = Plugins;
-                if (SecurityCheck) {
-                    const status = await SecurityCheck.getSecurityStatus();
-                    devMode = status.developerMode;
-                } else {
-                    // Try fetching if it's not immediately available in common object
-                    // In some Capacitor setups, global plugins might be needed or import from a file
-                    // We'll assume standard registration works. 
-                }
+                const status = await SecurityCheck.getSecurityStatus();
+                devMode = status.developerMode;
             } catch (e) {
-                console.error("Failed to check security status", e);
+                console.warn("Failed to check security status or plugin not available", e);
             }
 
             // 1. Location
