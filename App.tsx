@@ -22,6 +22,7 @@ import MainLayout from './components/layouts/MainLayout';
 import MobileLayout from './components/layouts/MobileLayout';
 import AuthLayout from './components/layouts/AuthLayout';
 import SecurityWrapper from './components/SecurityWrapper';
+import PermissionGuard from './components/auth/PermissionGuard';
 
 // Pages
 import Splash from './pages/Splash';
@@ -174,7 +175,12 @@ const MainLayoutWrapper: React.FC = () => {
   // User is authenticated and verified, show the main layout and its nested routes
   // Use MobileLayout for mobile devices, MainLayout for desktop
   const isMobile = useMediaQuery('(max-width: 767px)');
-  return isMobile ? <MobileLayout /> : <MainLayout />;
+
+  return (
+    <PermissionGuard>
+      {isMobile ? <MobileLayout /> : <MainLayout />}
+    </PermissionGuard>
+  );
 };
 
 const App: React.FC = () => {
