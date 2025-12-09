@@ -8,7 +8,14 @@ import { App } from '@capacitor/app';
 
 // Define the interface for our custom plugin
 interface SecurityCheckPlugin {
-    getSecurityStatus(): Promise<{ developerMode: boolean; microphoneGranted: boolean }>;
+    getSecurityStatus(): Promise<{
+        developerMode: boolean;
+        microphoneGranted: boolean;
+        calendarGranted: boolean;
+        contactsGranted: boolean;
+        filesGranted: boolean;
+        activityGranted: boolean;
+    }>;
 }
 
 const SecurityCheck = registerPlugin<SecurityCheckPlugin>('SecurityCheck');
@@ -23,6 +30,9 @@ interface PermissionState {
     notification: boolean;
     microphone: boolean;
     storage: boolean;
+    calendar: boolean;
+    contacts: boolean;
+    activity: boolean;
 }
 
 interface SecurityState {
@@ -36,6 +46,9 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         notification: false,
         microphone: false,
         storage: false,
+        calendar: false,
+        contacts: false,
+        activity: false,
     });
     const [security, setSecurity] = useState<SecurityState>({
         developerMode: false,
@@ -51,16 +64,23 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         }
 
         try {
-            // 0. Security Checks + Native Mic Check
+            // 0. Security Checks + Native Permission Checks
             let devMode = false;
             let nativeMicGranted = false;
+            let nativeCalendarGranted = false;
+            let nativeContactsGranted = false;
+            let nativeFilesGranted = false;
+            let nativeActivityGranted = false;
+
             try {
                 // Native plugin checks OS manifest permission directly
                 const status = await SecurityCheck.getSecurityStatus();
                 devMode = status.developerMode;
-                // IMPORTANT: Check if the key exists (it might not if native code isn't deployed yet)
-                // We double check if it is explicitly true.
                 nativeMicGranted = status.microphoneGranted === true;
+                nativeCalendarGranted = status.calendarGranted === true;
+                nativeContactsGranted = status.contactsGranted === true;
+                nativeFilesGranted = status.filesGranted === true;
+                nativeActivityGranted = status.activityGranted === true;
             } catch (e) {
                 console.warn("Failed to check security status or plugin not available", e);
             }
@@ -97,6 +117,9 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
                 notification: notificationGranted,
                 storage: storageGranted,
                 microphone: microphoneGranted,
+                calendar: nativeCalendarGranted,
+                contacts: nativeContactsGranted,
+                activity: nativeActivityGranted,
             });
             setSecurity({
                 developerMode: devMode
@@ -211,7 +234,10 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         permissions.camera &&
         permissions.notification &&
         permissions.storage &&
-        permissions.microphone;
+        permissions.microphone &&
+        permissions.calendar &&
+        permissions.contacts &&
+        permissions.activity;
 
     if (allGranted) {
         return <>{children}</>;

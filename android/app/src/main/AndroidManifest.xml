@@ -59,4 +59,13 @@
 
     <!-- Microphone -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Calendar -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- Contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- Physical Activity -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 </manifest>
