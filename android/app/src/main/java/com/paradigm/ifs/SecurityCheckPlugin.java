@@ -25,9 +25,6 @@ public class SecurityCheckPlugin extends Plugin {
             e.printStackTrace();
         }
 
-        // Check for Mock Location
-        // ret.put("developerMode", devOptionsEnabled);
-
         // Check Microphone Permission directly from Manifest
         boolean micGranted = false;
         try {
@@ -65,10 +62,7 @@ public class SecurityCheckPlugin extends Plugin {
                     context,
                     android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-            // On newer Android (13+), external storage permission might be split or
-            // implicitly denied if using scoped media perms.
-            // For now, we check standard external storage, OR media images as alternate
-            // positive.
+            // On newer Android (13+), external storage permission might be split
             if (!filesGranted && android.os.Build.VERSION.SDK_INT >= 33) {
                 boolean images = androidx.core.content.ContextCompat.checkSelfPermission(context,
                         "android.permission.READ_MEDIA_IMAGES") == android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -103,11 +97,11 @@ public class SecurityCheckPlugin extends Plugin {
 
     @PluginMethod
     public void openSettings(PluginCall call) {
-        android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        android.content.Intent intent = new android.content.Intent(
+                android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(android.net.Uri.fromParts("package", getContext().getPackageName(), null));
         intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
         call.resolve();
     }
-}
 }
