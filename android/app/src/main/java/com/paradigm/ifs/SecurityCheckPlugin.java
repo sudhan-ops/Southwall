@@ -19,23 +19,28 @@ public class SecurityCheckPlugin extends Plugin {
         boolean devOptionsEnabled = false;
         try {
             devOptionsEnabled = Settings.Global.getInt(
-                context.getContentResolver(),
-                Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0
-            ) != 0;
+                    context.getContentResolver(),
+                    Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Check for Mock Location (simplified: usually relying on dev options being off is enough, 
-        // but recent Androids allow "Select mock location app". 
-        // Checking if ANY mock location app is selected is non-trivial without specific permissions or checking list of all apps.
-        // However, if Dev Options is OFF, then Mock Location is effectively disabled for the user interface.
-        // We will just return the dev options status as the primary gate as requested.
-        
+        // Check for Mock Location
+        // ret.put("developerMode", devOptionsEnabled);
+
+        // Check Microphone Permission directly from Manifest
+        boolean micGranted = false;
+        try {
+            micGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         ret.put("developerMode", devOptionsEnabled);
-        
-        // We can add more checks here if needed, e.g. checking for rooted devices.
-        
+        ret.put("microphoneGranted", micGranted);
+
         call.resolve(ret);
     }
 }

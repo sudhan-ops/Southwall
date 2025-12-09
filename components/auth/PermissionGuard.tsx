@@ -6,8 +6,9 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Filesystem } from '@capacitor/filesystem';
 import { App } from '@capacitor/app';
 
+// Define the interface for our custom plugin
 interface SecurityCheckPlugin {
-    getSecurityStatus(): Promise<{ developerMode: boolean }>;
+    getSecurityStatus(): Promise<{ developerMode: boolean; microphoneGranted: boolean }>;
 }
 
 const SecurityCheck = registerPlugin<SecurityCheckPlugin>('SecurityCheck');
@@ -50,11 +51,16 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         }
 
         try {
-            // 0. Security Checks (Custom Native Plugin)
+            // 0. Security Checks + Native Mic Check
             let devMode = false;
+            let nativeMicGranted = false;
             try {
+                // Native plugin checks OS manifest permission directly
                 const status = await SecurityCheck.getSecurityStatus();
                 devMode = status.developerMode;
+                // IMPORTANT: Check if the key exists (it might not if native code isn't deployed yet)
+                // We double check if it is explicitly true.
+                nativeMicGranted = status.microphoneGranted === true;
             } catch (e) {
                 console.warn("Failed to check security status or plugin not available", e);
             }
@@ -81,14 +87,8 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
             const storageGranted = storageStatus.publicStorage === 'granted';
 
             // 5. Microphone
-            let microphoneGranted = false;
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getTracks().forEach(track => track.stop());
-                microphoneGranted = true;
-            } catch (err) {
-                microphoneGranted = false;
-            }
+            // Use the native check result.
+            const microphoneGranted = nativeMicGranted;
 
 
             setPermissions({
@@ -124,6 +124,13 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         if (!permissions.storage) {
             try { await Filesystem.requestPermissions(); } catch (e) { }
         }
+
+        // For microphone, we don't have a direct "request" method from our custom plugin (yet).
+        // But we can try using the standard user media request which triggers the robust prompt.
+        // Or we rely on the user having gone to settings if they are stuck.
+        // Ideally, we'd add a `requestMicrophonePermission` to the native plugin too, but
+        // `getUserMedia` usually successfully *triggers* the dialog, just fails to resolve successfully.
+        // So keeping this might still be useful to TRIGGER the prompt.
         if (!permissions.microphone) {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
