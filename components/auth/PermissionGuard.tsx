@@ -196,33 +196,33 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
     // Security Check: Developer Options
     if (security.developerMode) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen bg-red-50 px-6 text-center">
-                <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+            <div className="flex flex-col items-center justify-center h-screen bg-gray-50 px-6 text-center animate-fade-in">
+                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-red-100">
                     <div className="mb-6">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                            <svg className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50 ring-8 ring-red-50/50">
+                            <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Security Alert</h2>
-                    <p className="text-gray-600 mb-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Security Alert</h2>
+                    <p className="text-gray-600 mb-6 text-sm leading-relaxed">
                         Developer Options are enabled on this device.
                     </p>
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-left">
-                        <p className="text-sm text-yellow-700">
-                            To continue using this application, you must <strong>disable Developer Options</strong> in your device settings.
+                    <div className="bg-red-50 rounded-lg p-4 mb-6 text-left border border-red-100">
+                        <p className="text-xs text-red-800 font-medium mb-1">
+                            Action Required
                         </p>
-                        <p className="text-xs text-yellow-600 mt-2">
-                            This is required to prevent location spoofing (Fake GPS) and ensure data integrity.
+                        <p className="text-xs text-red-600">
+                            Please disable <strong>Developer Options</strong> in your device settings to continue using the application securely.
                         </p>
                     </div>
 
                     <button
                         onClick={() => checkPermissionsAndSecurity()}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/20 transition-all duration-200 active:scale-[0.98]"
                     >
-                        I have disabled them, Retry
+                        Retry Check
                     </button>
                 </div>
             </div>
@@ -244,46 +244,60 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50 px-6 text-center">
-            <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+        <div className="flex flex-col items-center justify-center h-screen bg-gray-50 px-6 text-center animate-fade-in">
+            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
                 <div className="mb-6">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
-                        <svg className="h-10 w-10 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/50">
+                        <svg className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Permissions Required</h2>
-                <p className="text-gray-600 mb-6">
-                    To use this application, you must grant access to Location, Camera, Notifications, Microphone, and Storage.
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Permissions Required</h2>
+                <p className="text-gray-500 mb-6 text-sm leading-relaxed">
+                    To ensure a seamless experience, please grant access to the following permissions.
                 </p>
 
-                <div className="w-full space-y-4 mb-6 text-left text-sm">
+                <div className="w-full space-y-3 mb-8 text-left text-sm">
                     <PermissionItem label="Location" granted={permissions.location} />
                     <PermissionItem label="Camera" granted={permissions.camera} />
                     <PermissionItem label="Notifications" granted={permissions.notification} />
                     <PermissionItem label="Microphone" granted={permissions.microphone} />
-                    <PermissionItem label="Storage" granted={permissions.storage} />
+                    <PermissionItem label="Files & Media" granted={permissions.storage} />
+                    <PermissionItem label="Calendar" granted={permissions.calendar} />
+                    <PermissionItem label="Contacts" granted={permissions.contacts} />
+                    <PermissionItem label="Physical Activity" granted={permissions.activity} />
                 </div>
 
-                <button
-                    onClick={requestAllPermissions}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
-                >
-                    Grant Permissions
-                </button>
+                <div className="space-y-3">
+                    <button
+                        onClick={requestAllPermissions}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all duration-200 active:scale-[0.98]"
+                    >
+                        Grant Access
+                    </button>
+                    <p className="text-xs text-gray-400">
+                        Tap again after granting permissions in Settings
+                    </p>
+                </div>
             </div>
         </div>
     );
 };
 
 const PermissionItem: React.FC<{ label: string; granted: boolean }> = ({ label, granted }) => (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-        <span className="font-medium text-gray-700">{label}</span>
-        <span className={`text-xs font-bold px-2 py-1 rounded-full ${granted ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {granted ? 'ALLOWED' : 'MISSING'}
-        </span>
+    <div className="flex justify-between items-center py-2.5 px-3 rounded-lg bg-gray-50 border border-gray-100">
+        <span className="font-medium text-gray-700 text-sm">{label}</span>
+        {granted ? (
+            <svg className="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+        ) : (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-600 tracking-wide uppercase">
+                Required
+            </span>
+        )}
     </div>
 );
 
