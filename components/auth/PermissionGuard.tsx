@@ -16,6 +16,7 @@ interface SecurityCheckPlugin {
         filesGranted: boolean;
         activityGranted: boolean;
     }>;
+    openSettings(): Promise<void>;
 }
 
 const SecurityCheck = registerPlugin<SecurityCheckPlugin>('SecurityCheck');
@@ -193,11 +194,11 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         );
     }
 
-    // Security Check: Developer Options
+    // Security Check: Developer Options - UNCHANGED for now, mostly matching previous
     if (security.developerMode) {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-gray-50 px-6 text-center animate-fade-in">
-                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-red-100">
+                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border-2 border-red-500">
                     <div className="mb-6">
                         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50 ring-8 ring-red-50/50">
                             <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,23 +244,34 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
         return <>{children}</>;
     }
 
+    const openSettings = async () => {
+        try {
+            await App.openAppSettings();
+        } catch (e) {
+            console.error("Failed to open settings", e);
+        }
+    };
+
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50 px-6 text-center animate-fade-in">
-            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
+        <div className="flex flex-col items-center justify-center h-screen bg-gray-900 px-6 text-center animate-fade-in">
+            {/* Red Border Box as requested */}
+            <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full border-4 border-red-600 relative overflow-hidden">
+
                 <div className="mb-6">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/50">
-                        <svg className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50 ring-8 ring-red-50/50">
+                        {/* Custom Lock or Alert Icon */}
+                        <svg className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                     </div>
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Permissions Required</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Permissions Access</h2>
                 <p className="text-gray-500 mb-6 text-sm leading-relaxed">
-                    To ensure a seamless experience, please grant access to the following permissions.
+                    This app requires full access to function. Please grant the following permissions in Settings.
                 </p>
 
-                <div className="w-full space-y-3 mb-8 text-left text-sm">
+                <div className="w-full space-y-3 mb-8 text-left text-sm max-h-[320px] overflow-y-auto pr-1">
                     <PermissionItem label="Location" granted={permissions.location} />
                     <PermissionItem label="Camera" granted={permissions.camera} />
                     <PermissionItem label="Notifications" granted={permissions.notification} />
@@ -272,14 +284,17 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({ children }) => {
 
                 <div className="space-y-3">
                     <button
-                        onClick={requestAllPermissions}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all duration-200 active:scale-[0.98]"
+                        onClick={openSettings}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-red-600/20 transition-all duration-200 active:scale-[0.98] uppercase tracking-wide text-sm"
                     >
                         Grant Access
                     </button>
-                    <p className="text-xs text-gray-400">
-                        Tap again after granting permissions in Settings
-                    </p>
+                    <button
+                        onClick={checkPermissionsAndSecurity}
+                        className="text-gray-500 text-xs hover:text-gray-700 underline underline-offset-2"
+                    >
+                        I have granted them, Check Again
+                    </button>
                 </div>
             </div>
         </div>

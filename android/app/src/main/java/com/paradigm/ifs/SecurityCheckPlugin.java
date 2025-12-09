@@ -100,4 +100,14 @@ public class SecurityCheckPlugin extends Plugin {
 
         call.resolve(ret);
     }
+
+    @PluginMethod
+    public void openSettings(PluginCall call) {
+        android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(android.net.Uri.fromParts("package", getContext().getPackageName(), null));
+        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        call.resolve();
+    }
+}
 }
