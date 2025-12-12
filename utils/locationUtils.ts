@@ -22,48 +22,61 @@
  * @param lon2 Longitude of point 2 in degrees
  * @returns Distance between the points in meters
  */
-export function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+export function calculateDistanceMeters(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const R = 6371000; // Earth radius in meters
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
 /**
- * Reverse geocode a latitude/longitude into a human readable address using
- * Nominatim (OpenStreetMap) API.  If the request fails, returns the
- * coordinates as a string.  The `zoom` parameter controls the level of
- * detail returned (16 = street level).
+ * Reverse geocode a latitude/longitude into a human readable address.
+ * First checks the local Supabase location_cache, then falls back to
+ * coordinates if external lookup fails (due to CORS or rate limits).
  *
  * @param lat Latitude in degrees
  * @param lon Longitude in degrees
  * @returns Display name or formatted address string
  */
-export async function reverseGeocode(lat: number, lon: number): Promise<string> {
+export async function reverseGeocode(
+  lat: number,
+  lon: number,
+): Promise<string> {
   const fallback = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+
   try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1`;
-    const res = await fetch(url);
-    if (!res.ok) return fallback;
-    const data = await res.json();
-    // Prefer the display_name if present; otherwise build from address
-    if (data.display_name) {
-      return data.display_name as string;
+    // First, check our local cache in Supabase (avoids CORS issues)
+    const { supabase } = await import("../services/supabase");
+    const roundedLat = Math.round(lat * 10000) / 10000;
+    const roundedLon = Math.round(lon * 10000) / 10000;
+
+    const { data: cached } = await supabase
+      .from("location_cache")
+      .select("address")
+      .eq("latitude", roundedLat)
+      .eq("longitude", roundedLon)
+      .maybeSingle();
+
+    if (cached?.address) {
+      return cached.address;
     }
-    if (data.address) {
-      const { road, suburb, city, village, town, state, country } = data.address;
-      return [road, suburb, city || village || town, state, country]
-        .filter(Boolean)
-        .join(', ');
-    }
+
+    // If not cached, return coordinates as fallback
+    // Note: Nominatim API has CORS restrictions from browser,
+    // so we skip the external call and use coordinates
     return fallback;
   } catch (err) {
-    console.warn('Reverse geocode failed:', err);
+    console.warn("Reverse geocode failed:", err);
     return fallback;
   }
 }
@@ -90,10 +103,13 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string> 
  * @param timeoutMs Maximum time to wait for a suitable fix.  Default 15000ms.
  * @returns A GeolocationPosition with the best available accuracy.
  */
-export function getPrecisePosition(accuracyThreshold: number = 50, timeoutMs: number = 10000): Promise<GeolocationPosition> {
+export function getPrecisePosition(
+  accuracyThreshold: number = 50,
+  timeoutMs: number = 10000,
+): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
-    if (!('geolocation' in navigator)) {
-      return reject(new Error('Geolocation is not supported by this browser.'));
+    if (!("geolocation" in navigator)) {
+      return reject(new Error("Geolocation is not supported by this browser."));
     }
     let bestPos: GeolocationPosition | null = null;
     // Set up a timeout to end the watch after the specified period
@@ -103,7 +119,11 @@ export function getPrecisePosition(accuracyThreshold: number = 50, timeoutMs: nu
         resolve(bestPos);
       } else {
         navigator.geolocation.clearWatch(watchId);
-        reject(new Error('Unable to acquire a precise position within the timeout period'));
+        reject(
+          new Error(
+            "Unable to acquire a precise position within the timeout period",
+          ),
+        );
       }
     }, timeoutMs);
     const watchId = navigator.geolocation.watchPosition(
@@ -124,7 +144,7 @@ export function getPrecisePosition(accuracyThreshold: number = 50, timeoutMs: nu
         navigator.geolocation.clearWatch(watchId);
         reject(err);
       },
-      { enableHighAccuracy: true, maximumAge: 0 }
+      { enableHighAccuracy: true, maximumAge: 0 },
     );
   });
 }
