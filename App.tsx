@@ -169,6 +169,8 @@ const shouldStorePath = (path: string) => {
 const MainLayoutWrapper: React.FC = () => {
   const { user, isInitialized } = useAuthStore();
   const location = useLocation();
+  // IMPORTANT: All hooks must be called before any conditional returns
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   if (!isInitialized) {
     // Wait for the session check to complete.
@@ -191,8 +193,6 @@ const MainLayoutWrapper: React.FC = () => {
   }
   // User is authenticated and verified, show the main layout and its nested routes
   // Use MobileLayout for mobile devices, MainLayout for desktop
-  const isMobile = useMediaQuery('(max-width: 767px)');
-
   return (
     <PermissionGuard>
       {isMobile ? <MobileLayout /> : <MainLayout />}
