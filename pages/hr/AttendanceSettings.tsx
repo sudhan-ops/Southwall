@@ -18,7 +18,25 @@ import { api } from '../../services/api';
 const AttendanceSettings: React.FC = () => {
     const { attendance, officeHolidays, fieldHolidays, recurringHolidays, addHoliday, removeHoliday, addRecurringHoliday, removeRecurringHoliday, updateAttendanceSettings: updateStore } = useSettingsStore();
 
-    const [localAttendance, setLocalAttendance] = useState<AttendanceSettings>(attendance);
+    // Default rules to prevent undefined values
+    const defaultRules: StaffAttendanceRules = {
+        minimumHoursFullDay: 8,
+        minimumHoursHalfDay: 4,
+        annualEarnedLeaves: 5,
+        annualSickLeaves: 12,
+        monthlyFloatingLeaves: 1,
+        annualCompOffLeaves: 5,
+        enableAttendanceNotifications: false,
+        sickLeaveCertificateThreshold: 2,
+    };
+
+    // Merge store attendance with defaults to ensure no undefined values
+    const safeAttendance: AttendanceSettings = {
+        office: { ...defaultRules, ...attendance?.office },
+        field: { ...defaultRules, ...attendance?.field }
+    };
+
+    const [localAttendance, setLocalAttendance] = useState<AttendanceSettings>(safeAttendance);
     const [isDirty, setIsDirty] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -30,8 +48,13 @@ const AttendanceSettings: React.FC = () => {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     useEffect(() => {
-        setLocalAttendance(attendance);
+        // Merge store attendance with defaults when store updates
+        setLocalAttendance({
+            office: { ...defaultRules, ...attendance?.office },
+            field: { ...defaultRules, ...attendance?.field }
+        });
     }, [attendance]);
+
 
     useEffect(() => {
         setIsDirty(JSON.stringify(localAttendance) !== JSON.stringify(attendance));
