@@ -202,7 +202,7 @@ const VerificationDashboard: React.FC = () => {
                                 ? <tr><td colSpan={colSpan}><TableSkeleton rows={3} cols={4} isMobile /></td></tr>
                                 : <TableSkeleton rows={5} cols={colSpan} />
                         ) : filteredSubmissions.length === 0 ? (
-                            <tr><td colSpan={colSpan} className="text-center py-10 text-muted">No submissions found.</td></tr>
+                            <tr><td colSpan={colSpan} className="text-center py-10 text-white">No submissions found.</td></tr>
                         ) : (
                             filteredSubmissions.map((s) => (
                                 <tr key={s.id} className={s.requiresManualVerification ? 'bg-orange-50' : ''}>

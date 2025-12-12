@@ -129,8 +129,8 @@ const AttendanceSettings: React.FC = () => {
                 </nav>
             </div>
 
-            {activeTab === 'office' && <p className="text-sm text-muted -mt-4 mb-4">These rules apply to Admin, HR, and Finance roles.</p>}
-            {activeTab === 'field' && <p className="text-sm text-muted -mt-4 mb-4">These rules apply to all other roles (e.g., Field Officers, Managers).</p>}
+            {activeTab === 'office' && <p className="text-sm text-white -mt-4 mb-4">These rules apply to Admin, HR, and Finance roles.</p>}
+            {activeTab === 'field' && <p className="text-sm text-white -mt-4 mb-4">These rules apply to all other roles (e.g., Field Officers, Managers).</p>}
 
 
             <div className="space-y-6">

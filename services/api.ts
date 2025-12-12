@@ -1,35 +1,81 @@
-import { createClient } from '@supabase/supabase-js';
-import { supabase, supabaseAnonKey } from './supabase';
+import { createClient } from "@supabase/supabase-js";
+import { supabase, supabaseAnonKey } from "./supabase";
 import type {
-  OnboardingData, User, Organization, OrganizationGroup, AttendanceEvent, Location, AttendanceSettings, Holiday,
-  LeaveBalance, LeaveRequest, Task, Notification, SiteConfiguration, Entity, Policy, Insurance,
-  ManpowerDetail, BackOfficeIdSeries, SiteStaffDesignation, Asset, MasterTool, MasterToolsList,
-  SiteGentsUniformConfig, MasterGentsUniforms, SiteLadiesUniformConfig, MasterLadiesUniforms, UniformRequest,
-  SiteUniformDetailsConfig, EnrollmentRules, InvoiceData, UserRole, UploadedFile, SalaryChangeRequest, SiteStaff,
-  SubmissionCostBreakdown, AppModule, Role, SupportTicket, TicketPost, TicketComment, VerificationResult, CompOffLog,
-  ExtraWorkLog, PerfiosVerificationData, HolidayListItem, UniformRequestItem, IssuedTool, RecurringHolidayRule
-} from '../types';
+  AppModule,
+  Asset,
+  AttendanceEvent,
+  AttendanceSettings,
+  BackOfficeIdSeries,
+  CompOffLog,
+  EnrollmentRules,
+  Entity,
+  ExtraWorkLog,
+  Holiday,
+  HolidayListItem,
+  Insurance,
+  InvoiceData,
+  IssuedTool,
+  LeaveBalance,
+  LeaveRequest,
+  Location,
+  ManpowerDetail,
+  MasterGentsUniforms,
+  MasterLadiesUniforms,
+  MasterTool,
+  MasterToolsList,
+  Notification,
+  OnboardingData,
+  Organization,
+  OrganizationGroup,
+  PerfiosVerificationData,
+  Policy,
+  RecurringHolidayRule,
+  Role,
+  SalaryChangeRequest,
+  SiteConfiguration,
+  SiteGentsUniformConfig,
+  SiteLadiesUniformConfig,
+  SiteStaff,
+  SiteStaffDesignation,
+  SiteUniformDetailsConfig,
+  SubmissionCostBreakdown,
+  SupportTicket,
+  Task,
+  TicketComment,
+  TicketPost,
+  UniformRequest,
+  UniformRequestItem,
+  UploadedFile,
+  User,
+  UserRole,
+  VerificationResult,
+} from "../types";
 // FIX: Add 'startOfMonth' and 'endOfMonth' to date-fns import to resolve errors.
-import { differenceInCalendarDays, format, startOfMonth, endOfMonth } from 'date-fns';
-import { GoogleGenAI, Type, Modality } from '@google/genai';
+import {
+  differenceInCalendarDays,
+  endOfMonth,
+  format,
+  startOfMonth,
+} from "date-fns";
+import { GoogleGenAI, Modality, Type } from "@google/genai";
 
-const ONBOARDING_DOCS_BUCKET = 'onboarding-documents';
-const AVATAR_BUCKET = 'avatars';
-const SUPPORT_ATTACHMENTS_BUCKET = 'support-attachments';
+const ONBOARDING_DOCS_BUCKET = "onboarding-documents";
+const AVATAR_BUCKET = "avatars";
+const SUPPORT_ATTACHMENTS_BUCKET = "support-attachments";
 // Buckets for storing branding assets.  These buckets should be created
 // in your Supabase project via the Storage interface.  The `logo`
 // bucket stores the active and default logos displayed throughout the
 // application.  The `background` bucket stores the carousel images for
 // the login screen.  Policies should permit public read and
 // authenticated upload/update/delete.
-const LOGO_BUCKET = 'logo';
-const BACKGROUND_BUCKET = 'background';
+const LOGO_BUCKET = "logo";
+const BACKGROUND_BUCKET = "background";
 
 // Bucket used to store attachments uploaded when marking tasks complete.  If this
 // bucket does not already exist in your Supabase project, create it via the
 // Supabase web console or CLI.  All task completion photos will be stored
 // here.  Alternatively you can reuse SUPPORT_ATTACHMENTS_BUCKET if you prefer.
-const TASK_ATTACHMENTS_BUCKET = 'task-attachments';
+const TASK_ATTACHMENTS_BUCKET = "task-attachments";
 
 // Resolve the Google GenAI API key from Vite environment variables.  When running
 // locally without a real key, the application should still boot and render
@@ -43,24 +89,27 @@ let ai: GoogleGenAI | null = null;
 if (!apiKey) {
   console.warn(
     "VITE_API_KEY for Google GenAI is not set in the environment variables. " +
-    "AI-powered features (document extraction, name cross‑verification, fingerprint detection, document enhancement) will be disabled."
+      "AI-powered features (document extraction, name cross‑verification, fingerprint detection, document enhancement) will be disabled.",
   );
 } else {
   ai = new GoogleGenAI({ apiKey });
 }
 
-
 // --- Helper Functions ---
 
 const processUrlsForDisplay = (obj: any): any => {
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map(processUrlsForDisplay);
 
   const newObj = { ...obj };
   // Check if the object looks like our UploadedFile structure with a path
-  if (typeof newObj.name === 'string' && typeof newObj.path === 'string') {
-    const bucket = newObj.path.startsWith('avatars/') ? AVATAR_BUCKET : ONBOARDING_DOCS_BUCKET;
-    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(newObj.path);
+  if (typeof newObj.name === "string" && typeof newObj.path === "string") {
+    const bucket = newObj.path.startsWith("avatars/")
+      ? AVATAR_BUCKET
+      : ONBOARDING_DOCS_BUCKET;
+    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(
+      newObj.path,
+    );
     newObj.preview = publicUrl;
     newObj.url = publicUrl;
   }
@@ -90,11 +139,17 @@ const processUrlsForDisplay = (obj: any): any => {
  * @param submissionId The onboarding submission ID; helps group files by
  *                   submission when provided.  May be an empty string.
  */
-const processFilesForUpload = async (obj: any, userId: string, submissionId: string): Promise<any> => {
-  if (obj === null || typeof obj !== 'object') return obj;
+const processFilesForUpload = async (
+  obj: any,
+  userId: string,
+  submissionId: string,
+): Promise<any> => {
+  if (obj === null || typeof obj !== "object") return obj;
   // Handle arrays by processing each element
   if (Array.isArray(obj)) {
-    return Promise.all(obj.map(item => processFilesForUpload(item, userId, submissionId)));
+    return Promise.all(
+      obj.map((item) => processFilesForUpload(item, userId, submissionId)),
+    );
   }
 
   const newObj: any = { ...obj };
@@ -104,12 +159,14 @@ const processFilesForUpload = async (obj: any, userId: string, submissionId: str
     // Construct a unique storage path using the userId and submissionId
     const filePath = `${userId}/documents/${Date.now()}_${file.name}`;
     // Upload the file to the onboarding documents bucket
-    const { error: uploadError } = await supabase.storage.from(ONBOARDING_DOCS_BUCKET).upload(filePath, file);
+    const { error: uploadError } = await supabase.storage.from(
+      ONBOARDING_DOCS_BUCKET,
+    ).upload(filePath, file);
     if (uploadError) throw uploadError;
     // Insert a record into the user_documents table.  Use a best‑effort
     // approach so the insert failing doesn't block the upload.
     try {
-      await supabase.from('user_documents').insert({
+      await supabase.from("user_documents").insert({
         user_id: userId,
         submission_id: submissionId || null,
         name: newObj.name || file.name,
@@ -119,7 +176,7 @@ const processFilesForUpload = async (obj: any, userId: string, submissionId: str
         file_size: file.size,
       });
     } catch (insertErr) {
-      console.error('Failed to record uploaded document:', insertErr);
+      console.error("Failed to record uploaded document:", insertErr);
     }
     // Replace with metadata object that will be stored in the submission JSON
     return {
@@ -130,7 +187,7 @@ const processFilesForUpload = async (obj: any, userId: string, submissionId: str
     };
   }
   // If object already has name and path, treat as existing file metadata
-  if (typeof newObj.name === 'string' && newObj.path) {
+  if (typeof newObj.name === "string" && newObj.path) {
     return {
       name: newObj.name,
       type: newObj.type,
@@ -141,7 +198,11 @@ const processFilesForUpload = async (obj: any, userId: string, submissionId: str
   // Recursively process nested properties
   for (const key in newObj) {
     if (Object.prototype.hasOwnProperty.call(newObj, key)) {
-      newObj[key] = await processFilesForUpload(newObj[key], userId, submissionId);
+      newObj[key] = await processFilesForUpload(
+        newObj[key],
+        userId,
+        submissionId,
+      );
     }
   }
   return newObj;
@@ -154,13 +215,19 @@ const dataUrlToBlob = async (dataUrl: string) => {
 
 const toSnakeCase = (data: any): any => {
   if (Array.isArray(data)) {
-    return data.map(item => toSnakeCase(item));
+    return data.map((item) => toSnakeCase(item));
   }
-  if (data !== null && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+  if (
+    data !== null && typeof data === "object" && !(data instanceof Date) &&
+    !(data instanceof File)
+  ) {
     const snaked: Record<string, any> = {};
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        const snakeKey = key.replace(
+          /[A-Z]/g,
+          (letter) => `_${letter.toLowerCase()}`,
+        );
         snaked[snakeKey] = toSnakeCase(data[key]);
       }
     }
@@ -171,13 +238,13 @@ const toSnakeCase = (data: any): any => {
 
 const toCamelCase = (data: any): any => {
   if (Array.isArray(data)) {
-    return data.map(item => toCamelCase(item));
+    return data.map((item) => toCamelCase(item));
   }
-  if (data !== null && typeof data === 'object' && !(data instanceof Date)) {
+  if (data !== null && typeof data === "object" && !(data instanceof Date)) {
     const camelCased: Record<string, any> = {};
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const camelKey = key.replace(/_([a-z])/g, g => g[1].toUpperCase());
+        const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
         camelCased[camelKey] = toCamelCase(data[key]);
       }
     }
@@ -188,19 +255,26 @@ const toCamelCase = (data: any): any => {
 
 export const api = {
   // --- Initial Data Loading ---
-  getInitialAppData: async (): Promise<{ settings: any; roles: Role[]; holidays: Holiday[] }> => {
+  getInitialAppData: async (): Promise<
+    { settings: any; roles: Role[]; holidays: Holiday[] }
+  > => {
     const { data: settingsData, error: settingsError } = await supabase
-      .from('settings')
-      .select('*')
-      .eq('id', 'singleton')
+      .from("settings")
+      .select("*")
+      .eq("id", "singleton")
       .single();
-    if (settingsError) throw new Error('Failed to fetch core application settings.');
+    if (settingsError) {
+      throw new Error("Failed to fetch core application settings.");
+    }
 
-    const { data: rolesData, error: rolesError } = await supabase.from('roles').select('*');
-    if (rolesError) throw new Error('Failed to fetch user roles.');
+    const { data: rolesData, error: rolesError } = await supabase.from("roles")
+      .select("*");
+    if (rolesError) throw new Error("Failed to fetch user roles.");
 
-    const { data: holidaysData, error: holidaysError } = await supabase.from('holidays').select('*');
-    if (holidaysError) throw new Error('Failed to fetch holidays.');
+    const { data: holidaysData, error: holidaysError } = await supabase.from(
+      "holidays",
+    ).select("*");
+    if (holidaysError) throw new Error("Failed to fetch holidays.");
 
     return {
       settings: toCamelCase(settingsData),
@@ -210,39 +284,56 @@ export const api = {
   },
 
   // --- Onboarding & Verification ---
-  getVerificationSubmissions: async (status?: string, organizationId?: string): Promise<OnboardingData[]> => {
-    let query = supabase.from('onboarding_submissions').select('*');
-    if (status) query = query.eq('status', status);
-    if (organizationId) query = query.eq('organization_id', organizationId);
-    const { data, error } = await query.order('created_at', { ascending: false });
+  getVerificationSubmissions: async (
+    status?: string,
+    organizationId?: string,
+  ): Promise<OnboardingData[]> => {
+    let query = supabase.from("onboarding_submissions").select("*");
+    if (status) query = query.eq("status", status);
+    if (organizationId) query = query.eq("organization_id", organizationId);
+    const { data, error } = await query.order("created_at", {
+      ascending: false,
+    });
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
 
   getOnboardingDataById: async (id: string): Promise<OnboardingData | null> => {
-    const { data, error } = await supabase.from('onboarding_submissions').select('*').eq('id', id).single();
-    if (error && error.code !== 'PGRST116') throw error;
+    const { data, error } = await supabase.from("onboarding_submissions")
+      .select("*").eq("id", id).single();
+    if (error && error.code !== "PGRST116") throw error;
     return data ? toCamelCase(data) : null;
   },
 
-  _saveSubmission: async (data: OnboardingData, asDraft: boolean): Promise<{ draftId: string }> => {
+  _saveSubmission: async (
+    data: OnboardingData,
+    asDraft: boolean,
+  ): Promise<{ draftId: string }> => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) throw new Error("User not authenticated");
 
-    const submissionId = (data.id && !data.id.startsWith('draft_')) ? data.id : crypto.randomUUID();
-    const dataWithPaths = await processFilesForUpload(data, session.user.id, submissionId);
+    const submissionId = (data.id && !data.id.startsWith("draft_"))
+      ? data.id
+      : crypto.randomUUID();
+    const dataWithPaths = await processFilesForUpload(
+      data,
+      session.user.id,
+      submissionId,
+    );
 
     const dbData = {
       ...toSnakeCase(dataWithPaths),
       id: submissionId,
       user_id: session.user.id,
-      status: asDraft ? 'draft' : data.status,
+      status: asDraft ? "draft" : data.status,
     };
 
     delete dbData.file;
     delete dbData.confirm_account_number;
 
-    const { data: savedData, error } = await supabase.from('onboarding_submissions').upsert(dbData, { onConflict: 'id' }).select('id').single();
+    const { data: savedData, error } = await supabase.from(
+      "onboarding_submissions",
+    ).upsert(dbData, { onConflict: "id" }).select("id").single();
     if (error) throw error;
     return { draftId: savedData.id };
   },
@@ -257,30 +348,41 @@ export const api = {
   },
 
   updateOnboarding: async (data: OnboardingData) => {
-    const { draftId } = await api._saveSubmission(data, data.status === 'draft');
+    const { draftId } = await api._saveSubmission(
+      data,
+      data.status === "draft",
+    );
     const updatedData = await api.getOnboardingDataById(draftId);
     if (!updatedData) throw new Error("Failed to retrieve updated data.");
     return updatedData;
   },
 
   verifySubmission: async (id: string): Promise<void> => {
-    const { error } = await supabase.from('onboarding_submissions').update({ status: 'verified', portal_sync_status: 'pending_sync' }).eq('id', id);
+    const { error } = await supabase.from("onboarding_submissions").update({
+      status: "verified",
+      portal_sync_status: "pending_sync",
+    }).eq("id", id);
     if (error) throw error;
   },
 
   requestChanges: async (id: string, reason: string): Promise<void> => {
-    const { error } = await supabase.from('onboarding_submissions').update({ status: 'rejected' }).eq('id', id);
+    const { error } = await supabase.from("onboarding_submissions").update({
+      status: "rejected",
+    }).eq("id", id);
     if (error) throw error;
   },
 
   syncPortals: async (id: string): Promise<OnboardingData> => {
-    const { data, error } = await supabase.functions.invoke('sync-portals', { body: { submissionId: id } });
+    const { data, error } = await supabase.functions.invoke("sync-portals", {
+      body: { submissionId: id },
+    });
     if (error) throw error;
     return toCamelCase(data);
   },
 
   deleteFile: async (filePath: string): Promise<void> => {
-    const { error } = await supabase.storage.from(ONBOARDING_DOCS_BUCKET).remove([filePath]);
+    const { error } = await supabase.storage.from(ONBOARDING_DOCS_BUCKET)
+      .remove([filePath]);
     if (error) throw error;
   },
 
@@ -304,20 +406,25 @@ export const api = {
     file: File,
     bucket: string = ONBOARDING_DOCS_BUCKET,
     submissionId?: string,
-    docName?: string
-  ): Promise<{ url: string; path: string; }> => {
+    docName?: string,
+  ): Promise<{ url: string; path: string }> => {
     const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id || 'anonymous_user';
+    const userId = session?.user?.id || "anonymous_user";
     const filePath = `${userId}/documents/${Date.now()}_${file.name}`;
-    const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, file);
+    const { error: uploadError } = await supabase.storage.from(bucket).upload(
+      filePath,
+      file,
+    );
     if (uploadError) throw uploadError;
     const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
-    if (!data.publicUrl) throw new Error('Could not get public URL for uploaded file.');
+    if (!data.publicUrl) {
+      throw new Error("Could not get public URL for uploaded file.");
+    }
 
     // Record the uploaded document in the user_documents table.  Use a try/catch
     // so that even if this insert fails, the upload will still succeed.
     try {
-      await supabase.from('user_documents').insert({
+      await supabase.from("user_documents").insert({
         user_id: userId,
         submission_id: submissionId || null,
         name: docName || file.name,
@@ -327,25 +434,39 @@ export const api = {
         file_size: file.size,
       });
     } catch (e) {
-      console.error('Failed to insert user_documents record:', e);
+      console.error("Failed to insert user_documents record:", e);
     }
     return { url: data.publicUrl, path: filePath };
   },
 
   // --- Users & Orgs ---
   getUsers: async (): Promise<User[]> => {
-    const { data, error } = await supabase.from('users').select('*, role_id');
+    const { data, error } = await supabase.from("users").select("*, role_id");
     if (error) throw error;
-    return (data || []).map(u => toCamelCase({ ...u, role: u.role_id }));
+    return (data || []).map((u) => toCamelCase({ ...u, role: u.role_id }));
   },
-  getUsersWithManagers: async (): Promise<(User & { managerName?: string })[]> => {
-    const { data: users, error } = await supabase.from('users').select('*, reporting_manager_id, role_id');
+  getUsersWithManagers: async (): Promise<
+    (User & { managerName?: string })[]
+  > => {
+    const { data: users, error } = await supabase.from("users").select(
+      "*, reporting_manager_id, role_id",
+    );
     if (error) throw error;
-    const camelUsers = (users || []).map(u => toCamelCase({ ...u, role: u.role_id }));
-    const userMap = new Map(camelUsers.map(u => [u.id, u.name]));
-    return camelUsers.map(u => ({ ...u, managerName: u.reportingManagerId ? userMap.get(u.reportingManagerId) : undefined }));
+    const camelUsers = (users || []).map((u) =>
+      toCamelCase({ ...u, role: u.role_id })
+    );
+    const userMap = new Map(camelUsers.map((u) => [u.id, u.name]));
+    return camelUsers.map((u) => ({
+      ...u,
+      managerName: u.reportingManagerId
+        ? userMap.get(u.reportingManagerId)
+        : undefined,
+    }));
   },
-  getFieldOfficers: async () => api.getUsers().then(users => users.filter(u => u.role === 'field_officer')),
+  getFieldOfficers: async () =>
+    api.getUsers().then((users) =>
+      users.filter((u) => u.role === "field_officer")
+    ),
   /**
    * Fetch users who should receive check‑in/out notifications.
    * Includes HR, operations managers, admins, developers and site managers.
@@ -365,28 +486,38 @@ export const api = {
       const start = new Date();
       start.setHours(0, 0, 0, 0);
       const end = new Date();
-      const events = await api.getAllAttendanceEvents(start.toISOString(), end.toISOString());
+      const events = await api.getAllAttendanceEvents(
+        start.toISOString(),
+        end.toISOString(),
+      );
       const latest: Record<string, { type: string; timestamp: string }> = {};
-      events.forEach(evt => {
+      events.forEach((evt) => {
         const { userId, type, timestamp } = evt as any;
         if (!userId) return;
-        if (!latest[userId] || new Date(timestamp) > new Date(latest[userId].timestamp)) {
+        if (
+          !latest[userId] ||
+          new Date(timestamp) > new Date(latest[userId].timestamp)
+        ) {
           latest[userId] = { type: type.toLowerCase(), timestamp };
         }
       });
-      availability = Object.fromEntries(Object.entries(latest).map(([userId, info]) => {
-        // Normalize the type string: remove underscores, hyphens, convert to lowercase
-        const normalizedType = info.type.toLowerCase().replace(/[-_\s]/g, '');
-        // User is available only if their latest event is check-in
-        const isCheckIn = normalizedType === 'checkin';
-        console.log(`User ${userId}: latest event type = "${info.type}", normalized = "${normalizedType}", isCheckIn = ${isCheckIn}`);
-        return [userId, isCheckIn];
-      }));
+      availability = Object.fromEntries(
+        Object.entries(latest).map(([userId, info]) => {
+          // Normalize the type string: remove underscores, hyphens, convert to lowercase
+          const normalizedType = info.type.toLowerCase().replace(/[-_\s]/g, "");
+          // User is available only if their latest event is check-in
+          const isCheckIn = normalizedType === "checkin";
+          console.log(
+            `User ${userId}: latest event type = "${info.type}", normalized = "${normalizedType}", isCheckIn = ${isCheckIn}`,
+          );
+          return [userId, isCheckIn];
+        }),
+      );
     } catch (e) {
-      console.warn('Failed to compute user availability:', e);
+      console.warn("Failed to compute user availability:", e);
     }
     return allUsers
-      .map(u => ({ ...u, isAvailable: availability[u.id] ?? false }));
+      .map((u) => ({ ...u, isAvailable: availability[u.id] ?? false }));
   },
 
   updateUser: async (id: string, updates: Partial<User>) => {
@@ -394,46 +525,59 @@ export const api = {
     const dbUpdates: any = toSnakeCase(rest);
     if (role) dbUpdates.role_id = role;
 
-    if ('photo_url' in dbUpdates) {
+    if ("photo_url" in dbUpdates) {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) throw new Error("User not authenticated for photo upload");
+      if (!session?.user) {
+        throw new Error("User not authenticated for photo upload");
+      }
       const userId = session.user.id;
 
-      const { data: currentUserData } = await supabase.from('users').select('photo_url').eq('id', id).single();
+      const { data: currentUserData } = await supabase.from("users").select(
+        "photo_url",
+      ).eq("id", id).single();
       const oldPhotoUrl = currentUserData?.photo_url;
 
       const deleteOldAvatar = async (oldUrl: string | null | undefined) => {
         if (!oldUrl) return;
         try {
           const urlObject = new URL(oldUrl);
-          const pathWithBucket = urlObject.pathname.split('/public/')[1];
+          const pathWithBucket = urlObject.pathname.split("/public/")[1];
           if (pathWithBucket) {
-            const [bucketName, ...pathParts] = pathWithBucket.split('/');
-            const oldPath = pathParts.join('/');
-            if (oldPath) await supabase.storage.from(bucketName).remove([oldPath]);
+            const [bucketName, ...pathParts] = pathWithBucket.split("/");
+            const oldPath = pathParts.join("/");
+            if (oldPath) {
+              await supabase.storage.from(bucketName).remove([oldPath]);
+            }
           }
         } catch (e) {
           console.error("Failed to process old avatar URL for deletion:", e);
         }
       };
 
-      if (dbUpdates.photo_url && dbUpdates.photo_url.startsWith('data:')) {
+      if (dbUpdates.photo_url && dbUpdates.photo_url.startsWith("data:")) {
         await deleteOldAvatar(oldPhotoUrl);
         const blob = await dataUrlToBlob(dbUpdates.photo_url);
-        const fileExt = dbUpdates.photo_url.split(';')[0].split('/')[1] || 'jpg';
+        const fileExt = dbUpdates.photo_url.split(";")[0].split("/")[1] ||
+          "jpg";
         const filePath = `${userId}/${Date.now()}.${fileExt}`;
         // Allow overwriting existing files if the same filename is used by enabling the `upsert` option.
         // Without `upsert: true`, Supabase will reject uploads with duplicate paths.
-        const { error: uploadError } = await supabase.storage.from(AVATAR_BUCKET).upload(filePath, blob, { upsert: true });
+        const { error: uploadError } = await supabase.storage.from(
+          AVATAR_BUCKET,
+        ).upload(filePath, blob, { upsert: true });
         if (uploadError) throw uploadError;
-        const { data: { publicUrl } } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+        const { data: { publicUrl } } = supabase.storage.from(AVATAR_BUCKET)
+          .getPublicUrl(filePath);
         dbUpdates.photo_url = publicUrl;
       } else if (dbUpdates.photo_url === null) {
         await deleteOldAvatar(oldPhotoUrl);
       }
     }
 
-    const { data, error } = await supabase.from('users').update(dbUpdates).eq('id', id).select().single();
+    const { data, error } = await supabase.from("users").update(dbUpdates).eq(
+      "id",
+      id,
+    ).select().single();
     if (error) throw error;
     return toCamelCase({ ...data, role: data.role_id });
   },
@@ -443,37 +587,52 @@ export const api = {
     const dbData: any = toSnakeCase(rest);
     if (role) dbData.role_id = role;
 
-    const { data, error } = await supabase.from('users').insert(dbData).select().single();
+    const { data, error } = await supabase.from("users").insert(dbData).select()
+      .single();
     if (error) throw error;
     return toCamelCase({ ...data, role: data.role_id });
   },
 
   deleteUser: async (id: string) => {
-    const { error } = await supabase.from('users').delete().eq('id', id);
+    const { error } = await supabase.from("users").delete().eq("id", id);
     if (error) throw error;
   },
 
-  updateUserReportingManager: async (userId: string, managerId: string | null) => {
-    const { error } = await supabase.from('users').update({ reporting_manager_id: managerId }).eq('id', userId);
+  updateUserReportingManager: async (
+    userId: string,
+    managerId: string | null,
+  ) => {
+    const { error } = await supabase.from("users").update({
+      reporting_manager_id: managerId,
+    }).eq("id", userId);
     if (error) throw error;
   },
 
   getOrganizations: async (): Promise<Organization[]> => {
-    const { data, error } = await supabase.from('organizations').select('*').order('short_name');
+    const { data, error } = await supabase.from("organizations").select("*")
+      .order("short_name");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   createOrganization: async (org: Organization): Promise<Organization> => {
-    const { data, error } = await supabase.from('organizations').insert(toSnakeCase(org)).select().single();
+    const { data, error } = await supabase.from("organizations").insert(
+      toSnakeCase(org),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   getOrganizationStructure: async (): Promise<OrganizationGroup[]> => {
-    const { data: groups, error: groupsError } = await supabase.from('organization_groups').select('*');
+    const { data: groups, error: groupsError } = await supabase.from(
+      "organization_groups",
+    ).select("*");
     if (groupsError) throw groupsError;
-    const { data: companies, error: companiesError } = await supabase.from('companies').select('*');
+    const { data: companies, error: companiesError } = await supabase.from(
+      "companies",
+    ).select("*");
     if (companiesError) throw companiesError;
-    const { data: entities, error: entitiesError } = await supabase.from('entities').select('*');
+    const { data: entities, error: entitiesError } = await supabase.from(
+      "entities",
+    ).select("*");
     if (entitiesError) throw entitiesError;
 
     const camelGroups: any[] = (groups || []).map(toCamelCase);
@@ -481,75 +640,114 @@ export const api = {
     const camelEntities: any[] = (entities || []).map(toCamelCase);
 
     const companyMap = new Map<string, any[]>();
-    camelCompanies.forEach(company => {
-      const companyWithEntities = { ...company, entities: camelEntities.filter(e => e.companyId === company.id) };
+    camelCompanies.forEach((company) => {
+      const companyWithEntities = {
+        ...company,
+        entities: camelEntities.filter((e) => e.companyId === company.id),
+      };
       if (!companyMap.has(company.groupId)) companyMap.set(company.groupId, []);
       companyMap.get(company.groupId)!.push(companyWithEntities);
     });
 
-    return camelGroups.map(group => ({ ...group, companies: companyMap.get(group.id) || [], locations: [] }));
+    return camelGroups.map((group) => ({
+      ...group,
+      companies: companyMap.get(group.id) || [],
+      locations: [],
+    }));
   },
   getSiteConfigurations: async (): Promise<SiteConfiguration[]> => {
-    const { data, error } = await supabase.from('site_configurations').select('*');
+    const { data, error } = await supabase.from("site_configurations").select(
+      "*",
+    );
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  bulkUploadOrganizations: async (orgs: Organization[]): Promise<{ count: number }> => {
-    const { count, error } = await supabase.from('organizations').upsert(toSnakeCase(orgs), { onConflict: 'id' });
+  bulkUploadOrganizations: async (
+    orgs: Organization[],
+  ): Promise<{ count: number }> => {
+    const { count, error } = await supabase.from("organizations").upsert(
+      toSnakeCase(orgs),
+      { onConflict: "id" },
+    );
     if (error) throw error;
     return { count: count || 0 };
   },
   getModules: async (): Promise<AppModule[]> => {
-    const { data, error } = await supabase.from('app_modules').select('*');
+    const { data, error } = await supabase.from("app_modules").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   saveModules: async (modules: AppModule[]): Promise<void> => {
     // A full replacement is complex, upsert is simplest for now.
-    const { error } = await supabase.from('app_modules').upsert(toSnakeCase(modules));
+    const { error } = await supabase.from("app_modules").upsert(
+      toSnakeCase(modules),
+    );
     if (error) throw error;
   },
   getRoles: async (): Promise<Role[]> => {
-    const { data, error } = await supabase.from('roles').select('*');
+    const { data, error } = await supabase.from("roles").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   saveRoles: async (roles: Role[]): Promise<void> => {
-    const { error } = await supabase.from('roles').upsert(toSnakeCase(roles));
+    const { error } = await supabase.from("roles").upsert(toSnakeCase(roles));
     if (error) throw error;
   },
   getHolidays: async (): Promise<Holiday[]> => {
-    const { data, error } = await supabase.from('holidays').select('*');
+    const { data, error } = await supabase.from("holidays").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  addHoliday: async (holiday: Omit<Holiday, 'id'>): Promise<Holiday> => {
-    const { data, error } = await supabase.from('holidays').insert(toSnakeCase(holiday)).select().single();
+  addHoliday: async (holiday: Omit<Holiday, "id">): Promise<Holiday> => {
+    const { data, error } = await supabase.from("holidays").insert(
+      toSnakeCase(holiday),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   removeHoliday: async (id: string): Promise<void> => {
-    const { error } = await supabase.from('holidays').delete().eq('id', id);
+    const { error } = await supabase.from("holidays").delete().eq("id", id);
     if (error) throw error;
   },
-  getAttendanceEvents: async (userId: string, start: string, end: string): Promise<AttendanceEvent[]> => {
-    const { data, error } = await supabase.from('attendance_events').select('*').eq('user_id', userId).gte('timestamp', start).lte('timestamp', end);
+  getAttendanceEvents: async (
+    userId: string,
+    start: string,
+    end: string,
+  ): Promise<AttendanceEvent[]> => {
+    const { data, error } = await supabase.from("attendance_events").select("*")
+      .eq("user_id", userId).gte("timestamp", start).lte("timestamp", end);
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  getAllAttendanceEvents: async (start: string, end: string): Promise<AttendanceEvent[]> => {
-    const { data, error } = await supabase.from('attendance_events').select('*').gte('timestamp', start).lte('timestamp', end);
+  getAllAttendanceEvents: async (
+    start: string,
+    end: string,
+  ): Promise<AttendanceEvent[]> => {
+    const { data, error } = await supabase.from("attendance_events").select("*")
+      .gte("timestamp", start).lte("timestamp", end);
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  getAttendanceDashboardData: async (startDate: Date, endDate: Date, currentDate: Date, timezone: string = 'UTC') => {
-    const { data, error } = await supabase.rpc('get_attendance_dashboard_data', {
-      start_date_iso: format(startDate, 'yyyy-MM-dd'),
-      end_date_iso: format(endDate, 'yyyy-MM-dd'),
-      current_date_iso: format(currentDate, 'yyyy-MM-dd'),
-      p_timezone: timezone,
-    });
-    if (error) throw new Error('Could not load attendance dashboard data from the database function.');
+  getAttendanceDashboardData: async (
+    startDate: Date,
+    endDate: Date,
+    currentDate: Date,
+    timezone: string = "UTC",
+  ) => {
+    const { data, error } = await supabase.rpc(
+      "get_attendance_dashboard_data",
+      {
+        start_date_iso: format(startDate, "yyyy-MM-dd"),
+        end_date_iso: format(endDate, "yyyy-MM-dd"),
+        current_date_iso: format(currentDate, "yyyy-MM-dd"),
+        p_timezone: timezone,
+      },
+    );
+    if (error) {
+      throw new Error(
+        "Could not load attendance dashboard data from the database function.",
+      );
+    }
     return data;
   },
   /**
@@ -562,9 +760,11 @@ export const api = {
    * @param event An attendance event without an id.  Accepts optional
    *              latitude, longitude and locationId properties.
    */
-  addAttendanceEvent: async (event: Omit<AttendanceEvent, 'id'>): Promise<void> => {
+  addAttendanceEvent: async (
+    event: Omit<AttendanceEvent, "id">,
+  ): Promise<void> => {
     const { error } = await supabase
-      .from('attendance_events')
+      .from("attendance_events")
       .insert(toSnakeCase(event));
     if (error) throw error;
   },
@@ -589,14 +789,17 @@ export const api = {
     // creator.  Supabase will return an array of objects with a
     // created_by_user property containing the joined user row.
     const { data, error } = await supabase
-      .from('locations')
-      .select('*, created_by_user:created_by (id, name)');
+      .from("locations")
+      .select("*, created_by_user:created_by (id, name)");
     if (error) throw error;
     // Convert to camelCase and hoist the creator name into
     // createdByName for convenience.  Preserve other fields as is.
     return (data || []).map((raw: any) => {
       const camel = toCamelCase(raw) as any;
-      const createdByUser = camel.createdByUser as { id?: string; name?: string } | undefined;
+      const createdByUser = camel.createdByUser as {
+        id?: string;
+        name?: string;
+      } | undefined;
       const createdByName = createdByUser?.name || undefined;
       // Remove the nested createdByUser field to avoid leaking
       // implementation details.  Spread the camel object first to
@@ -614,9 +817,9 @@ export const api = {
    */
   getUserLocations: async (userId: string): Promise<Location[]> => {
     const { data, error } = await supabase
-      .from('user_locations')
-      .select('location_id:location_id (*), id')
-      .eq('user_id', userId);
+      .from("user_locations")
+      .select("location_id:location_id (*), id")
+      .eq("user_id", userId);
     if (error) throw error;
     // Flatten nested location record from join: { location_id: { ... } }
     return (data || []).map((row: any) => {
@@ -642,9 +845,9 @@ export const api = {
     // Convert camelCased keys to snake_cased for Supabase
     const payload = toSnakeCase(loc);
     const { data, error } = await supabase
-      .from('locations')
+      .from("locations")
       .insert(payload)
-      .select('*')
+      .select("*")
       .single();
     if (error) throw error;
     return toCamelCase(data) as Location;
@@ -654,9 +857,12 @@ export const api = {
    * Assign an existing location to a user.  This creates a row in
    * user_locations.  Only the id of the new assignment is returned.
    */
-  assignLocationToUser: async (userId: string, locationId: string): Promise<void> => {
+  assignLocationToUser: async (
+    userId: string,
+    locationId: string,
+  ): Promise<void> => {
     const { error } = await supabase
-      .from('user_locations')
+      .from("user_locations")
       .insert({ user_id: userId, location_id: locationId });
     if (error) throw error;
   },
@@ -675,10 +881,10 @@ export const api = {
   }): Promise<Location> => {
     const payload = toSnakeCase(updates);
     const { data, error } = await supabase
-      .from('locations')
+      .from("locations")
       .update(payload)
-      .eq('id', id)
-      .select('*')
+      .eq("id", id)
+      .select("*")
       .single();
     if (error) throw error;
     return toCamelCase(data) as Location;
@@ -690,9 +896,9 @@ export const api = {
    */
   deleteLocation: async (id: string): Promise<void> => {
     const { error } = await supabase
-      .from('locations')
+      .from("locations")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
     if (error) throw error;
   },
 
@@ -700,9 +906,12 @@ export const api = {
    * Remove a user->location assignment.  Deletes the row from
    * user_locations for the given userId and locationId.
    */
-  unassignLocationFromUser: async (userId: string, locationId: string): Promise<void> => {
+  unassignLocationFromUser: async (
+    userId: string,
+    locationId: string,
+  ): Promise<void> => {
     const { error } = await supabase
-      .from('user_locations')
+      .from("user_locations")
       .delete()
       .match({ user_id: userId, location_id: locationId });
     if (error) throw error;
@@ -716,12 +925,14 @@ export const api = {
    * overwriting existing objects.
    */
   uploadLogo: async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop() || 'png';
+    const fileExt = file.name.split(".").pop() || "png";
     const fileName = `${Date.now()}_${file.name}`;
     const filePath = `${fileName}`;
-    const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET).upload(filePath, file, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from(LOGO_BUCKET)
+      .upload(filePath, file, { upsert: true });
     if (uploadError) throw uploadError;
-    const { data: { publicUrl } } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(filePath);
+    const { data: { publicUrl } } = supabase.storage.from(LOGO_BUCKET)
+      .getPublicUrl(filePath);
     return publicUrl;
   },
 
@@ -731,10 +942,14 @@ export const api = {
    * listing available logos in the interface settings modal.
    */
   getLogos: async (): Promise<{ name: string; url: string }[]> => {
-    const { data, error } = await supabase.storage.from(LOGO_BUCKET).list('', { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+    const { data, error } = await supabase.storage.from(LOGO_BUCKET).list("", {
+      limit: 100,
+      sortBy: { column: "name", order: "asc" },
+    });
     if (error) throw error;
-    return (data || []).map(obj => {
-      const { data: { publicUrl } } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(obj.name);
+    return (data || []).map((obj) => {
+      const { data: { publicUrl } } = supabase.storage.from(LOGO_BUCKET)
+        .getPublicUrl(obj.name);
       return { name: obj.name, url: publicUrl };
     });
   },
@@ -745,7 +960,9 @@ export const api = {
    * in settings.  If the file does not exist, this call is a no-op.
    */
   deleteLogo: async (fileName: string): Promise<void> => {
-    const { error } = await supabase.storage.from(LOGO_BUCKET).remove([fileName]);
+    const { error } = await supabase.storage.from(LOGO_BUCKET).remove([
+      fileName,
+    ]);
     if (error) throw error;
   },
 
@@ -754,12 +971,15 @@ export const api = {
    * login carousel.  Returns the public URL of the uploaded image.
    */
   uploadBackground: async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop() || 'png';
+    const fileExt = file.name.split(".").pop() || "png";
     const fileName = `${Date.now()}_${file.name}`;
     const filePath = `${fileName}`;
-    const { error: uploadError } = await supabase.storage.from(BACKGROUND_BUCKET).upload(filePath, file, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from(
+      BACKGROUND_BUCKET,
+    ).upload(filePath, file, { upsert: true });
     if (uploadError) throw uploadError;
-    const { data: { publicUrl } } = supabase.storage.from(BACKGROUND_BUCKET).getPublicUrl(filePath);
+    const { data: { publicUrl } } = supabase.storage.from(BACKGROUND_BUCKET)
+      .getPublicUrl(filePath);
     return publicUrl;
   },
 
@@ -768,10 +988,14 @@ export const api = {
    * an array of objects with `name` and `url` for each file.
    */
   getBackgroundImages: async (): Promise<{ name: string; url: string }[]> => {
-    const { data, error } = await supabase.storage.from(BACKGROUND_BUCKET).list('', { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+    const { data, error } = await supabase.storage.from(BACKGROUND_BUCKET).list(
+      "",
+      { limit: 100, sortBy: { column: "name", order: "asc" } },
+    );
     if (error) throw error;
-    return (data || []).map(obj => {
-      const { data: { publicUrl } } = supabase.storage.from(BACKGROUND_BUCKET).getPublicUrl(obj.name);
+    return (data || []).map((obj) => {
+      const { data: { publicUrl } } = supabase.storage.from(BACKGROUND_BUCKET)
+        .getPublicUrl(obj.name);
       return { name: obj.name, url: publicUrl };
     });
   },
@@ -780,26 +1004,34 @@ export const api = {
    * Delete a background image by filename from the `background` bucket.
    */
   deleteBackground: async (fileName: string): Promise<void> => {
-    const { error } = await supabase.storage.from(BACKGROUND_BUCKET).remove([fileName]);
+    const { error } = await supabase.storage.from(BACKGROUND_BUCKET).remove([
+      fileName,
+    ]);
     if (error) throw error;
   },
   getAttendanceSettings: async (): Promise<AttendanceSettings> => {
-    const { data, error } = await supabase.from('settings').select('attendance_settings').eq('id', 'singleton').single();
+    const { data, error } = await supabase.from("settings").select(
+      "attendance_settings",
+    ).eq("id", "singleton").single();
     if (error) throw error;
-    if (!data?.attendance_settings) throw new Error('Attendance settings are not configured.');
+    if (!data?.attendance_settings) {
+      throw new Error("Attendance settings are not configured.");
+    }
     return toCamelCase(data.attendance_settings) as AttendanceSettings;
   },
-  saveAttendanceSettings: async (settings: AttendanceSettings): Promise<void> => {
+  saveAttendanceSettings: async (
+    settings: AttendanceSettings,
+  ): Promise<void> => {
     // Ensure we are upserting with the correct ID and data structure
     const { error } = await supabase
-      .from('settings')
+      .from("settings")
       .upsert(
         {
-          id: 'singleton',
+          id: "singleton",
           attendance_settings: toSnakeCase(settings),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         },
-        { onConflict: 'id' }
+        { onConflict: "id" },
       );
 
     if (error) {
@@ -809,123 +1041,213 @@ export const api = {
   },
 
   getRecurringHolidays: async (): Promise<RecurringHolidayRule[]> => {
-    const { data, error } = await supabase.from('recurring_holidays').select('*');
+    const { data, error } = await supabase.from("recurring_holidays").select(
+      "*",
+    );
     if (error) throw error;
-    return (data || []).map(row => ({
+    return (data || []).map((row) => ({
       id: row.id,
       type: row.role_type,
       day: row.day,
-      n: row.occurrence
+      n: row.occurrence,
     }));
   },
 
-  addRecurringHoliday: async (rule: RecurringHolidayRule): Promise<RecurringHolidayRule> => {
+  addRecurringHoliday: async (
+    rule: RecurringHolidayRule,
+  ): Promise<RecurringHolidayRule> => {
     const dbRule = {
-      role_type: rule.type || 'office',
+      role_type: rule.type || "office",
       day: rule.day,
-      occurrence: rule.n
+      occurrence: rule.n,
     };
-    const { data, error } = await supabase.from('recurring_holidays').insert(dbRule).select().single();
+    const { data, error } = await supabase.from("recurring_holidays").insert(
+      dbRule,
+    ).select().single();
     if (error) throw error;
     return {
       id: data.id,
       type: data.role_type,
       day: data.day,
-      n: data.occurrence
+      n: data.occurrence,
     };
   },
 
   deleteRecurringHoliday: async (id: string): Promise<void> => {
-    const { error } = await supabase.from('recurring_holidays').delete().eq('id', id);
+    const { error } = await supabase.from("recurring_holidays").delete().eq(
+      "id",
+      id,
+    );
     if (error) throw error;
   },
-  createAssignment: async (officerId: string, siteId: string, date: string): Promise<void> => {
-    const site = (await api.getOrganizations()).find(o => o.id === siteId);
+  createAssignment: async (
+    officerId: string,
+    siteId: string,
+    date: string,
+  ): Promise<void> => {
+    const site = (await api.getOrganizations()).find((o) => o.id === siteId);
     await api.createTask({
-      name: `Visit ${site?.shortName || 'site'} for verification`,
-      description: `Perform on-site duties and verification tasks for ${site?.shortName}.`,
+      name: `Visit ${site?.shortName || "site"} for verification`,
+      description:
+        `Perform on-site duties and verification tasks for ${site?.shortName}.`,
       dueDate: date,
-      priority: 'Medium',
+      priority: "Medium",
       assignedToId: officerId,
     });
   },
   getLeaveBalancesForUser: async (userId: string): Promise<LeaveBalance> => {
-    const getStaffType = (role: UserRole): 'office' | 'field' => (['hr', 'admin', 'finance'].includes(role) ? 'office' : 'field');
-    const { data: settingsData, error: settingsError } = await supabase.from('settings').select('attendance_settings').eq('id', 'singleton').single();
-    if (settingsError || !settingsData?.attendance_settings) throw new Error('Could not load attendance rules.');
-    const { data: userData, error: userError } = await supabase.from('users').select('role_id').eq('id', userId).single();
+    const getStaffType = (
+      role: UserRole,
+    ):
+      | "office"
+      | "field" => (["hr", "admin", "finance"].includes(role)
+        ? "office"
+        : "field");
+    const { data: settingsData, error: settingsError } = await supabase.from(
+      "settings",
+    ).select("attendance_settings").eq("id", "singleton").single();
+    if (settingsError || !settingsData?.attendance_settings) {
+      throw new Error("Could not load attendance rules.");
+    }
+    const { data: userData, error: userError } = await supabase.from("users")
+      .select("role_id").eq("id", userId).single();
     if (userError) throw userError;
 
     const staffType = getStaffType(userData.role_id);
-    const rules = (toCamelCase(settingsData.attendance_settings) as AttendanceSettings)[staffType];
+    const rules =
+      (toCamelCase(settingsData.attendance_settings) as AttendanceSettings)[
+        staffType
+      ];
 
     const [
       { data: approvedLeaves, error: leavesError },
       { data: compOffData, error: compOffError },
-      { data: otData, error: otError }
+      { data: otData, error: otError },
     ] = await Promise.all([
-      supabase.from('leave_requests').select('leave_type, start_date, end_date, day_option').eq('user_id', userId).eq('status', 'approved'),
-      supabase.from('comp_off_logs').select('*').eq('user_id', userId),
-      supabase.from('extra_work_logs').select('hours_worked').eq('user_id', userId).eq('claim_type', 'OT').eq('status', 'Approved').gte('work_date', format(startOfMonth(new Date()), 'yyyy-MM-dd')).lte('work_date', format(endOfMonth(new Date()), 'yyyy-MM-dd'))
+      supabase.from("leave_requests").select(
+        "leave_type, start_date, end_date, day_option",
+      ).eq("user_id", userId).eq("status", "approved"),
+      supabase.from("comp_off_logs").select("*").eq("user_id", userId),
+      supabase.from("extra_work_logs").select("hours_worked").eq(
+        "user_id",
+        userId,
+      ).eq("claim_type", "OT").eq("status", "Approved").gte(
+        "work_date",
+        format(startOfMonth(new Date()), "yyyy-MM-dd"),
+      ).lte("work_date", format(endOfMonth(new Date()), "yyyy-MM-dd")),
     ]);
 
-    if (leavesError || compOffError || otError) throw new Error("Failed to fetch all leave balance data.");
+    if (leavesError || compOffError || otError) {
+      throw new Error("Failed to fetch all leave balance data.");
+    }
 
     const balance: LeaveBalance = {
       userId,
-      earnedTotal: rules.annualEarnedLeaves || 0, earnedUsed: 0,
-      sickTotal: rules.annualSickLeaves || 0, sickUsed: 0,
-      floatingTotal: (rules.monthlyFloatingLeaves || 0) * 12, floatingUsed: 0,
-      compOffTotal: (compOffData || []).length, compOffUsed: (compOffData || []).filter(log => log.status === 'used').length,
-      otHoursThisMonth: (otData || []).reduce((sum, log) => sum + (log.hours_worked || 0), 0),
+      earnedTotal: rules.annualEarnedLeaves || 0,
+      earnedUsed: 0,
+      sickTotal: rules.annualSickLeaves || 0,
+      sickUsed: 0,
+      floatingTotal: (rules.monthlyFloatingLeaves || 0) * 12,
+      floatingUsed: 0,
+      compOffTotal: (compOffData || []).length,
+      compOffUsed:
+        (compOffData || []).filter((log) => log.status === "used").length,
+      otHoursThisMonth: (otData || []).reduce(
+        (sum, log) => sum + (log.hours_worked || 0),
+        0,
+      ),
     };
 
-    (approvedLeaves || []).forEach(leave => {
-      const leaveAmount = leave.day_option === 'half' ? 0.5 : differenceInCalendarDays(new Date(leave.end_date), new Date(leave.start_date)) + 1;
-      if (leave.leave_type === 'Earned') balance.earnedUsed += leaveAmount;
-      if (leave.leave_type === 'Sick') balance.sickUsed += leaveAmount;
-      if (leave.leave_type === 'Floating') balance.floatingUsed += leaveAmount;
+    (approvedLeaves || []).forEach((leave) => {
+      const leaveAmount = leave.day_option === "half"
+        ? 0.5
+        : differenceInCalendarDays(
+          new Date(leave.end_date),
+          new Date(leave.start_date),
+        ) + 1;
+      if (leave.leave_type === "Earned") balance.earnedUsed += leaveAmount;
+      if (leave.leave_type === "Sick") balance.sickUsed += leaveAmount;
+      if (leave.leave_type === "Floating") balance.floatingUsed += leaveAmount;
     });
 
     return balance;
   },
-  submitLeaveRequest: async (data: Omit<LeaveRequest, 'id' | 'status' | 'currentApproverId' | 'approvalHistory'>): Promise<LeaveRequest> => {
-    const { data: userProfile, error: userError } = await supabase.from('users').select('reporting_manager_id').eq('id', data.userId).single();
+  submitLeaveRequest: async (
+    data: Omit<
+      LeaveRequest,
+      "id" | "status" | "currentApproverId" | "approvalHistory"
+    >,
+  ): Promise<LeaveRequest> => {
+    const { data: userProfile, error: userError } = await supabase.from("users")
+      .select("reporting_manager_id").eq("id", data.userId).single();
     if (userError) throw userError;
-    const { data: insertedData, error: insertError } = await supabase.from('leave_requests').insert({ ...toSnakeCase(data), status: 'pending_manager_approval', current_approver_id: userProfile.reporting_manager_id || null, approval_history: [] }).select('*').single();
+    const { data: insertedData, error: insertError } = await supabase.from(
+      "leave_requests",
+    ).insert({
+      ...toSnakeCase(data),
+      status: "pending_manager_approval",
+      current_approver_id: userProfile.reporting_manager_id || null,
+      approval_history: [],
+    }).select("*").single();
     if (insertError) throw insertError;
     return toCamelCase(insertedData);
   },
-  getLeaveRequests: async (filter?: { userId?: string, userIds?: string[], status?: string, forApproverId?: string, startDate?: string, endDate?: string }): Promise<LeaveRequest[]> => {
-    let query = supabase.from('leave_requests').select('*');
-    if (filter?.userId) query = query.eq('user_id', filter.userId);
-    if (filter?.userIds) query = query.in('user_id', filter.userIds);
-    if (filter?.status) query = query.eq('status', filter.status);
-    if (filter?.forApproverId) query = query.eq('current_approver_id', filter.forApproverId);
-    if (filter?.startDate && filter?.endDate) {
-      query = query.lte('start_date', filter.endDate).gte('end_date', filter.startDate);
+  getLeaveRequests: async (
+    filter?: {
+      userId?: string;
+      userIds?: string[];
+      status?: string;
+      forApproverId?: string;
+      startDate?: string;
+      endDate?: string;
+    },
+  ): Promise<LeaveRequest[]> => {
+    let query = supabase.from("leave_requests").select("*");
+    if (filter?.userId) query = query.eq("user_id", filter.userId);
+    if (filter?.userIds) query = query.in("user_id", filter.userIds);
+    if (filter?.status) query = query.eq("status", filter.status);
+    if (filter?.forApproverId) {
+      query = query.eq("current_approver_id", filter.forApproverId);
     }
-    const { data, error } = await query.order('start_date', { ascending: false });
+    if (filter?.startDate && filter?.endDate) {
+      query = query.lte("start_date", filter.endDate).gte(
+        "end_date",
+        filter.startDate,
+      );
+    }
+    const { data, error } = await query.order("start_date", {
+      ascending: false,
+    });
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   getTasks: async (): Promise<Task[]> => {
-    const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from("tasks").select("*").order(
+      "created_at",
+      { ascending: false },
+    );
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   createTask: async (taskData: Partial<Task>): Promise<Task> => {
-    const { data, error } = await supabase.from('tasks').insert(toSnakeCase({ ...taskData, status: 'To Do', escalationStatus: 'None' })).select().single();
+    const { data, error } = await supabase.from("tasks").insert(
+      toSnakeCase({ ...taskData, status: "To Do", escalationStatus: "None" }),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   updateTask: async (id: string, updates: Partial<Task>): Promise<Task> => {
     // Handle completion photo upload
-    if ((updates as any)?.completionPhoto && (updates as any).completionPhoto.file) {
+    if (
+      (updates as any)?.completionPhoto && (updates as any).completionPhoto.file
+    ) {
       const completion: any = (updates as any).completionPhoto;
       const file: File = completion.file;
       try {
-        const { path } = await api.uploadDocument(file, TASK_ATTACHMENTS_BUCKET);
+        const { path } = await api.uploadDocument(
+          file,
+          TASK_ATTACHMENTS_BUCKET,
+        );
         // Replace the completionPhoto with a JSON object containing metadata and the path
         (updates as any).completionPhoto = {
           name: completion.name,
@@ -934,39 +1256,52 @@ export const api = {
           path,
         };
       } catch (uploadError) {
-        console.error('Failed to upload task completion photo:', uploadError);
+        console.error("Failed to upload task completion photo:", uploadError);
         // Remove the file property to avoid sending File object to database
         delete (updates as any).completionPhoto;
       }
     }
-    const { data, error } = await supabase.from('tasks').update(toSnakeCase(updates)).eq('id', id).select().single();
+    const { data, error } = await supabase.from("tasks").update(
+      toSnakeCase(updates),
+    ).eq("id", id).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   deleteTask: async (id: string): Promise<void> => {
-    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (error) throw error;
   },
-  runAutomaticEscalations: async (): Promise<{ updatedTasks: Task[], newNotifications: Notification[] }> => {
-    const { data, error } = await supabase.functions.invoke('run-escalations');
+  runAutomaticEscalations: async (): Promise<
+    { updatedTasks: Task[]; newNotifications: Notification[] }
+  > => {
+    const { data, error } = await supabase.functions.invoke("run-escalations");
     if (error) throw error;
     return toCamelCase(data);
   },
   getNotifications: async (userId: string): Promise<Notification[]> => {
-    const { data, error } = await supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from("notifications").select("*").eq(
+      "user_id",
+      userId,
+    ).order("created_at", { ascending: false });
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  createNotification: async (data: Omit<Notification, 'id' | 'createdAt' | 'isRead'>): Promise<Notification> => {
-    const { data: inserted, error } = await supabase.from('notifications').insert(toSnakeCase(data)).select().single();
+  createNotification: async (
+    data: Omit<Notification, "id" | "createdAt" | "isRead">,
+  ): Promise<Notification> => {
+    const { data: inserted, error } = await supabase.from("notifications")
+      .insert(toSnakeCase(data)).select().single();
     if (error) throw error;
     return toCamelCase(inserted);
   },
   markNotificationAsRead: async (id: string): Promise<void> => {
-    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
   },
   markAllNotificationsAsRead: async (userId: string): Promise<void> => {
-    await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId).eq('is_read', false);
+    await supabase.from("notifications").update({ is_read: true }).eq(
+      "user_id",
+      userId,
+    ).eq("is_read", false);
   },
 
   /**
@@ -980,7 +1315,9 @@ export const api = {
    * @param data An object containing the new user's name, email, password and role.
    * @returns The newly created user record.
    */
-  createAuthUser: async (data: { name: string; email: string; password: string; role: string; }): Promise<User> => {
+  createAuthUser: async (
+    data: { name: string; email: string; password: string; role: string },
+  ): Promise<User> => {
     const { name, email, password, role } = data;
     // Attempt to create the user via the Supabase edge function first.  The
     // edge function uses the service role key on the server to create an auth
@@ -988,9 +1325,12 @@ export const api = {
     // is the preferred path in production because it avoids exposing the
     // service role key to the browser.
     try {
-      const { error: fnError } = await supabase.functions.invoke('admin-create-user', {
-        body: { name, email, password, role },
-      });
+      const { error: fnError } = await supabase.functions.invoke(
+        "admin-create-user",
+        {
+          body: { name, email, password, role },
+        },
+      );
       if (fnError) {
         throw fnError;
       }
@@ -998,30 +1338,40 @@ export const api = {
       // view.  The handle_new_user trigger should have inserted the row and
       // the edge function should have set the role.
       const allUsers = await api.getUsers();
-      const newUser = allUsers.find(u => u.email === email);
+      const newUser = allUsers.find((u) => u.email === email);
       if (newUser) return newUser;
       // If the user cannot be found immediately, fall through to the
       // fallback creation path below.
-      console.warn('admin-create-user completed but user not found; falling back to client side signup');
+      console.warn(
+        "admin-create-user completed but user not found; falling back to client side signup",
+      );
     } catch (fnError: any) {
       // If the edge function call fails entirely (e.g. network error or not
       // deployed), we fall back to client side signup using the anon key.
-      const msg = typeof fnError?.message === 'string' ? fnError.message : String(fnError);
-      if (!msg.toLowerCase().includes('failed to send a request') && !msg.toLowerCase().includes('edge function')) {
+      const msg = typeof fnError?.message === "string"
+        ? fnError.message
+        : String(fnError);
+      if (
+        !msg.toLowerCase().includes("failed to send a request") &&
+        !msg.toLowerCase().includes("edge function")
+      ) {
         // For other errors (such as email already registered), surface them directly.
         throw fnError;
       }
-      console.warn('Edge function not reachable, falling back to client side signup');
+      console.warn(
+        "Edge function not reachable, falling back to client side signup",
+      );
       // Create the auth user using the client side anon key.  This will send a
       // confirmation email automatically.  We include the name in user
       // metadata so it is persisted in auth.users.
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { name } },
-      });
+      const { data: signUpData, error: signUpError } = await supabase.auth
+        .signUp({
+          email,
+          password,
+          options: { data: { name } },
+        });
       if (signUpError || !signUpData?.user) {
-        throw signUpError || new Error('Failed to sign up user');
+        throw signUpError || new Error("Failed to sign up user");
       }
       const newAuthUser = signUpData.user;
       // Upsert into the public.users table.  This will create a row if it
@@ -1029,9 +1379,17 @@ export const api = {
       // upsert instead of update to handle the trigger delay between auth
       // signup and the creation of the profile row.
       try {
-        await supabase.from('users').upsert({ id: newAuthUser.id, name, email, role_id: role }, { onConflict: 'id' });
+        await supabase.from("users").upsert({
+          id: newAuthUser.id,
+          name,
+          email,
+          role_id: role,
+        }, { onConflict: "id" });
       } catch (profileErr) {
-        console.warn('Failed to upsert user profile after fallback signup:', profileErr);
+        console.warn(
+          "Failed to upsert user profile after fallback signup:",
+          profileErr,
+        );
       }
       // Finally return a user object combining the known fields.  Note that
       // some optional fields (phone, organization) will be undefined until the
@@ -1052,7 +1410,7 @@ export const api = {
     // Default return if no user found by either path.  This should rarely
     // occur; if it does, we return a minimal user object for consistency.
     return {
-      id: '',
+      id: "",
       name,
       email,
       role,
@@ -1064,181 +1422,373 @@ export const api = {
     } as User;
   },
   getPolicies: async (): Promise<Policy[]> => {
-    const { data, error } = await supabase.from('policies').select('*');
+    const { data, error } = await supabase.from("policies").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  createPolicy: async (data: Omit<Policy, 'id'>): Promise<Policy> => {
-    const { data: inserted, error } = await supabase.from('policies').insert(toSnakeCase(data)).select().single();
+  createPolicy: async (data: Omit<Policy, "id">): Promise<Policy> => {
+    const { data: inserted, error } = await supabase.from("policies").insert(
+      toSnakeCase(data),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(inserted);
   },
   getInsurances: async (): Promise<Insurance[]> => {
-    const { data, error } = await supabase.from('insurances').select('*');
+    const { data, error } = await supabase.from("insurances").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  createInsurance: async (data: Omit<Insurance, 'id'>): Promise<Insurance> => {
-    const { data: inserted, error } = await supabase.from('insurances').insert(toSnakeCase(data)).select().single();
+  createInsurance: async (data: Omit<Insurance, "id">): Promise<Insurance> => {
+    const { data: inserted, error } = await supabase.from("insurances").insert(
+      toSnakeCase(data),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(inserted);
   },
-  getApprovalWorkflowSettings: async (): Promise<{ finalConfirmationRole: UserRole }> => {
-    const { data, error } = await supabase.from('settings').select('approval_workflow_settings').eq('id', 'singleton').single();
+  getApprovalWorkflowSettings: async (): Promise<
+    { finalConfirmationRole: UserRole }
+  > => {
+    const { data, error } = await supabase.from("settings").select(
+      "approval_workflow_settings",
+    ).eq("id", "singleton").single();
     if (error) throw error;
-    if (!data?.approval_workflow_settings) throw new Error('Approval workflow settings are not configured.');
+    if (!data?.approval_workflow_settings) {
+      throw new Error("Approval workflow settings are not configured.");
+    }
     return toCamelCase(data.approval_workflow_settings);
   },
   updateApprovalWorkflowSettings: async (role: UserRole): Promise<void> => {
-    const { error } = await supabase.from('settings').update({ approval_workflow_settings: toSnakeCase({ finalConfirmationRole: role }) }).eq('id', 'singleton');
+    const { error } = await supabase.from("settings").update({
+      approval_workflow_settings: toSnakeCase({ finalConfirmationRole: role }),
+    }).eq("id", "singleton");
     if (error) throw error;
   },
-  approveLeaveRequest: async (id: string, approverId: string): Promise<void> => {
-    const { data: request, error: fetchError } = await supabase.from('leave_requests').select('approval_history').eq('id', id).single();
+  approveLeaveRequest: async (
+    id: string,
+    approverId: string,
+  ): Promise<void> => {
+    const { data: request, error: fetchError } = await supabase.from(
+      "leave_requests",
+    ).select("approval_history").eq("id", id).single();
     if (fetchError) throw fetchError;
     const { finalConfirmationRole } = await api.getApprovalWorkflowSettings();
-    const { data: finalApprover } = await supabase.from('users').select('id').eq('role_id', finalConfirmationRole).limit(1).single();
-    const { data: approverData, error: nameError } = await supabase.from('users').select('name').eq('id', approverId).single();
+    const { data: finalApprover } = await supabase.from("users").select("id")
+      .eq("role_id", finalConfirmationRole).limit(1).single();
+    const { data: approverData, error: nameError } = await supabase.from(
+      "users",
+    ).select("name").eq("id", approverId).single();
     if (nameError) throw nameError;
-    const newHistoryRecord = { approver_id: approverId, approver_name: approverData.name, status: 'approved', timestamp: new Date().toISOString() };
-    const updatedHistory = [...((request.approval_history as any[]) || []), newHistoryRecord];
-    const { error } = await supabase.from('leave_requests').update({ status: 'pending_hr_confirmation', current_approver_id: finalApprover?.id, approval_history: updatedHistory }).eq('id', id);
+    const newHistoryRecord = {
+      approver_id: approverId,
+      approver_name: approverData.name,
+      status: "approved",
+      timestamp: new Date().toISOString(),
+    };
+    const updatedHistory = [
+      ...((request.approval_history as any[]) || []),
+      newHistoryRecord,
+    ];
+    const { error } = await supabase.from("leave_requests").update({
+      status: "pending_hr_confirmation",
+      current_approver_id: finalApprover?.id,
+      approval_history: updatedHistory,
+    }).eq("id", id);
     if (error) throw error;
   },
-  rejectLeaveRequest: async (id: string, approverId: string, reason = ''): Promise<void> => {
-    const { data: request, error: fetchError } = await supabase.from('leave_requests').select('approval_history').eq('id', id).single();
+  rejectLeaveRequest: async (
+    id: string,
+    approverId: string,
+    reason = "",
+  ): Promise<void> => {
+    const { data: request, error: fetchError } = await supabase.from(
+      "leave_requests",
+    ).select("approval_history").eq("id", id).single();
     if (fetchError) throw fetchError;
-    const { data: approverData, error: nameError } = await supabase.from('users').select('name').eq('id', approverId).single();
+    const { data: approverData, error: nameError } = await supabase.from(
+      "users",
+    ).select("name").eq("id", approverId).single();
     if (nameError) throw nameError;
-    const newHistoryRecord = { approver_id: approverId, approver_name: approverData.name, status: 'rejected', timestamp: new Date().toISOString(), comments: reason };
-    const updatedHistory = [...((request.approval_history as any[]) || []), newHistoryRecord];
-    const { error } = await supabase.from('leave_requests').update({ status: 'rejected', current_approver_id: null, approval_history: updatedHistory }).eq('id', id);
+    const newHistoryRecord = {
+      approver_id: approverId,
+      approver_name: approverData.name,
+      status: "rejected",
+      timestamp: new Date().toISOString(),
+      comments: reason,
+    };
+    const updatedHistory = [
+      ...((request.approval_history as any[]) || []),
+      newHistoryRecord,
+    ];
+    const { error } = await supabase.from("leave_requests").update({
+      status: "rejected",
+      current_approver_id: null,
+      approval_history: updatedHistory,
+    }).eq("id", id);
     if (error) throw error;
   },
   confirmLeaveByHR: async (id: string, hrId: string): Promise<void> => {
-    const { data: request, error: fetchError } = await supabase.from('leave_requests').select('leave_type, user_id, approval_history').eq('id', id).single();
+    const { data: request, error: fetchError } = await supabase.from(
+      "leave_requests",
+    ).select("leave_type, user_id, approval_history").eq("id", id).single();
     if (fetchError) throw fetchError;
-    const { data: approverData, error: nameError } = await supabase.from('users').select('name').eq('id', hrId).single();
+    const { data: approverData, error: nameError } = await supabase.from(
+      "users",
+    ).select("name").eq("id", hrId).single();
     if (nameError) throw nameError;
-    const newHistoryRecord = { approver_id: hrId, approver_name: approverData.name, status: 'approved', timestamp: new Date().toISOString(), comments: 'Final approval.' };
-    const updatedHistory = [...((request.approval_history as any[]) || []), newHistoryRecord];
-    const { error } = await supabase.from('leave_requests').update({ status: 'approved', current_approver_id: null, approval_history: updatedHistory }).eq('id', id);
+    const newHistoryRecord = {
+      approver_id: hrId,
+      approver_name: approverData.name,
+      status: "approved",
+      timestamp: new Date().toISOString(),
+      comments: "Final approval.",
+    };
+    const updatedHistory = [
+      ...((request.approval_history as any[]) || []),
+      newHistoryRecord,
+    ];
+    const { error } = await supabase.from("leave_requests").update({
+      status: "approved",
+      current_approver_id: null,
+      approval_history: updatedHistory,
+    }).eq("id", id);
     if (error) throw error;
-    if (request.leave_type === 'Comp Off') {
-      const { data: availableLog, error: logError } = await supabase.from('comp_off_logs').select('id').eq('user_id', request.user_id).eq('status', 'earned').limit(1).single();
-      if (logError && logError.code !== 'PGRST116') throw logError;
-      if (availableLog) await supabase.from('comp_off_logs').update({ status: 'used', leave_request_id: id }).eq('id', availableLog.id);
+    if (request.leave_type === "Comp Off") {
+      const { data: availableLog, error: logError } = await supabase.from(
+        "comp_off_logs",
+      ).select("id").eq("user_id", request.user_id).eq("status", "earned")
+        .limit(1).single();
+      if (logError && logError.code !== "PGRST116") throw logError;
+      if (availableLog) {
+        await supabase.from("comp_off_logs").update({
+          status: "used",
+          leave_request_id: id,
+        }).eq("id", availableLog.id);
+      }
     }
   },
-  submitExtraWorkClaim: async (claimData: Omit<ExtraWorkLog, 'id' | 'createdAt' | 'status'>): Promise<void> => {
-    const { error } = await supabase.from('extra_work_logs').insert(toSnakeCase({ ...claimData, status: 'Pending' }));
+  submitExtraWorkClaim: async (
+    claimData: Omit<ExtraWorkLog, "id" | "createdAt" | "status">,
+  ): Promise<void> => {
+    const { error } = await supabase.from("extra_work_logs").insert(
+      toSnakeCase({ ...claimData, status: "Pending" }),
+    );
     if (error) throw error;
   },
   getExtraWorkLogs: async (userId?: string): Promise<ExtraWorkLog[]> => {
-    let query = supabase.from('extra_work_logs').select('*');
-    if (userId) query = query.eq('user_id', userId);
-    else query = query.eq('status', 'Pending');
-    const { data, error } = await query.order('work_date', { ascending: false });
+    let query = supabase.from("extra_work_logs").select("*");
+    if (userId) query = query.eq("user_id", userId);
+    else query = query.eq("status", "Pending");
+    const { data, error } = await query.order("work_date", {
+      ascending: false,
+    });
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  approveExtraWorkClaim: async (claimId: string, approverId: string): Promise<void> => {
-    const { data: approverData, error: nameError } = await supabase.from('users').select('name').eq('id', approverId).single();
+  approveExtraWorkClaim: async (
+    claimId: string,
+    approverId: string,
+  ): Promise<void> => {
+    const { data: approverData, error: nameError } = await supabase.from(
+      "users",
+    ).select("name").eq("id", approverId).single();
     if (nameError) throw nameError;
-    const { data: claim, error: fetchError } = await supabase.from('extra_work_logs').select('*').eq('id', claimId).single();
+    const { data: claim, error: fetchError } = await supabase.from(
+      "extra_work_logs",
+    ).select("*").eq("id", claimId).single();
     if (fetchError) throw fetchError;
-    if (!claim) throw new Error('Claim not found.');
-    const { error: updateError } = await supabase.from('extra_work_logs').update({ status: 'Approved', approver_id: approverId, approver_name: approverData.name, approved_at: new Date().toISOString() }).eq('id', claimId);
+    if (!claim) throw new Error("Claim not found.");
+    const { error: updateError } = await supabase.from("extra_work_logs")
+      .update({
+        status: "Approved",
+        approver_id: approverId,
+        approver_name: approverData.name,
+        approved_at: new Date().toISOString(),
+      }).eq("id", claimId);
     if (updateError) throw updateError;
-    if (claim.claim_type === 'Comp Off') await api.addCompOffLog({ userId: claim.user_id, userName: claim.user_name, dateEarned: claim.work_date, reason: `Claim approved: ${claim.reason}`, status: 'earned', grantedById: approverId, grantedByName: approverData.name });
+    if (claim.claim_type === "Comp Off") {
+      await api.addCompOffLog({
+        userId: claim.user_id,
+        userName: claim.user_name,
+        dateEarned: claim.work_date,
+        reason: `Claim approved: ${claim.reason}`,
+        status: "earned",
+        grantedById: approverId,
+        grantedByName: approverData.name,
+      });
+    }
   },
-  rejectExtraWorkClaim: async (claimId: string, approverId: string, reason: string): Promise<void> => {
-    const { data: approverData, error: nameError } = await supabase.from('users').select('name').eq('id', approverId).single();
+  rejectExtraWorkClaim: async (
+    claimId: string,
+    approverId: string,
+    reason: string,
+  ): Promise<void> => {
+    const { data: approverData, error: nameError } = await supabase.from(
+      "users",
+    ).select("name").eq("id", approverId).single();
     if (nameError) throw nameError;
-    const { error } = await supabase.from('extra_work_logs').update({ status: 'Rejected', approver_id: approverId, approver_name: approverData.name, rejection_reason: reason }).eq('id', claimId);
+    const { error } = await supabase.from("extra_work_logs").update({
+      status: "Rejected",
+      approver_id: approverId,
+      approver_name: approverData.name,
+      rejection_reason: reason,
+    }).eq("id", claimId);
     if (error) throw error;
   },
   getManpowerDetails: async (siteId: string): Promise<ManpowerDetail[]> => {
-    const { data, error } = await supabase.rpc('get_manpower_details', { site_id_param: siteId });
+    const { data, error } = await supabase.rpc("get_manpower_details", {
+      site_id_param: siteId,
+    });
     if (error) throw error;
     return toCamelCase(data);
   },
   // Fix: Add all missing functions to the api object.
-  addCompOffLog: async (logData: Omit<CompOffLog, 'id'>): Promise<CompOffLog> => {
-    const { data, error } = await supabase.from('comp_off_logs').insert(toSnakeCase(logData)).select().single();
+  addCompOffLog: async (
+    logData: Omit<CompOffLog, "id">,
+  ): Promise<CompOffLog> => {
+    const { data, error } = await supabase.from("comp_off_logs").insert(
+      toSnakeCase(logData),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   exportAllData: async (): Promise<any> => {
-    const tables = ['users', 'organizations', 'onboarding_submissions', 'settings'];
+    const tables = [
+      "users",
+      "organizations",
+      "onboarding_submissions",
+      "settings",
+    ];
     const data: Record<string, any> = {};
     for (const table of tables) {
-      const { data: tableData, error } = await supabase.from(table).select('*');
+      const { data: tableData, error } = await supabase.from(table).select("*");
       if (error) throw new Error(`Failed to export ${table}`);
       data[table] = tableData;
     }
     return toCamelCase(data);
   },
-  getPincodeDetails: async (pincode: string): Promise<{ city: string; state: string; }> => {
+  getPincodeDetails: async (
+    pincode: string,
+  ): Promise<{ city: string; state: string }> => {
     // This is a mock. A real implementation would use an external API.
-    return new Promise(resolve => setTimeout(() => resolve({ city: 'Bengaluru', state: 'Karnataka' }), 500));
+    return new Promise((resolve) =>
+      setTimeout(() => resolve({ city: "Bengaluru", state: "Karnataka" }), 500)
+    );
   },
-  suggestDepartmentForDesignation: async (designation: string): Promise<string | null> => {
+  suggestDepartmentForDesignation: async (
+    designation: string,
+  ): Promise<string | null> => {
     const mapping: Record<string, string> = {
-      'Security Guard': 'Security',
-      'Housekeeping Staff': 'Housekeeping',
-      'Site Manager': 'Management',
+      "Security Guard": "Security",
+      "Housekeeping Staff": "Housekeeping",
+      "Site Manager": "Management",
     };
-    const key = Object.keys(mapping).find(key => designation.toLowerCase().includes(key.toLowerCase()));
+    const key = Object.keys(mapping).find((key) =>
+      designation.toLowerCase().includes(key.toLowerCase())
+    );
     return Promise.resolve(key ? mapping[key] : null);
   },
-  verifyBankAccountWithPerfios: async (data: PerfiosVerificationData): Promise<VerificationResult> => {
-    console.log('Mock verifying bank account:', data);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  verifyBankAccountWithPerfios: async (
+    data: PerfiosVerificationData,
+  ): Promise<VerificationResult> => {
+    console.log("Mock verifying bank account:", data);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     const success = Math.random() > 0.1; // 90% success rate
     return {
       success,
-      message: success ? 'Bank account verified successfully.' : 'Account holder name did not match.',
-      verifiedFields: { name: null, dob: null, aadhaar: null, bank: success, uan: null, esi: null, accountHolderName: success, accountNumber: success, ifscCode: true }
+      message: success
+        ? "Bank account verified successfully."
+        : "Account holder name did not match.",
+      verifiedFields: {
+        name: null,
+        dob: null,
+        aadhaar: null,
+        bank: success,
+        uan: null,
+        esi: null,
+        accountHolderName: success,
+        accountNumber: success,
+        ifscCode: true,
+      },
     };
   },
   verifyAadhaar: async (aadhaar: string): Promise<VerificationResult> => {
-    console.log('Mock verifying Aadhaar:', aadhaar);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log("Mock verifying Aadhaar:", aadhaar);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const success = aadhaar.length === 12 && Math.random() > 0.1;
-    return { success, message: success ? 'Aadhaar details verified.' : 'Invalid Aadhaar number.', verifiedFields: { name: null, dob: null, aadhaar: success, bank: null, uan: null, esi: null } };
+    return {
+      success,
+      message: success
+        ? "Aadhaar details verified."
+        : "Invalid Aadhaar number.",
+      verifiedFields: {
+        name: null,
+        dob: null,
+        aadhaar: success,
+        bank: null,
+        uan: null,
+        esi: null,
+      },
+    };
   },
   lookupUan: async (uan: string): Promise<VerificationResult> => {
-    console.log('Mock looking up UAN:', uan);
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    console.log("Mock looking up UAN:", uan);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     const success = uan.length === 12 && Math.random() > 0.1;
-    return { success, message: success ? 'UAN found and linked.' : 'UAN not found in EPFO database.', verifiedFields: { name: null, dob: null, aadhaar: null, bank: null, uan: success, esi: null } };
+    return {
+      success,
+      message: success
+        ? "UAN found and linked."
+        : "UAN not found in EPFO database.",
+      verifiedFields: {
+        name: null,
+        dob: null,
+        aadhaar: null,
+        bank: null,
+        uan: success,
+        esi: null,
+      },
+    };
   },
-  extractDataFromImage: async (base64: string, mimeType: string, schema: any, docType?: string): Promise<any> => {
+  extractDataFromImage: async (
+    base64: string,
+    mimeType: string,
+    schema: any,
+    docType?: string,
+  ): Promise<any> => {
     // If AI is not available return an empty object.  This prevents the
     // application from crashing when running without an API key.  Otherwise,
     // call the Gemini model to extract structured data from the image.
     if (!ai) {
-      console.warn('AI feature disabled: cannot extract data from image. Returning empty result.');
+      console.warn(
+        "AI feature disabled: cannot extract data from image. Returning empty result.",
+      );
       return {};
     }
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       contents: {
         parts: [
-          { text: `Extract the structured data from this document image. It is a ${docType || 'document'}.` },
-          { inlineData: { data: base64, mimeType } }
-        ]
+          {
+            text:
+              `Extract the structured data from this document image. It is a ${
+                docType || "document"
+              }.`,
+          },
+          { inlineData: { data: base64, mimeType } },
+        ],
       },
       config: {
-        responseMimeType: 'application/json',
+        responseMimeType: "application/json",
         responseSchema: schema,
       },
     });
     const jsonStr = response.text.trim();
     return JSON.parse(jsonStr);
   },
-  crossVerifyNames: async (name1: string, name2: string): Promise<{ isMatch: boolean; reason: string }> => {
+  crossVerifyNames: async (
+    name1: string,
+    name2: string,
+  ): Promise<{ isMatch: boolean; reason: string }> => {
     // Without the AI client fall back to a simple case-insensitive
     // comparison.  Return a basic match result with a reason.  This ensures
     // the application continues to operate without a Google API key.
@@ -1246,12 +1796,15 @@ export const api = {
       const isMatch = name1.trim().toLowerCase() === name2.trim().toLowerCase();
       return {
         isMatch,
-        reason: isMatch ? 'Names are identical (case-insensitive match) without AI.' : 'AI disabled; simple case-insensitive comparison used.'
+        reason: isMatch
+          ? "Names are identical (case-insensitive match) without AI."
+          : "AI disabled; simple case-insensitive comparison used.",
       };
     }
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Are these two names referring to the same person? Name 1: "${name1}", Name 2: "${name2}". Respond in JSON format with two keys: "isMatch" (boolean) and "reason" (a brief string explanation).`,
+      model: "gemini-2.5-flash",
+      contents:
+        `Are these two names referring to the same person? Name 1: "${name1}", Name 2: "${name2}". Respond in JSON format with two keys: "isMatch" (boolean) and "reason" (a brief string explanation).`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -1259,30 +1812,36 @@ export const api = {
           properties: {
             isMatch: { type: Type.BOOLEAN },
             reason: { type: Type.STRING },
-          }
-        }
-      }
+          },
+        },
+      },
     });
     const jsonStr = response.text.trim();
     return JSON.parse(jsonStr);
   },
-  verifyFingerprintImage: async (base64: string, mimeType: string): Promise<{ containsFingerprints: boolean; reason: string }> => {
+  verifyFingerprintImage: async (
+    base64: string,
+    mimeType: string,
+  ): Promise<{ containsFingerprints: boolean; reason: string }> => {
     // When AI is unavailable return a default response indicating that no
     // fingerprints were detected.  This fallback prevents runtime errors when
     // running the project without a Gemini API key.
     if (!ai) {
       return {
         containsFingerprints: false,
-        reason: 'AI disabled; cannot detect fingerprints.'
+        reason: "AI disabled; cannot detect fingerprints.",
       };
     }
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       contents: {
         parts: [
-          { text: 'Does this image contain one or more human fingerprints? The image might be a scan from paper. Respond in JSON with "containsFingerprints" (boolean) and "reason" (string).' },
-          { inlineData: { data: base64, mimeType } }
-        ]
+          {
+            text:
+              'Does this image contain one or more human fingerprints? The image might be a scan from paper. Respond in JSON with "containsFingerprints" (boolean) and "reason" (string).',
+          },
+          { inlineData: { data: base64, mimeType } },
+        ],
       },
       config: {
         responseMimeType: "application/json",
@@ -1291,27 +1850,35 @@ export const api = {
           properties: {
             containsFingerprints: { type: Type.BOOLEAN },
             reason: { type: Type.STRING },
-          }
-        }
-      }
+          },
+        },
+      },
     });
     const jsonStr = response.text.trim();
     return JSON.parse(jsonStr);
   },
-  enhanceDocumentPhoto: async (base64: string, mimeType: string): Promise<string> => {
+  enhanceDocumentPhoto: async (
+    base64: string,
+    mimeType: string,
+  ): Promise<string> => {
     // When AI is unavailable simply return the original image.  This ensures
     // document uploads still work without enhancement.
     if (!ai) {
-      console.warn('AI disabled; returning original document photo without enhancement.');
+      console.warn(
+        "AI disabled; returning original document photo without enhancement.",
+      );
       return base64;
     }
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model: "gemini-2.5-flash-image",
       contents: {
         parts: [
-          { text: 'Enhance this document photo. Improve contrast, correct perspective to be flat, and make text as clear as possible. Return only the enhanced image.' },
-          { inlineData: { data: base64, mimeType } }
-        ]
+          {
+            text:
+              "Enhance this document photo. Improve contrast, correct perspective to be flat, and make text as clear as possible. Return only the enhanced image.",
+          },
+          { inlineData: { data: base64, mimeType } },
+        ],
       },
       config: {
         responseModalities: [Modality.IMAGE],
@@ -1325,41 +1892,63 @@ export const api = {
     throw new Error("AI did not return an enhanced image.");
   },
   getSiteStaffDesignations: async (): Promise<SiteStaffDesignation[]> => {
-    const { data, error } = await supabase.from('site_staff_designations').select('*');
+    const { data, error } = await supabase.from("site_staff_designations")
+      .select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  updateManpowerDetails: async (siteId: string, details: ManpowerDetail[]): Promise<void> => {
+  updateManpowerDetails: async (
+    siteId: string,
+    details: ManpowerDetail[],
+  ): Promise<void> => {
     console.log("Mock updating manpower for", siteId, details);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   },
   getCompOffLogs: async (userId: string): Promise<CompOffLog[]> => {
-    const { data, error } = await supabase.from('comp_off_logs').select('*').eq('user_id', userId).order('date_earned', { ascending: false });
+    const { data, error } = await supabase.from("comp_off_logs").select("*").eq(
+      "user_id",
+      userId,
+    ).order("date_earned", { ascending: false });
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   checkCompOffTableExists: async (): Promise<void> => {
-    const { error } = await supabase.from('comp_off_logs').select('id').limit(1);
+    const { error } = await supabase.from("comp_off_logs").select("id").limit(
+      1,
+    );
     if (error) throw error;
   },
   getAllSiteAssets: async (): Promise<Record<string, Asset[]>> => {
     return Promise.resolve({}); // mock
   },
   updateSiteAssets: async (siteId: string, assets: Asset[]): Promise<void> => {
-    console.log('Mock updating assets for site', siteId, assets);
+    console.log("Mock updating assets for site", siteId, assets);
     return Promise.resolve();
   },
   getBackOfficeIdSeries: async (): Promise<BackOfficeIdSeries[]> => {
-    const { data, error } = await supabase.from('back_office_id_series').select('*');
+    const { data, error } = await supabase.from("settings").select(
+      "back_office_id_series",
+    ).eq("id", "singleton").single();
     if (error) throw error;
-    return (data || []).map(toCamelCase);
+    return data?.back_office_id_series
+      ? toCamelCase(data.back_office_id_series)
+      : [];
   },
-  updateBackOfficeIdSeries: async (series: BackOfficeIdSeries[]): Promise<void> => {
-    const { error } = await supabase.from('back_office_id_series').upsert(toSnakeCase(series), { onConflict: 'id' });
+  updateBackOfficeIdSeries: async (
+    series: BackOfficeIdSeries[],
+  ): Promise<void> => {
+    const { error } = await supabase.from("settings").update({
+      back_office_id_series: toSnakeCase(series),
+    }).eq("id", "singleton");
     if (error) throw error;
   },
-  updateSiteStaffDesignations: async (designations: SiteStaffDesignation[]): Promise<void> => {
-    const { error } = await supabase.from('site_staff_designations').upsert(toSnakeCase(designations), { onConflict: 'id' });
+  updateSiteStaffDesignations: async (
+    designations: SiteStaffDesignation[],
+  ): Promise<void> => {
+    const { error } = await supabase.from("site_staff_designations").upsert(
+      toSnakeCase(designations),
+      { onConflict: "id" },
+    );
     if (error) throw error;
   },
   getAllSiteIssuedTools: async (): Promise<Record<string, IssuedTool[]>> => {
@@ -1368,76 +1957,128 @@ export const api = {
   getToolsList: async (): Promise<MasterToolsList> => {
     return Promise.resolve({});
   },
-  updateSiteIssuedTools: async (siteId: string, tools: IssuedTool[]): Promise<void> => {
-    console.log('Mock updating tools for site', siteId, tools);
+  updateSiteIssuedTools: async (
+    siteId: string,
+    tools: IssuedTool[],
+  ): Promise<void> => {
+    console.log("Mock updating tools for site", siteId, tools);
   },
-  getAllSiteGentsUniforms: async (): Promise<Record<string, SiteGentsUniformConfig>> => {
+  getAllSiteGentsUniforms: async (): Promise<
+    Record<string, SiteGentsUniformConfig>
+  > => {
     return Promise.resolve({});
   },
   getMasterGentsUniforms: async (): Promise<MasterGentsUniforms> => {
     return Promise.resolve({ pants: [], shirts: [] });
   },
-  updateSiteGentsUniforms: async (siteId: string, config: SiteGentsUniformConfig): Promise<void> => {
-    console.log('Mock updating gents uniforms for', siteId, config);
+  updateSiteGentsUniforms: async (
+    siteId: string,
+    config: SiteGentsUniformConfig,
+  ): Promise<void> => {
+    console.log("Mock updating gents uniforms for", siteId, config);
   },
-  getAllSiteUniformDetails: async (): Promise<Record<string, SiteUniformDetailsConfig>> => {
+  getAllSiteUniformDetails: async (): Promise<
+    Record<string, SiteUniformDetailsConfig>
+  > => {
     return Promise.resolve({});
   },
-  updateSiteUniformDetails: async (siteId: string, config: SiteUniformDetailsConfig): Promise<void> => {
-    console.log('Mock updating uniform details for', siteId, config);
+  updateSiteUniformDetails: async (
+    siteId: string,
+    config: SiteUniformDetailsConfig,
+  ): Promise<void> => {
+    console.log("Mock updating uniform details for", siteId, config);
   },
-  getAllSiteLadiesUniforms: async (): Promise<Record<string, SiteLadiesUniformConfig>> => {
+  getAllSiteLadiesUniforms: async (): Promise<
+    Record<string, SiteLadiesUniformConfig>
+  > => {
     return Promise.resolve({});
   },
   getMasterLadiesUniforms: async (): Promise<MasterLadiesUniforms> => {
     return Promise.resolve({ pants: [], shirts: [] });
   },
-  updateSiteLadiesUniforms: async (siteId: string, config: SiteLadiesUniformConfig): Promise<void> => {
-    console.log('Mock updating ladies uniforms for', siteId, config);
+  updateSiteLadiesUniforms: async (
+    siteId: string,
+    config: SiteLadiesUniformConfig,
+  ): Promise<void> => {
+    console.log("Mock updating ladies uniforms for", siteId, config);
   },
   getUniformRequests: async (): Promise<UniformRequest[]> => {
-    const { data, error } = await supabase.from('uniform_requests').select('*');
+    const { data, error } = await supabase.from("uniform_requests").select("*");
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
-  submitUniformRequest: async (request: UniformRequest): Promise<UniformRequest> => {
-    const { data, error } = await supabase.from('uniform_requests').insert(toSnakeCase(request)).select().single();
+  submitUniformRequest: async (
+    request: UniformRequest,
+  ): Promise<UniformRequest> => {
+    const { data, error } = await supabase.from("uniform_requests").insert(
+      toSnakeCase(request),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
-  updateUniformRequest: async (request: UniformRequest): Promise<UniformRequest> => {
-    const { data, error } = await supabase.from('uniform_requests').update(toSnakeCase(request)).eq('id', request.id).select().single();
+  updateUniformRequest: async (
+    request: UniformRequest,
+  ): Promise<UniformRequest> => {
+    const { data, error } = await supabase.from("uniform_requests").update(
+      toSnakeCase(request),
+    ).eq("id", request.id).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
   deleteUniformRequest: async (id: string): Promise<void> => {
-    const { error } = await supabase.from('uniform_requests').delete().eq('id', id);
+    const { error } = await supabase.from("uniform_requests").delete().eq(
+      "id",
+      id,
+    );
     if (error) throw error;
   },
-  getInvoiceStatuses: async (date: Date): Promise<Record<string, 'Not Generated' | 'Generated' | 'Sent' | 'Paid'>> => {
-    console.log('Mock fetching invoice statuses for', date);
+  getInvoiceStatuses: async (
+    date: Date,
+  ): Promise<
+    Record<string, "Not Generated" | "Generated" | "Sent" | "Paid">
+  > => {
+    console.log("Mock fetching invoice statuses for", date);
     return Promise.resolve({});
   },
-  getInvoiceSummaryData: async (siteId: string, date: Date): Promise<InvoiceData> => {
-    console.log('Mock fetching invoice data for', siteId, date);
-    return Promise.resolve({ siteName: 'Mock Site', siteAddress: 'Mock Address', invoiceNumber: 'INV-001', invoiceDate: '2023-01-31', statementMonth: 'January-2023', lineItems: [] });
+  getInvoiceSummaryData: async (
+    siteId: string,
+    date: Date,
+  ): Promise<InvoiceData> => {
+    console.log("Mock fetching invoice data for", siteId, date);
+    return Promise.resolve({
+      siteName: "Mock Site",
+      siteAddress: "Mock Address",
+      invoiceNumber: "INV-001",
+      invoiceDate: "2023-01-31",
+      statementMonth: "January-2023",
+      lineItems: [],
+    });
   },
   getSupportTickets: async (): Promise<SupportTicket[]> => {
-    const { data, error } = await supabase.from('support_tickets').select('*, posts:ticket_posts(*, comments:ticket_comments(*))');
+    const { data, error } = await supabase.from("support_tickets").select(
+      "*, posts:ticket_posts(*, comments:ticket_comments(*))",
+    );
     if (error) throw error;
     return (data || []).map(toCamelCase);
   },
   getSupportTicketById: async (id: string): Promise<SupportTicket | null> => {
-    const { data, error } = await supabase.from('support_tickets').select('*, posts:ticket_posts(*, comments:ticket_comments(*))').eq('id', id).single();
+    const { data, error } = await supabase.from("support_tickets").select(
+      "*, posts:ticket_posts(*, comments:ticket_comments(*))",
+    ).eq("id", id).single();
     if (error) throw error;
     return toCamelCase(data);
   },
-  createSupportTicket: async (ticketData: Partial<SupportTicket>): Promise<SupportTicket> => {
+  createSupportTicket: async (
+    ticketData: Partial<SupportTicket>,
+  ): Promise<SupportTicket> => {
     // If an attachment was provided with a File object, upload it to the support attachments bucket
     const attachment: any = (ticketData as any).attachment;
     if (attachment && attachment.file instanceof File) {
       try {
-        const { path } = await api.uploadDocument(attachment.file as File, SUPPORT_ATTACHMENTS_BUCKET);
+        const { path } = await api.uploadDocument(
+          attachment.file as File,
+          SUPPORT_ATTACHMENTS_BUCKET,
+        );
         (ticketData as any).attachment = {
           name: attachment.name,
           type: attachment.type,
@@ -1445,21 +2086,29 @@ export const api = {
           path,
         };
       } catch (uploadErr) {
-        console.error('Failed to upload support ticket attachment:', uploadErr);
+        console.error("Failed to upload support ticket attachment:", uploadErr);
         // Remove attachment to prevent sending File object to database
         delete (ticketData as any).attachment;
       }
     }
-    const { data, error } = await supabase.from('support_tickets').insert(toSnakeCase(ticketData)).select('*, posts:ticket_posts(*, comments:ticket_comments(*))').single();
+    const { data, error } = await supabase.from("support_tickets").insert(
+      toSnakeCase(ticketData),
+    ).select("*, posts:ticket_posts(*, comments:ticket_comments(*))").single();
     if (error) throw error;
     return toCamelCase(data);
   },
-  updateSupportTicket: async (id: string, updates: Partial<SupportTicket>): Promise<SupportTicket> => {
+  updateSupportTicket: async (
+    id: string,
+    updates: Partial<SupportTicket>,
+  ): Promise<SupportTicket> => {
     // Handle attachment upload when updating a ticket
     const attachment: any = (updates as any).attachment;
     if (attachment && attachment.file instanceof File) {
       try {
-        const { path } = await api.uploadDocument(attachment.file as File, SUPPORT_ATTACHMENTS_BUCKET);
+        const { path } = await api.uploadDocument(
+          attachment.file as File,
+          SUPPORT_ATTACHMENTS_BUCKET,
+        );
         (updates as any).attachment = {
           name: attachment.name,
           type: attachment.type,
@@ -1467,56 +2116,87 @@ export const api = {
           path,
         };
       } catch (uploadErr) {
-        console.error('Failed to upload updated support ticket attachment:', uploadErr);
+        console.error(
+          "Failed to upload updated support ticket attachment:",
+          uploadErr,
+        );
         delete (updates as any).attachment;
       }
     }
-    const { data, error } = await supabase.from('support_tickets').update(toSnakeCase(updates)).eq('id', id).select('*, posts:ticket_posts(*, comments:ticket_comments(*))').single();
+    const { data, error } = await supabase.from("support_tickets").update(
+      toSnakeCase(updates),
+    ).eq("id", id).select(
+      "*, posts:ticket_posts(*, comments:ticket_comments(*))",
+    ).single();
     if (error) throw error;
     return toCamelCase(data);
   },
-  addTicketPost: async (ticketId: string, postData: Partial<TicketPost>): Promise<TicketPost> => {
-    const { data, error } = await supabase.from('ticket_posts').insert(toSnakeCase(postData)).select('*, comments:ticket_comments(*)').single();
+  addTicketPost: async (
+    ticketId: string,
+    postData: Partial<TicketPost>,
+  ): Promise<TicketPost> => {
+    const { data, error } = await supabase.from("ticket_posts").insert(
+      toSnakeCase(postData),
+    ).select("*, comments:ticket_comments(*)").single();
     if (error) throw error;
     return toCamelCase(data);
   },
   togglePostLike: async (postId: string, userId: string): Promise<void> => {
-    const { data, error } = await supabase.from('ticket_posts').select('likes').eq('id', postId).single();
+    const { data, error } = await supabase.from("ticket_posts").select("likes")
+      .eq("id", postId).single();
     if (error) throw error;
     const likes = (data.likes as string[]) || [];
-    const newLikes = likes.includes(userId) ? likes.filter(id => id !== userId) : [...likes, userId];
-    const { error: updateError } = await supabase.from('ticket_posts').update({ likes: newLikes }).eq('id', postId);
+    const newLikes = likes.includes(userId)
+      ? likes.filter((id) => id !== userId)
+      : [...likes, userId];
+    const { error: updateError } = await supabase.from("ticket_posts").update({
+      likes: newLikes,
+    }).eq("id", postId);
     if (updateError) throw updateError;
   },
-  addPostComment: async (postId: string, commentData: Partial<TicketComment>): Promise<TicketComment> => {
-    const { data, error } = await supabase.from('ticket_comments').insert(toSnakeCase(commentData)).select().single();
+  addPostComment: async (
+    postId: string,
+    commentData: Partial<TicketComment>,
+  ): Promise<TicketComment> => {
+    const { data, error } = await supabase.from("ticket_comments").insert(
+      toSnakeCase(commentData),
+    ).select().single();
     if (error) throw error;
     return toCamelCase(data);
   },
-  getVerificationCostBreakdown: async (startDate: string, endDate: string): Promise<SubmissionCostBreakdown[]> => {
-    const { data, error } = await supabase.from('onboarding_submissions').select('id, employee_id, personal, enrollment_date, verification_usage').gte('enrollment_date', startDate).lte('enrollment_date', endDate);
+  getVerificationCostBreakdown: async (
+    startDate: string,
+    endDate: string,
+  ): Promise<SubmissionCostBreakdown[]> => {
+    const { data, error } = await supabase.from("onboarding_submissions")
+      .select("id, employee_id, personal, enrollment_date, verification_usage")
+      .gte("enrollment_date", startDate).lte("enrollment_date", endDate);
     if (error) throw error;
 
-    return (data || []).map(sub => {
+    return (data || []).map((sub) => {
       const camelSub = toCamelCase(sub);
       return {
         id: camelSub.id,
         employeeId: camelSub.personal.employeeId,
-        employeeName: `${camelSub.personal.firstName} ${camelSub.personal.lastName}`,
+        employeeName:
+          `${camelSub.personal.firstName} ${camelSub.personal.lastName}`,
         enrollmentDate: camelSub.enrollmentDate,
         totalCost: 0, // Will be calculated on the frontend
         breakdown: camelSub.verificationUsage || [],
-      }
+      };
     });
   },
 
-  generatePdf: async (content: string | HTMLElement, options: any): Promise<void> => {
+  generatePdf: async (
+    content: string | HTMLElement,
+    options: any,
+  ): Promise<void> => {
     try {
       // @ts-ignore
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2pdf = (await import("html2pdf.js")).default;
       await html2pdf().set(options).from(content).save();
     } catch (error) {
-      console.error('PDF generation failed:', error);
+      console.error("PDF generation failed:", error);
       throw error;
     }
   },
@@ -1526,15 +2206,21 @@ export const api = {
    * Checks Supabase 'location_cache' first, then fetches from Nominatim for missing ones,
    * and caches the results.
    */
-  batchResolveAddresses: async (coords: { lat: number; lon: number }[]): Promise<Record<string, string>> => {
+  batchResolveAddresses: async (
+    coords: { lat: number; lon: number }[],
+  ): Promise<Record<string, string>> => {
     if (coords.length === 0) return {};
 
     // Normalize coordinates to 6 decimal places for consistent key generation
     const normalizeCoord = (n: number) => parseFloat(n.toFixed(6));
 
-    const uniqueCoords = Array.from(new Set(coords.map(c => `${normalizeCoord(c.lat)},${normalizeCoord(c.lon)}`)))
-      .map(s => {
-        const [lat, lon] = s.split(',').map(Number);
+    const uniqueCoords = Array.from(
+      new Set(coords.map((c) =>
+        `${normalizeCoord(c.lat)},${normalizeCoord(c.lon)}`
+      )),
+    )
+      .map((s) => {
+        const [lat, lon] = s.split(",").map(Number);
         return { lat, lon };
       });
 
@@ -1543,11 +2229,11 @@ export const api = {
 
     // 1. Check Cache in Supabase
     // Fetch cache entries that match any of the latitudes (approximate filter)
-    const lats = uniqueCoords.map(c => c.lat);
+    const lats = uniqueCoords.map((c) => c.lat);
     const { data: cachedData, error } = await supabase
-      .from('location_cache')
-      .select('*')
-      .in('latitude', lats);
+      .from("location_cache")
+      .select("*")
+      .in("latitude", lats);
 
     if (!error && cachedData) {
       cachedData.forEach((row: any) => {
@@ -1557,44 +2243,59 @@ export const api = {
         const key = `${dbLat},${dbLon}`;
 
         // Verify exact match including longitude
-        if (uniqueCoords.some(c => normalizeCoord(c.lat) === dbLat && normalizeCoord(c.lon) === dbLon)) {
+        if (
+          uniqueCoords.some((c) =>
+            normalizeCoord(c.lat) === dbLat && normalizeCoord(c.lon) === dbLon
+          )
+        ) {
           resultMap[key] = row.address;
         }
       });
     }
 
     // 2. Identify Missing
-    uniqueCoords.forEach(c => {
+    uniqueCoords.forEach((c) => {
       const key = `${normalizeCoord(c.lat)},${normalizeCoord(c.lon)}`;
       if (!resultMap[key]) {
         missingCoords.push(c);
       }
     });
 
-    console.log('Geocoding API: Found', Object.keys(resultMap).length, 'cached,', missingCoords.length, 'missing');
+    console.log(
+      "Geocoding API: Found",
+      Object.keys(resultMap).length,
+      "cached,",
+      missingCoords.length,
+      "missing",
+    );
 
     // 3. Fetch Missing from Nominatim & Cache
     // We must rate limit this to avoid banning. 1 request per second is safe.
     for (const coord of missingCoords) {
       try {
-        const address = await import('../utils/locationUtils').then(m => m.reverseGeocode(coord.lat, coord.lon));
+        const address = await import("../utils/locationUtils").then((m) =>
+          m.reverseGeocode(coord.lat, coord.lon)
+        );
 
         const key = `${normalizeCoord(coord.lat)},${normalizeCoord(coord.lon)}`;
         resultMap[key] = address;
 
         // Insert into Cache
-        await supabase.from('location_cache').insert({
+        await supabase.from("location_cache").insert({
           latitude: normalizeCoord(coord.lat),
           longitude: normalizeCoord(coord.lon),
-          address: address
+          address: address,
         });
 
-        console.log('Geocoding API: Fetched and cached', key, '->', address);
+        console.log("Geocoding API: Fetched and cached", key, "->", address);
 
         // Delay to respect API rate limits
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
       } catch (e) {
-        console.error(`Failed to resolve address for ${coord.lat},${coord.lon}`, e);
+        console.error(
+          `Failed to resolve address for ${coord.lat},${coord.lon}`,
+          e,
+        );
         const key = `${normalizeCoord(coord.lat)},${normalizeCoord(coord.lon)}`;
         resultMap[key] = `${coord.lat.toFixed(4)}, ${coord.lon.toFixed(4)}`;
       }
@@ -1607,30 +2308,36 @@ export const api = {
    * Send a security alert notification to the user's reporting manager about
    * developer mode, location spoofing, or other security violations.
    */
-  sendSecurityAlert: async (userId: string, userName: string, violationType: 'developer_mode' | 'location_spoofing', deviceInfo?: string): Promise<void> => {
+  sendSecurityAlert: async (
+    userId: string,
+    userName: string,
+    violationType: "developer_mode" | "location_spoofing",
+    deviceInfo?: string,
+  ): Promise<void> => {
     // Get the user's reporting manager
     const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('reporting_manager_id')
-      .eq('id', userId)
+      .from("users")
+      .select("reporting_manager_id")
+      .eq("id", userId)
       .single();
 
     if (userError || !userData?.reporting_manager_id) {
-      console.warn('Could not find reporting manager for security alert');
+      console.warn("Could not find reporting manager for security alert");
       return;
     }
 
-    const violationMessage = violationType === 'developer_mode'
-      ? 'attempted to access the application with Developer Mode enabled'
-      : 'attempted to access the application with Location Spoofing detected';
+    const violationMessage = violationType === "developer_mode"
+      ? "attempted to access the application with Developer Mode enabled"
+      : "attempted to access the application with Location Spoofing detected";
 
-    const deviceText = deviceInfo ? ` using device: ${deviceInfo}` : '';
+    const deviceText = deviceInfo ? ` using device: ${deviceInfo}` : "";
 
     await api.createNotification({
       userId: userData.reporting_manager_id,
-      title: '🔒 Security Alert',
-      message: `${userName} ${violationMessage}${deviceText}. Access was blocked for security reasons.`,
-      type: 'security',
+      title: "🔒 Security Alert",
+      message:
+        `${userName} ${violationMessage}${deviceText}. Access was blocked for security reasons.`,
+      type: "security",
       link: `/user-management`, // Link to user management or security dashboard
     });
   },
@@ -1638,26 +2345,31 @@ export const api = {
   /**
    * Send a device change alert notification to the user's reporting manager.
    */
-  sendDeviceChangeAlert: async (userId: string, userName: string, oldDevice: string, newDevice: string): Promise<void> => {
+  sendDeviceChangeAlert: async (
+    userId: string,
+    userName: string,
+    oldDevice: string,
+    newDevice: string,
+  ): Promise<void> => {
     // Get the user's reporting manager
     const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('reporting_manager_id')
-      .eq('id', userId)
+      .from("users")
+      .select("reporting_manager_id")
+      .eq("id", userId)
       .single();
 
     if (userError || !userData?.reporting_manager_id) {
-      console.warn('Could not find reporting manager for device change alert');
+      console.warn("Could not find reporting manager for device change alert");
       return;
     }
 
     await api.createNotification({
       userId: userData.reporting_manager_id,
-      title: '📱 Device Change Detected',
-      message: `${userName} logged in from a new device. Previous device: ${oldDevice}, New device: ${newDevice}`,
-      type: 'info',
+      title: "📱 Device Change Detected",
+      message:
+        `${userName} logged in from a new device. Previous device: ${oldDevice}, New device: ${newDevice}`,
+      type: "info",
       link: `/user-management`,
     });
   },
-
 };

@@ -116,10 +116,10 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                         className={({ isActive }) =>
                             `group flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out ${isCollapsed ? 'justify-center' : ''} ${mode === 'light'
                                 ? isActive
-                                    ? 'text-white shadow-sm border'
-                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                    ? '!text-white shadow-sm border'
+                                    : 'text-white hover:bg-gray-50 hover:text-white'
                                 : isActive
-                                    ? 'bg-[#1c3a23] text-white shadow-sm border border-white/5'
+                                    ? 'bg-[#1c3a23] !text-white shadow-sm border border-white/5'
                                     : 'text-white hover:bg-white/5 hover:text-white/90'
                             }`
                         }

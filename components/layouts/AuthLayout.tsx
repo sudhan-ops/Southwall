@@ -67,13 +67,13 @@ const AuthLayout: React.FC = () => {
                             <h1 className="text-xl lg:text-2xl xl:text-4xl font-bold text-white mt-6 lg:mt-8 leading-tight drop-shadow-lg">
                                 Welcome to the Future of Onboarding.
                             </h1>
-                            <p className="text-white/80 mt-4 max-w-md drop-shadow-lg text-xs lg:text-sm xl:text-base">
+                            <p className="text-white mt-4 max-w-md drop-shadow-lg text-xs lg:text-sm xl:text-base">
                                 Streamlining the journey for every new member of the Paradigm family.
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-white/50 text-[10px] lg:text-xs mt-4">© {new Date().getFullYear()} Paradigm Services. All rights reserved.</p>
+                            <p className="text-white text-[10px] lg:text-xs mt-4">© {new Date().getFullYear()} Paradigm Services. All rights reserved.</p>
                         </div>
                     </div>
 
@@ -85,7 +85,7 @@ const AuthLayout: React.FC = () => {
                                 <Logo className="h-12" />
                             </div>
                             <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2">{pageInfo.title}</h2>
-                            <p className="text-gray-300 mb-4 lg:mb-6 xl:mb-8 text-xs lg:text-sm xl:text-base">{pageInfo.subtitle}</p>
+                            <p className="text-white mb-4 lg:mb-6 xl:mb-8 text-xs lg:text-sm xl:text-base">{pageInfo.subtitle}</p>
                             <Outlet />
                         </div>
                     </div>
