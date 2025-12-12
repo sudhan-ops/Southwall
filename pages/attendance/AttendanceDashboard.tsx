@@ -49,7 +49,7 @@ import Toast from '../../components/ui/Toast';
 import Input from '../../components/ui/Input';
 import StatCard from '../../components/ui/StatCard';
 import Logo from '../../components/ui/Logo';
-import { pdfLogoLocalPath } from '../../components/ui/logoData';
+import { pdfLogoLocalPath, getPdfLogoPath, getOrganizationName } from '../../components/ui/logoData';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useThemeStore } from '../../store/themeStore';
 import { useBrandingStore } from '../../store/brandingStore';
@@ -343,11 +343,11 @@ type AttendanceLogDataRow = {
 
 
 // Extend AttendanceEvent with a locationName field for human readable addresses
-const AttendanceLogPdfComponent: React.FC<{ data: AttendanceLogDataRow[]; dateRange: Range }> = ({ data, dateRange }) => {
+const AttendanceLogPdfComponent: React.FC<{ data: AttendanceLogDataRow[]; dateRange: Range; colorScheme: 'green' | 'blue' }> = ({ data, dateRange, colorScheme }) => {
     return (
         <div className="p-8 font-sans text-sm text-black bg-white">
             <div className="flex justify-between items-center border-b pb-4 mb-6">
-                <Logo className="h-10" localPath={pdfLogoLocalPath} />
+                <Logo className="h-10" localPath={getPdfLogoPath(colorScheme)} />
                 <div className="text-right">
                     <h1 className="text-xl font-bold">Attendance Log</h1>
                     <p className="text-gray-600">{format(dateRange.startDate!, 'dd MMM yyyy')} to {format(dateRange.endDate!, 'dd MMM yyyy')}</p>
@@ -385,7 +385,7 @@ const AttendanceLogPdfComponent: React.FC<{ data: AttendanceLogDataRow[]; dateRa
  * - Removed negative marginTop on title to avoid clipping/overlap
  * - Keeps fixed minHeight so each page height is consistent
  */
-const BasicReportPdfLayout: React.FC<{ data: BasicReportDataRow[]; dateRange: Range }> = ({ data, dateRange }) => {
+const BasicReportPdfLayout: React.FC<{ data: BasicReportDataRow[]; dateRange: Range; colorScheme: 'green' | 'blue' }> = ({ data, dateRange, colorScheme }) => {
     const rowsPerPage = 15;
     const pages: BasicReportDataRow[][] = [];
     for (let i = 0; i < data.length; i += rowsPerPage) {
@@ -433,7 +433,7 @@ const BasicReportPdfLayout: React.FC<{ data: BasicReportDataRow[]; dateRange: Ra
                             <tbody>
                                 <tr>
                                     <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'left' }}>
-                                        <Logo className="h-14" localPath={pdfLogoLocalPath} />
+                                        <Logo className="h-14" localPath={getPdfLogoPath(colorScheme)} />
                                     </td>
                                     <td style={{ width: '50%', verticalAlign: 'top', textAlign: 'right' }}>
                                         <div
@@ -654,7 +654,7 @@ const BasicReportPdfLayout: React.FC<{ data: BasicReportDataRow[]; dateRange: Ra
                                 color: '#888',
                             }}
                         >
-                            Paradigm Services - Confidential Report - Page {pageIndex + 1} of {pages.length}
+                            {getOrganizationName(colorScheme)} - Confidential Report - Page {pageIndex + 1} of {pages.length}
                         </div>
                     </div>
                 );
@@ -690,12 +690,12 @@ interface MonthlyReportRow {
 }
 
 
-const MonthlyReportPdfComponent: React.FC<{ data: MonthlyReportRow[]; dateRange: Range }> = ({ data, dateRange }) => {
+const MonthlyReportPdfComponent: React.FC<{ data: MonthlyReportRow[]; dateRange: Range; colorScheme: 'green' | 'blue' }> = ({ data, dateRange, colorScheme }) => {
     const days = eachDayOfInterval({ start: dateRange.startDate!, end: dateRange.endDate! });
     return (
         <div className="p-8 font-sans text-[9px] text-black bg-white">
             <div className="flex justify-between items-center border-b pb-4 mb-4">
-                <Logo className="h-8" localPath={pdfLogoLocalPath} />
+                <Logo className="h-8" localPath={getPdfLogoPath(colorScheme)} />
                 <div className="text-right">
                     <h1 className="text-lg font-bold">Monthly Attendance Report</h1>
                     <p className="text-gray-600">
@@ -1376,14 +1376,14 @@ const AttendanceDashboard: React.FC = () => {
     // Determine which PDF component to render
     const pdfContent = useMemo(() => {
         if (reportType === 'basic') {
-            return <BasicReportPdfLayout data={basicReportData} dateRange={dateRange} />;
+            return <BasicReportPdfLayout data={basicReportData} dateRange={dateRange} colorScheme={colorScheme} />;
         } else if (reportType === 'log') {
-            return <AttendanceLogPdfComponent data={attendanceLogData} dateRange={dateRange} />;
+            return <AttendanceLogPdfComponent data={attendanceLogData} dateRange={dateRange} colorScheme={colorScheme} />;
         } else if (reportType === 'monthly') {
-            return <MonthlyReportPdfComponent data={monthlyReportData} dateRange={dateRange} />;
+            return <MonthlyReportPdfComponent data={monthlyReportData} dateRange={dateRange} colorScheme={colorScheme} />;
         }
         return null;
-    }, [reportType, basicReportData, attendanceLogData, monthlyReportData, dateRange]);
+    }, [reportType, basicReportData, attendanceLogData, monthlyReportData, dateRange, colorScheme]);
 
 
     const handleDownloadCsv = () => {

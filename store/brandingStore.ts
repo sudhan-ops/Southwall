@@ -12,7 +12,7 @@ interface BrandingState {
 export const useBrandingStore = create<BrandingState>()(
     persist(
         (set) => ({
-            colorScheme: "green", // Default to green (Paradigm Services)
+            colorScheme: "blue", // Default to blue (SouthWall)
             setColorScheme: (scheme) => set({ colorScheme: scheme }),
             initBranding: (scheme) => set({ colorScheme: scheme }),
         }),
