@@ -848,6 +848,18 @@
          color: #64748b !important;
       }
 
+      /* ENTITY MANAGEMENT: Subcategory nav button text colors */
+      /* Active button - white text on blue background */
+      .blue-theme nav button[style*="background"] span,
+      nav button[style*="background"] span {
+        color: #ffffff !important;
+      }
+      /* Inactive buttons - dark text on white background */
+      .blue-theme nav button:not([style*="background"]) span,
+      nav button:not([style*="background"]) span {
+        color: #334155 !important;
+      }
+
       /* PERMANENT FIX: Auth card text must always be white on login page */
       .blue-theme .auth-card-container h1,
       .blue-theme .auth-card-container h2,
