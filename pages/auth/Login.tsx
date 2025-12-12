@@ -165,7 +165,7 @@ const Login: React.FC = () => {
                             <Checkbox
                                 id="rememberMe"
                                 label="Remember me"
-                                labelClassName="text-white font-medium"
+                                labelClassName="!text-white font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
                                 inputClassName={`${colorScheme === 'blue' ? 'text-blue-500 focus:ring-blue-500' : 'text-[#22c55e] focus:ring-[#22c55e]'} border-white/20 rounded bg-black/40`}

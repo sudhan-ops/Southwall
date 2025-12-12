@@ -117,7 +117,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                             `group flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out ${isCollapsed ? 'justify-center' : ''} ${mode === 'light'
                                 ? isActive
                                     ? '!text-white shadow-sm border'
-                                    : 'text-white hover:bg-gray-50 hover:text-white'
+                                    : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                 : isActive
                                     ? 'bg-[#1c3a23] !text-white shadow-sm border border-white/5'
                                     : 'text-white hover:bg-white/5 hover:text-white/90'
@@ -135,7 +135,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                             <>
                                 <link.icon
                                     className={`h-5 w-5 flex-shrink-0 transition-colors duration-200 ${mode === 'light'
-                                        ? isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'
+                                        ? isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700'
                                         : isActive ? 'text-white' : 'text-white group-hover:text-white'
                                         } ${isCollapsed ? '' : 'mr-3'}`}
                                 />

@@ -745,11 +745,11 @@ const EntityManagement: React.FC = () => {
                                     onClick={() => setActiveSubcategory(sc.key)}
                                     className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-left transition-colors ${activeSubcategory === sc.key
                                         ? 'text-white'
-                                        : 'text-white hover:bg-accent-light hover:text-accent-dark'
+                                        : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                         }`}
                                     style={activeSubcategory === sc.key ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F' } : {}}
                                 >
-                                    <sc.icon className="h-5 w-5" />
+                                    <sc.icon className={`h-5 w-5 ${activeSubcategory === sc.key ? 'text-white' : 'text-slate-500'}`} />
                                     <span>{sc.label}</span>
                                 </button>
                             ))}

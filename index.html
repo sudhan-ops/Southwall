@@ -847,6 +847,28 @@
       .blue-theme p, .blue-theme span {
          color: #64748b !important;
       }
+
+      /* PERMANENT FIX: Auth card text must always be white on login page */
+      .blue-theme .auth-card-container h1,
+      .blue-theme .auth-card-container h2,
+      .blue-theme .auth-card-container h3,
+      .blue-theme .auth-card-container h4,
+      .blue-theme .auth-card-container h5,
+      .blue-theme .auth-card-container h6,
+      .blue-theme .auth-card-container p,
+      .blue-theme .auth-card-container span,
+      .blue-theme .auth-card-container label,
+      .auth-card-container h1,
+      .auth-card-container h2,
+      .auth-card-container h3,
+      .auth-card-container h4,
+      .auth-card-container h5,
+      .auth-card-container h6,
+      .auth-card-container p,
+      .auth-card-container span,
+      .auth-card-container label {
+        color: #ffffff !important;
+      }
       
       /* Specific override to keep white text on the dark cards in MobileHome if needed, 
          but MobileHome uses specific classes. 
@@ -893,6 +915,31 @@
       .blue-theme.pro-dark-theme .form-input:focus {
         border-color: #1a3a6e !important;
         box-shadow: 0 0 0 1px #1a3a6e !important;
+      }
+
+      /* AUTH CARD: Keep dark inputs on login/signup pages */
+      .blue-theme .auth-card-container .form-input,
+      .blue-theme .auth-card-container input,
+      .auth-card-container .form-input,
+      .auth-card-container input {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+      }
+      
+      .blue-theme .auth-card-container .form-input::placeholder,
+      .blue-theme .auth-card-container input::placeholder,
+      .auth-card-container .form-input::placeholder,
+      .auth-card-container input::placeholder {
+        color: rgba(156, 163, 175, 0.8) !important;
+      }
+      
+      .blue-theme .auth-card-container .form-input:focus,
+      .blue-theme .auth-card-container input:focus,
+      .auth-card-container .form-input:focus,
+      .auth-card-container input:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 1px #3b82f6 !important;
       }
 
       /* Toggle switch */
@@ -1434,6 +1481,18 @@
           margin-left: auto !important;
           margin-right: auto !important;
         }
+
+        /* Force ALL text in auth card to be white */
+        .auth-card-container *,
+        .auth-card-container h1,
+        .auth-card-container h2,
+        .auth-card-container h3,
+        .auth-card-container p,
+        .auth-card-container span,
+        .auth-card-container div {
+          color: #ffffff !important;
+        }
+
 
         /* Fix Avatar Upload Buttons - Override mobile defaults */
         .avatar-capture-btn {

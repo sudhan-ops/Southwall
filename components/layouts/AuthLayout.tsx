@@ -64,16 +64,16 @@ const AuthLayout: React.FC = () => {
                     <div className="hidden md:flex flex-col justify-between p-6 lg:p-10 xl:p-16 bg-gradient-to-br from-black/40 to-black/70">
                         <div className="flex flex-col items-center text-center">
                             <Logo className="h-10 lg:h-14 xl:h-24" />
-                            <h1 className="text-xl lg:text-2xl xl:text-4xl font-bold text-white mt-6 lg:mt-8 leading-tight drop-shadow-lg">
+                            <h1 className="text-xl lg:text-2xl xl:text-4xl font-bold !text-white mt-6 lg:mt-8 leading-tight drop-shadow-lg">
                                 Welcome to the Future of Onboarding.
                             </h1>
-                            <p className="text-white mt-4 max-w-md drop-shadow-lg text-xs lg:text-sm xl:text-base">
+                            <p className="!text-white mt-4 max-w-md drop-shadow-lg text-xs lg:text-sm xl:text-base">
                                 Streamlining the journey for every new member of the Paradigm family.
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-white text-[10px] lg:text-xs mt-4">© {new Date().getFullYear()} Paradigm Services. All rights reserved.</p>
+                            <p className="!text-white text-[10px] lg:text-xs mt-4">© {new Date().getFullYear()} Paradigm Services. All rights reserved.</p>
                         </div>
                     </div>
 
