@@ -7,6 +7,7 @@ import { ProfilePlaceholder } from '../../components/ui/ProfilePlaceholder';
 import Toast from '../../components/ui/Toast';
 import StatusChip from '../../components/ui/StatusChip';
 import { useEnrollmentRulesStore } from '../../store/enrollmentRulesStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import CardListSkeleton from '../../components/skeletons/CardListSkeleton';
 
 type StatusFilter = 'in-progress' | 'existing';
@@ -22,6 +23,7 @@ const CheckboxItem: React.FC<{ label: string, checked: boolean }> = ({ label, ch
 // Component for the individual employee card
 const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }) => {
     const { esiCtcThreshold } = useEnrollmentRulesStore();
+    const { colorScheme } = useBrandingStore();
 
     const progress = useMemo(() => {
         const { personal, uan, esi, gmc } = submission;
@@ -51,7 +53,7 @@ const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }
 
     return (
         <Link to={`/onboarding/add/personal?id=${submission.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-xl">
-            <div className="bg-[#041b0f] md:bg-[#243524] p-3 rounded-xl flex gap-4 items-start border border-transparent hover:border-emerald-500 transition-colors duration-200">
+            <div className={`${colorScheme === 'blue' ? 'bg-[#0f2548] md:bg-white hover:border-blue-500' : 'bg-[#041b0f] md:bg-[#243524] hover:border-emerald-500'} p-3 rounded-xl flex gap-4 items-start border border-transparent transition-colors duration-200`}>
                 <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-600">
                     <ProfilePlaceholder photoUrl={submission.personal.photo?.preview} seed={submission.id} />
                 </div>
@@ -77,6 +79,7 @@ const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }
 
 // Main component for the My Submissions page
 const MySubmissions: React.FC = () => {
+    const { colorScheme } = useBrandingStore();
     const [submissions, setSubmissions] = useState<OnboardingData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('in-progress');
@@ -129,10 +132,10 @@ const MySubmissions: React.FC = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col bg-[#041b0f] text-white">
+        <div className={`h-full flex flex-col ${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#041b0f]'} text-white`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
-            <header className="p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 bg-[#041b0f]/80 backdrop-blur-sm border-b border-[#374151]">
+            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 ${colorScheme === 'blue' ? 'bg-[#1a3a6e]/80 border-blue-800' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm border-b`}>
                 <button onClick={() => navigate('/onboarding')} aria-label="Go back" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
                     <ArrowLeft className="h-6 w-6" />
                 </button>

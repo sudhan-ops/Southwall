@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, Crosshair, ChevronDown, Menu, X, ArrowLeft, Bell } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { usePermissionsStore } from '../../store/permissionsStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import Logo from '../ui/Logo';
 import NotificationBell from '../notifications/NotificationBell';
 import Button from '../ui/Button';
@@ -17,6 +18,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
     const { user, logout } = useAuthStore();
     const { permissions } = usePermissionsStore();
+    const { colorScheme } = useBrandingStore();
     const navigate = useNavigate();
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -65,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
                 Are you sure you want to log out?
             </Modal>
             <header
-                className="sticky top-0 z-40 bg-[#041b0f] md:bg-gray-50/50 backdrop-blur-md border-b border-[#1f3d2b] md:border-gray-200/50 transition-all duration-200"
+                className={`sticky top-0 z-40 ${isMobile ? (colorScheme === 'blue' ? 'bg-[#1a3a6e] border-white/10' : 'bg-[#041b0f] border-[#1f3d2b]') : 'md:bg-gray-50/50 md:border-gray-200/50'} backdrop-blur-md border-b transition-all duration-200`}
                 style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
                 <div className="px-4 sm:px-6 lg:px-8">

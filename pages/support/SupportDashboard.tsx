@@ -13,6 +13,8 @@ import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import Modal from '../../components/ui/Modal';
 
+import { useBrandingStore } from '../../store/brandingStore';
+
 const PriorityIndicator: React.FC<{ priority: SupportTicket['priority'] }> = ({ priority }) => {
     const styles = {
         Low: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]',
@@ -69,7 +71,9 @@ const TicketCard: React.FC<{ ticket: SupportTicket, onClick: () => void }> = ({ 
     </div>
 );
 
-const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void }> = ({ user, onAction }) => (
+const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void }> = ({ user, onAction }) => {
+    const { colorScheme } = useBrandingStore();
+    return (
     <div className="flex items-center gap-4 p-3 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
         <div className="relative">
             <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className="w-12 h-12 rounded-full shadow-sm" />
@@ -85,7 +89,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                 title="Call"
                 onClick={() => onAction(user.phone)}
             >
@@ -95,7 +99,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                 title="Message"
                 onClick={() => onAction(user.phone)}
             >
@@ -105,7 +109,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                 title="Video"
                 onClick={() => onAction(user.phone)}
             >
@@ -113,11 +117,13 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
             </Button>
         </div>
     </div>
-);
+    );
+};
 
 const SupportDashboard: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
 
     const [tickets, setTickets] = useState<SupportTicket[]>([]);
     const [nearbyUsers, setNearbyUsers] = useState<User[]>([]);

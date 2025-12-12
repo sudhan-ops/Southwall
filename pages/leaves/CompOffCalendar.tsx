@@ -3,6 +3,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import type { CompOffLog } from '../../types';
 import Button from '../../components/ui/Button';
+import { useBrandingStore } from '../../store/brandingStore';
 
 interface CompOffCalendarProps {
     logs: CompOffLog[];
@@ -10,6 +11,7 @@ interface CompOffCalendarProps {
 }
 
 const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = false }) => {
+    const { colorScheme } = useBrandingStore();
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const daysInMonth = useMemo(() => {
@@ -33,7 +35,7 @@ const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = fal
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'earned': return 'bg-blue-600 text-white border-blue-700 shadow-sm'; // Vibrant Blue for Comp Off
+            case 'earned': return colorScheme === 'blue' ? 'bg-blue-600 text-white border-blue-700 shadow-sm' : 'bg-[#006B3F] text-white border-[#005632] shadow-sm'; // Dynamic Theme
             default: return 'bg-gray-50 text-gray-400 border-gray-100'; // Neutral
         }
     };
@@ -75,7 +77,7 @@ const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = fal
                 </div>
             )}
             <div className="mt-3 flex gap-3 text-xs text-muted justify-center">
-                <div className="flex items-center gap-1"><div className="w-2 h-2 bg-blue-600 border border-blue-700 rounded-sm"></div> Comp Off Earned</div>
+                <div className="flex items-center gap-1"><div className={`w-2 h-2 ${colorScheme === 'blue' ? 'bg-blue-600 border-blue-700' : 'bg-[#006B3F] border-[#005632]'} border rounded-sm`}></div> Comp Off Earned</div>
             </div>
         </div>
     );

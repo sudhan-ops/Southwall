@@ -6,7 +6,10 @@ import { api } from '../../services/api';
 import type { AttendanceEvent } from '../../types';
 import Button from '../../components/ui/Button';
 
+import { useBrandingStore } from '../../store/brandingStore';
+
 const OTCalendar: React.FC = () => {
+    const { colorScheme } = useBrandingStore();
     const { user } = useAuthStore();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<AttendanceEvent[]>([]);
@@ -99,7 +102,7 @@ const OTCalendar: React.FC = () => {
                         const hasOT = ot > 0;
 
                         return (
-                            <div key={date.toISOString()} className={`aspect-square rounded border flex flex-col items-center justify-center transition-colors ${hasOT ? 'bg-blue-600 text-white border-blue-700 shadow-sm' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                            <div key={date.toISOString()} className={`aspect-square rounded border flex flex-col items-center justify-center transition-colors ${hasOT ? (colorScheme === 'blue' ? 'bg-blue-600 text-white border-blue-700 shadow-sm' : 'bg-[#006B3F] text-white border-[#005632] shadow-sm') : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
                                 <span className="text-xs font-semibold">{format(date, 'd')}</span>
                                 {hasOT && <span className="text-[8px] font-bold">+{ot}h</span>}
                             </div>
@@ -108,7 +111,7 @@ const OTCalendar: React.FC = () => {
                 </div>
             )}
             <div className="mt-3 flex gap-3 text-[10px] text-muted justify-center flex-wrap">
-                <div className="flex items-center gap-1"><div className="w-2 h-2 bg-blue-600 border border-blue-700 rounded-sm"></div> Overtime (&gt;8h)</div>
+                <div className="flex items-center gap-1"><div className={`w-2 h-2 ${colorScheme === 'blue' ? 'bg-blue-600 border-blue-700' : 'bg-[#006B3F] border-[#005632]'} border rounded-sm`}></div> Overtime (&gt;8h)</div>
             </div>
         </div>
     );

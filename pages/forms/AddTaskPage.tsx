@@ -14,6 +14,7 @@ import Toast from '../../components/ui/Toast';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useThemeStore } from '../../store/themeStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import { CheckSquare } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
@@ -59,6 +60,7 @@ const AddTaskPage: React.FC = () => {
     const { permissions } = usePermissionsStore();
     const { fetchNotifications } = useNotificationStore();
     const { theme } = useThemeStore();
+    const { colorScheme } = useBrandingStore();
     const isDark = theme === 'dark';
 
     const { register, handleSubmit, formState: { errors }, reset, control, watch } = useForm<TaskFormInputs>({
@@ -149,7 +151,9 @@ const AddTaskPage: React.FC = () => {
     };
 
     // Styles
-    const darkInputStyle = "!bg-[#041b0f] !border-white/10 !text-white !placeholder-gray-500 !rounded-xl focus:!ring-emerald-500 focus:!border-emerald-500";
+    const darkInputStyle = colorScheme === 'blue'
+        ? "!bg-[#0f2548] !border-white/10 !text-white !placeholder-slate-400 !rounded-xl focus:!ring-blue-500 focus:!border-blue-500"
+        : "!bg-[#041b0f] !border-white/10 !text-white !placeholder-gray-500 !rounded-xl focus:!ring-emerald-500 focus:!border-emerald-500";
     const darkLabelStyle = "text-gray-300 font-medium mb-1.5 block";
     const lightInputStyle = "";
     const lightLabelStyle = "block text-sm font-medium text-muted mb-1";
@@ -159,12 +163,12 @@ const AddTaskPage: React.FC = () => {
 
     if (isMobile) {
         return (
-            <div className={`h-full flex flex-col ${isDark ? 'bg-[#041b0f] text-white' : ''}`}>
+            <div className={`h-full flex flex-col ${isDark ? (colorScheme === 'blue' ? 'bg-[#0a1628] text-white' : 'bg-[#041b0f] text-white') : ''}`}>
                 <header className="p-4 flex-shrink-0 fo-mobile-header">
                     <h1>{isEditing ? 'Edit Task' : 'Add Task'}</h1>
                 </header>
                 <main className="flex-1 overflow-y-auto p-4">
-                    <div className={`${isDark ? 'bg-[#152b1b] border border-white/10' : 'bg-card'} rounded-2xl p-6 space-y-6`}>
+                    <div className={`${isDark ? (colorScheme === 'blue' ? 'bg-[#0f2548] border border-white/10' : 'bg-[#152b1b] border border-white/10') : 'bg-card'} rounded-2xl p-6 space-y-6`}>
                         <div className="text-center">
                             <div className={`inline-block p-3 rounded-full mb-2 ${isDark ? 'bg-emerald-500/20' : 'bg-accent-light'}`}>
                                 <CheckSquare className={`h-8 w-8 ${isDark ? 'text-emerald-400' : 'text-accent-dark'}`} />
@@ -217,18 +221,18 @@ const AddTaskPage: React.FC = () => {
                                 <div>
                                     <label htmlFor="priority" className={labelStyle}>Priority</label>
                                     <Select id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
-                                        <option value="Low" className={isDark ? "bg-[#041b0f]" : ""}>Low</option>
-                                        <option value="Medium" className={isDark ? "bg-[#041b0f]" : ""}>Medium</option>
-                                        <option value="High" className={isDark ? "bg-[#041b0f]" : ""}>High</option>
+                                        <option value="Low" className={isDark ? (colorScheme === 'blue' ? "bg-[#0f2548]" : "bg-[#041b0f]") : ""}>Low</option>
+                                        <option value="Medium" className={isDark ? (colorScheme === 'blue' ? "bg-[#0f2548]" : "bg-[#041b0f]") : ""}>Medium</option>
+                                        <option value="High" className={isDark ? (colorScheme === 'blue' ? "bg-[#0f2548]" : "bg-[#041b0f]") : ""}>High</option>
                                     </Select>
                                 </div>
 
                                 <div>
                                     <label htmlFor="assignedToId" className={labelStyle}>Assign To</label>
                                     <Select id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
-                                        <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
+                                        <option value="" className={isDark ? (colorScheme === 'blue' ? "bg-[#0f2548]" : "bg-[#041b0f]") : ""}>Select User</option>
                                         {users.map(user => (
-                                            <option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
+                                            <option key={user.id} value={user.id} className={isDark ? (colorScheme === 'blue' ? "bg-[#0f2548]" : "bg-[#041b0f]") : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
                                         ))}
                                     </Select>
                                 </div>
@@ -261,7 +265,7 @@ const AddTaskPage: React.FC = () => {
 
     return (
         <div className={`p-4 md:p-6 ${isDark ? 'text-white' : ''}`}>
-            <div className={`${isDark ? 'bg-[#152b1b] border border-white/10' : 'bg-card'} p-8 rounded-xl shadow-card w-full max-w-3xl mx-auto`}>
+            <div className={`${isDark ? (colorScheme === 'blue' ? 'bg-[#0f2548] border border-white/10' : 'bg-[#152b1b] border border-white/10') : 'bg-card'} p-8 rounded-xl shadow-card w-full max-w-3xl mx-auto`}>
                 <div className="flex items-center mb-6">
                     <div className={`p-3 rounded-full mr-4 ${isDark ? 'bg-emerald-500/20' : 'bg-accent-light'}`}>
                         <CheckSquare className={`h-8 w-8 ${isDark ? 'text-emerald-400' : 'text-accent-dark'}`} />

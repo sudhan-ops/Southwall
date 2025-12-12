@@ -59,11 +59,11 @@ const AuthLayout: React.FC = () => {
 
             {/* Centered content container */}
             <div className="relative w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl p-4">
-                <div className="auth-card-container w-full grid md:grid-cols-2 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md bg-black/40 border border-[#041b0f] md:border-white/10">
+                <div className="auth-card-container w-full grid md:grid-cols-2 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md bg-black/40 border border-white/10">
                     {/* Left Visual Column */}
                     <div className="hidden md:flex flex-col justify-between p-6 lg:p-10 xl:p-16 bg-gradient-to-br from-black/40 to-black/70">
-                        <div>
-                            <Logo className="h-8 lg:h-12 xl:h-14" />
+                        <div className="flex flex-col items-center text-center">
+                            <Logo className="h-10 lg:h-14 xl:h-24" />
                             <h1 className="text-xl lg:text-2xl xl:text-4xl font-bold text-white mt-6 lg:mt-8 leading-tight drop-shadow-lg">
                                 Welcome to the Future of Onboarding.
                             </h1>

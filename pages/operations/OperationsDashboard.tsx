@@ -11,12 +11,14 @@ import Select from '../../components/ui/Select';
 import { Users, UserCheck, UserX, Calendar, MapPin, Send, FileText, Activity } from 'lucide-react';
 import Toast from '../../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
+import { useBrandingStore } from '../../store/brandingStore';
 import FormHeader from '../../components/onboarding/FormHeader';
 import DatePicker from '../../components/ui/DatePicker';
 import StatCard from '../../components/ui/StatCard';
 
 const OperationsDashboard: React.FC = () => {
     const navigate = useNavigate();
+    const { colorScheme } = useBrandingStore();
     const [submissions, setSubmissions] = useState<OnboardingData[]>([]);
     const [fieldOfficers, setFieldOfficers] = useState<User[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -160,7 +162,7 @@ const OperationsDashboard: React.FC = () => {
                                 e.stopPropagation();
                                 navigate('/operations/team-activity');
                             }}
-                            style={{ backgroundColor: '#006B3F', color: '#FFFFFF' }}
+                            style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
                         >
                             View Team Activity →
                         </Button>

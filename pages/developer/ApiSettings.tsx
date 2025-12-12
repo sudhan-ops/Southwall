@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Server, Download, ShieldCheck, Settings, Mail, Image, Phone, Building } from 'lucide-react';
+import { Server, Download, ShieldCheck, Settings, Mail, Image, Phone, Building, Palette } from 'lucide-react';
 import { api } from '../../services/api';
 import Toast from '../../components/ui/Toast';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useBrandingStore, ColorScheme } from '../../store/brandingStore';
 import Checkbox from '../../components/ui/Checkbox';
 import PageInterfaceSettingsModal from '../../components/developer/PageInterfaceSettingsModal';
 
@@ -27,6 +28,7 @@ const SettingsCard: React.FC<{ title: string; icon: React.ElementType, children:
 
 export const ApiSettings: React.FC = () => {
     const store = useSettingsStore();
+    const { colorScheme, setColorScheme } = useBrandingStore();
 
     const [isExporting, setIsExporting] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -52,6 +54,11 @@ export const ApiSettings: React.FC = () => {
         }
     };
 
+    const handleColorSchemeChange = (scheme: ColorScheme) => {
+        setColorScheme(scheme);
+        setToast({ message: `Color scheme changed to ${scheme === 'green' ? 'Paradigm (Green)' : 'SouthWall (Blue)'}`, type: 'success' });
+    };
+
     return (
         <div className="space-y-8 p-4 md:p-0">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
@@ -64,6 +71,47 @@ export const ApiSettings: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 {/* --- COLUMN 1: INTERFACE & INTEGRATIONS --- */}
                 <div className="space-y-8">
+                    {/* Color Scheme Selection */}
+                    <SettingsCard title="Color Scheme" icon={Palette}>
+                        <p className="text-sm text-muted -mt-2">Choose the application's primary color scheme.</p>
+                        <div className="flex flex-wrap gap-4 pt-4">
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('green')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'green' 
+                                        ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                                        : 'border-border hover:border-green-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#006B3F] flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">P</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">Paradigm (Green)</p>
+                                    <p className="text-xs text-muted">Default theme</p>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('blue')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'blue' 
+                                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
+                                        : 'border-border hover:border-blue-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#1a3a6e] flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">S</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">SouthWall (Blue)</p>
+                                    <p className="text-xs text-muted">Security theme</p>
+                                </div>
+                            </button>
+                        </div>
+                    </SettingsCard>
+
                     <SettingsCard title="Page Interface" icon={Image}>
                         <p className="text-sm text-muted -mt-2">Customize the application's branding, login screen, and user interaction settings.</p>
                         <div className="pt-4">
@@ -81,7 +129,7 @@ export const ApiSettings: React.FC = () => {
                                     label="Enable Gemini API OCR Verification"
                                     description="Use Google's Gemini API for document data extraction. This is a powerful fallback or primary OCR. API key must be configured on the backend."
                                     checked={store.geminiApi.enabled}
-                                    onChange={val => store.updateGeminiApiSettings({ enabled: val })}
+                                    onChange={e => store.updateGeminiApiSettings({ enabled: e.target.checked })}
                                 />
                             </div>
                             {/* Perfios API */}
@@ -91,7 +139,7 @@ export const ApiSettings: React.FC = () => {
                                     label="Enable Perfios API Verification"
                                     description="Use Perfios for Bank, Aadhaar, and UAN verification."
                                     checked={store.perfiosApi.enabled}
-                                    onChange={val => store.updatePerfiosApiSettings({ enabled: val })}
+                                    onChange={e => store.updatePerfiosApiSettings({ enabled: e.target.checked })}
                                 />
                                 <div className={`mt-4 space-y-4 transition-opacity ${store.perfiosApi.enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
                                     <Input label="Perfios Client ID" value={store.perfiosApi.clientId} onChange={e => store.updatePerfiosApiSettings({ clientId: e.target.value })} />
@@ -109,7 +157,7 @@ export const ApiSettings: React.FC = () => {
                                 label="Enable OTP Phone Sign-In"
                                 description="Allow users to sign in using a one-time password sent via SMS."
                                 checked={store.otp.enabled}
-                                onChange={val => store.updateOtpSettings({ enabled: val })}
+                                onChange={e => store.updateOtpSettings({ enabled: e.target.checked })}
                             />
                         </div>
                     </SettingsCard>
@@ -125,14 +173,14 @@ export const ApiSettings: React.FC = () => {
                                 label="Enable Provisional Site Creation"
                                 description="Allows HR/Admins to create a site with just a name, providing a 90-day grace period to complete the full configuration for easier onboarding."
                                 checked={store.siteManagement.enableProvisionalSites}
-                                onChange={val => store.updateSiteManagementSettings({ enableProvisionalSites: val })}
+                                onChange={e => store.updateSiteManagementSettings({ enableProvisionalSites: e.target.checked })}
                             />
                         </div>
                     </SettingsCard>
                     <SettingsCard title="System & Data" icon={Settings}>
                         <p className="text-sm text-muted -mt-2">Manage core system settings and data operations.</p>
                         <div className="space-y-6 pt-4">
-                            <Checkbox id="pincode-verification" label="Enable Pincode API Verification" description="Auto-fill City/State from pincode during onboarding." checked={store.address.enablePincodeVerification} onChange={val => store.updateAddressSettings({ enablePincodeVerification: val })} />
+                            <Checkbox id="pincode-verification" label="Enable Pincode API Verification" description="Auto-fill City/State from pincode during onboarding." checked={store.address.enablePincodeVerification} onChange={e => store.updateAddressSettings({ enablePincodeVerification: e.target.checked })} />
 
                             <div className="pt-4 border-t">
                                 <h4 className="font-semibold text-primary-text mb-2">Backup & Export</h4>
@@ -152,7 +200,7 @@ export const ApiSettings: React.FC = () => {
                                 label="Enable Email Notifications"
                                 description="Send emails for important events like task assignments. SMTP must be configured on the backend."
                                 checked={store.notifications.email.enabled}
-                                onChange={val => store.updateNotificationSettings({ email: { enabled: val } })}
+                                onChange={e => store.updateNotificationSettings({ email: { enabled: e.target.checked } })}
                             />
                         </div>
                     </SettingsCard>

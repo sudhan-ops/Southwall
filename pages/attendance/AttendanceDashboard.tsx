@@ -52,6 +52,7 @@ import Logo from '../../components/ui/Logo';
 import { pdfLogoLocalPath } from '../../components/ui/logoData';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useThemeStore } from '../../store/themeStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import {
     Chart,
     BarController,
@@ -100,6 +101,8 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstance = useRef<Chart | null>(null);
 
+    const { colorScheme } = useBrandingStore();
+
     useEffect(() => {
         if (chartRef.current) {
             if (chartInstance.current) {
@@ -107,6 +110,10 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
             }
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
+                // Theme Colors
+                const presentBg = colorScheme === 'blue' ? '#1a3a6e' : '#005D22';
+                const presentBorder = colorScheme === 'blue' ? '#0f264a' : '#004218';
+
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -115,8 +122,8 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
                             {
                                 label: 'Present',
                                 data: data.present,
-                                backgroundColor: '#005D22',
-                                borderColor: '#004218',
+                                backgroundColor: presentBg,
+                                borderColor: presentBorder,
                                 borderWidth: 1,
                                 borderRadius: 4,
                             },
@@ -180,7 +187,7 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
                 chartInstance.current.destroy();
             }
         };
-    }, [data]);
+    }, [data, colorScheme]);
 
     return (
         <div className="h-full w-full flex flex-col">
@@ -195,6 +202,8 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstance = useRef<Chart | null>(null);
 
+    const { colorScheme } = useBrandingStore();
+
     useEffect(() => {
         if (chartRef.current) {
             if (chartInstance.current) {
@@ -202,9 +211,13 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
             }
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
+                // Theme Colors
+                const themeRgb = colorScheme === 'blue' ? '26, 58, 110' : '0, 93, 34';
+                const themeColor = colorScheme === 'blue' ? '#1a3a6e' : '#005D22';
+
                 const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, 'rgba(0, 93, 34, 0.4)');
-                gradient.addColorStop(1, 'rgba(0, 93, 34, 0)');
+                gradient.addColorStop(0, `rgba(${themeRgb}, 0.4)`);
+                gradient.addColorStop(1, `rgba(${themeRgb}, 0)`);
                 chartInstance.current = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -212,11 +225,11 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
                         datasets: [{
                             label: 'Average Hours Worked',
                             data: data.hours,
-                            borderColor: '#005D22',
+                            borderColor: themeColor,
                             backgroundColor: gradient,
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: '#005D22',
+                            pointBackgroundColor: themeColor,
                             pointRadius: 0,
                             pointHoverRadius: 5,
                         }]
@@ -284,7 +297,7 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
                 chartInstance.current.destroy();
             }
         };
-    }, [data]);
+    }, [data, colorScheme]);
 
     return (
         <div className="h-full w-full flex flex-col">
@@ -737,6 +750,7 @@ const AttendanceDashboard: React.FC = () => {
     const { user } = useAuthStore();
     const { permissions } = usePermissionsStore();
     const { recurringHolidays } = useSettingsStore();
+    const { colorScheme } = useBrandingStore();
 
     const [users, setUsers] = useState<User[]>([]);
     const [attendanceEvents, setAttendanceEvents] = useState<AttendanceEvent[]>([]);
@@ -1428,7 +1442,7 @@ const AttendanceDashboard: React.FC = () => {
 
     if (isEmployeeView) {
         return (
-            <div className="p-4 space-y-6 pb-24 md:bg-transparent bg-[#041b0f]">
+            <div className={`p-4 space-y-6 pb-24 md:bg-transparent ${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#041b0f]'}`}>
                 <div className="flex flex-col gap-4">
                     <h2 className="text-2xl font-bold text-primary-text">My Attendance</h2>
 
@@ -1444,7 +1458,7 @@ const AttendanceDashboard: React.FC = () => {
                                     ? "text-white shadow-md border"
                                     : "bg-card text-primary-text border border-border hover:bg-accent-light"
                                 }
-                                style={activeDateFilter === filter ? { backgroundColor: '#006B3F', borderColor: '#005632' } : {}}
+                                style={activeDateFilter === filter ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
                             >
                                 {filter}
                             </Button>
@@ -1458,7 +1472,7 @@ const AttendanceDashboard: React.FC = () => {
                                     ? "text-white shadow-md border"
                                     : "bg-card text-primary-text border border-border hover:bg-accent-light"
                                 }
-                                style={activeDateFilter === 'Custom' ? { backgroundColor: '#006B3F', borderColor: '#005632' } : {}}
+                                style={activeDateFilter === 'Custom' ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
                             >
                                 <Calendar className="mr-2 h-4 w-4" />
                                 <span>
@@ -1577,7 +1591,7 @@ const AttendanceDashboard: React.FC = () => {
                                 ? "text-white shadow-md border"
                                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                             }
-                            style={activeDateFilter === filter ? { backgroundColor: '#006B3F', borderColor: '#005632' } : {}}
+                            style={activeDateFilter === filter ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
                         >
                             {filter}
                         </Button>
@@ -1643,7 +1657,7 @@ const AttendanceDashboard: React.FC = () => {
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Report Type</label>
                         <select
-                            className="border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-green-500 outline-none"
+                            className={`border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 ${colorScheme === 'blue' ? 'focus:ring-[#1a3a6e]' : 'focus:ring-green-500'} outline-none`}
                             value={reportType}
                             onChange={(e) => setReportType(e.target.value as any)}
                         >
@@ -1656,7 +1670,7 @@ const AttendanceDashboard: React.FC = () => {
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Employee</label>
                         <select
-                            className="border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-green-500 outline-none max-w-[200px]"
+                            className={`border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 ${colorScheme === 'blue' ? 'focus:ring-[#1a3a6e]' : 'focus:ring-green-500'} outline-none max-w-[200px]`}
                             value={selectedUser}
                             onChange={(e) => setSelectedUser(e.target.value)}
                         >
@@ -1670,7 +1684,7 @@ const AttendanceDashboard: React.FC = () => {
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
                         <select
-                            className="border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-green-500 outline-none max-w-[200px]"
+                            className={`border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 ${colorScheme === 'blue' ? 'focus:ring-[#1a3a6e]' : 'focus:ring-green-500'} outline-none max-w-[200px]`}
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
@@ -1688,7 +1702,7 @@ const AttendanceDashboard: React.FC = () => {
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Record Type</label>
                         <select
-                            className="border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 focus:ring-green-500 outline-none max-w-[200px]"
+                            className={`border rounded-md px-3 py-1.5 text-sm bg-white focus:ring-2 ${colorScheme === 'blue' ? 'focus:ring-[#1a3a6e]' : 'focus:ring-green-500'} outline-none max-w-[200px]`}
                             value={selectedRecordType}
                             onChange={(e) => setSelectedRecordType(e.target.value)}
                         >
@@ -1734,7 +1748,7 @@ const AttendanceDashboard: React.FC = () => {
                             type="button"
                             onClick={handleDownloadCsv}
                             disabled={isDownloading}
-                            style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                            style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                             className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                         >
                             {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileDown className="mr-2 h-4 w-4" />}

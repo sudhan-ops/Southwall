@@ -16,6 +16,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import { useUiSettingsStore } from '../../store/uiSettingsStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import TemplateInstructionsModal from '../../components/hr/TemplateInstructionsModal';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import PlaceholderView from '../../components/ui/PlaceholderView';
@@ -160,6 +161,7 @@ const subcategories = [
 
 const EntityManagement: React.FC = () => {
     const navigate = useNavigate();
+    const { colorScheme } = useBrandingStore();
     const [groups, setGroups] = useState<OrganizationGroup[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [siteConfigs, setSiteConfigs] = useState<SiteConfiguration[]>([]);
@@ -523,7 +525,7 @@ const EntityManagement: React.FC = () => {
                 return (
                     <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
-                            <Button onClick={() => navigate('/hr/entity-management/add-group')} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Plus className="mr-2 h-4" />Add Group</Button>
+                            <Button onClick={() => navigate('/hr/entity-management/add-group')} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Plus className="mr-2 h-4" />Add Group</Button>
                             <div className="flex items-center gap-2 flex-wrap">
                                 <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="hover:bg-gray-100"><FileText className="mr-2 h-4 w-4" /> Template</Button>
                                 <Button type="button" variant="outline" onClick={() => importRef.current?.click()} className="hover:bg-gray-100"><Upload className="mr-2 h-4 w-4" /> Import</Button>
@@ -700,14 +702,14 @@ const EntityManagement: React.FC = () => {
                     <div className="flex items-center gap-2 flex-wrap">
                         <Button variant="outline" onClick={() => setIsInstructionsOpen(true)} className="hover:bg-gray-100"><HelpCircle className="mr-2 h-4 w-4" /> Help</Button>
                         <input type="file" ref={importRef} className="hidden" accept=".csv" onChange={handleImport} />
-                        <Button onClick={handleSaveAll} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
+                        <Button onClick={handleSaveAll} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
                     </div>
                 )}
             </div>
 
             {isMobile && (
                 <div className="flex flex-col gap-3 mb-4">
-                    <Button onClick={handleSaveAll} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
+                    <Button onClick={handleSaveAll} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
                     <Button variant="outline" onClick={() => setIsInstructionsOpen(true)} className="w-full justify-center hover:bg-gray-100"><HelpCircle className="mr-2 h-4 w-4" /> Help</Button>
                     <input type="file" ref={importRef} className="hidden" accept=".csv" onChange={handleImport} />
                 </div>
@@ -745,7 +747,7 @@ const EntityManagement: React.FC = () => {
                                         ? 'text-white'
                                         : 'text-muted hover:bg-accent-light hover:text-accent-dark'
                                         }`}
-                                    style={activeSubcategory === sc.key ? { backgroundColor: '#006B3F' } : {}}
+                                    style={activeSubcategory === sc.key ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F' } : {}}
                                 >
                                     <sc.icon className="h-5 w-5" />
                                     <span>{sc.label}</span>

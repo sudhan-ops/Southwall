@@ -6,6 +6,7 @@ import { useThemeStore } from './store/themeStore';
 import { useEnrollmentRulesStore } from './store/enrollmentRulesStore';
 import { usePermissionsStore } from './store/permissionsStore';
 import { useSettingsStore } from './store/settingsStore';
+import { useBrandingStore } from './store/brandingStore';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { supabase } from './services/supabase';
 import { authService } from './services/authService';
@@ -130,6 +131,22 @@ const ThemeManager: React.FC = () => {
       body.classList.remove('pro-dark-theme');
     }
   }, [theme, isAutomatic, isMobile, _setThemeInternal]);
+
+  return null;
+};
+
+// Branding Manager - applies color scheme class to body
+const BrandingManager: React.FC = () => {
+  const { colorScheme } = useBrandingStore();
+
+  useEffect(() => {
+    const body = document.body;
+    if (colorScheme === 'blue') {
+      body.classList.add('blue-theme');
+    } else {
+      body.classList.remove('blue-theme');
+    }
+  }, [colorScheme]);
 
   return null;
 };
@@ -431,6 +448,7 @@ const App: React.FC = () => {
     <>
       <ScrollToTop />
       <ThemeManager />
+      <BrandingManager />
       {user && <IdleTimeoutManager />}
       <Routes>
         {/* 1. Public Authentication Routes */}

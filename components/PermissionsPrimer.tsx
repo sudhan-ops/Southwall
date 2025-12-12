@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import Logo from './ui/Logo';
 import Button from './ui/Button';
+import { useBrandingStore } from '../store/brandingStore';
 
 interface PermissionsPrimerProps {
   onComplete: () => void;
@@ -11,12 +12,22 @@ type PermissionStatus = 'prompt' | 'granted' | 'denied';
 
 const PermissionsPrimer: React.FC<PermissionsPrimerProps> = ({ onComplete }) => {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const { colorScheme } = useBrandingStore();
   const [locationStatus, setLocationStatus] = useState<PermissionStatus>('prompt');
   const [cameraStatus, setCameraStatus] = useState<PermissionStatus>('prompt');
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const allPermissionsGranted = locationStatus === 'granted' && cameraStatus === 'granted';
+
+  // SouthWall Blue Color Constants
+  const isBlue = colorScheme === 'blue';
+  const bgColor = isBlue ? 'bg-[#1a3a6e]' : 'bg-white';
+  const textColor = isBlue ? 'text-white' : 'text-gray-600';
+  const headingColor = isBlue ? 'text-white' : 'text-gray-900';
+  const cardBg = isBlue ? 'bg-white/10 border-white/20' : 'bg-gray-100 border-gray-300';
+  const cardTitle = isBlue ? 'text-white' : 'text-gray-900';
+  const cardText = isBlue ? 'text-gray-300' : 'text-gray-600';
 
   useEffect(() => {
     // If not on mobile, or if all permissions are already granted, complete immediately.
@@ -106,35 +117,35 @@ const PermissionsPrimer: React.FC<PermissionsPrimerProps> = ({ onComplete }) => 
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4 text-center">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 text-center ${bgColor}`}>
       <div className="splash-logo">
         <Logo className="h-16 mb-8" />
       </div>
       <div className="max-w-md">
-        <h1 className="text-2xl font-bold mb-4">Permissions Required</h1>
-        <p className="text-gray-600 mb-8">
+        <h1 className={`text-2xl font-bold mb-4 ${headingColor}`}>Permissions Required</h1>
+        <p className={`mb-8 ${textColor}`}>
           To ensure the best experience and enable features like location-based check-ins and photo uploads,
           we need access to your device's Camera and Location.
         </p>
 
         <div className="space-y-4 mb-8">
-          <div className={`p-4 rounded-lg border ${locationStatus === 'granted' ? 'bg-green-100 border-green-300' : 'bg-gray-100 border-gray-300'}`}>
-            <p className="font-semibold">Location Access</p>
-            <p className="text-sm">{locationStatus === 'granted' ? 'Permission Granted' : 'Needed for check-in/out'}</p>
+          <div className={`p-4 rounded-lg border ${locationStatus === 'granted' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-100' : cardBg}`}>
+            <p className={`font-semibold ${cardTitle}`}>Location Access</p>
+            <p className={`text-sm ${cardText}`}>{locationStatus === 'granted' ? 'Permission Granted' : 'Needed for check-in/out'}</p>
           </div>
-          <div className={`p-4 rounded-lg border ${cameraStatus === 'granted' ? 'bg-green-100 border-green-300' : 'bg-gray-100 border-gray-300'}`}>
-            <p className="font-semibold">Camera Access</p>
-            <p className="text-sm">{cameraStatus === 'granted' ? 'Permission Granted' : 'Needed for identity verification'}</p>
+          <div className={`p-4 rounded-lg border ${cameraStatus === 'granted' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-100' : cardBg}`}>
+            <p className={`font-semibold ${cardTitle}`}>Camera Access</p>
+            <p className={`text-sm ${cardText}`}>{cameraStatus === 'granted' ? 'Permission Granted' : 'Needed for identity verification'}</p>
           </div>
         </div>
 
-        <Button onClick={requestPermissions} disabled={isRequesting}>
+        <Button onClick={requestPermissions} disabled={isRequesting} className={isBlue ? 'w-full bg-white text-[#1a3a6e] hover:bg-gray-100' : 'w-full'}>
           {isRequesting ? 'Requesting...' : 'Grant Permissions'}
         </Button>
 
         {error && <p className="text-red-500 mt-4">{error}</p>}
         
-        <p className="text-xs text-gray-500 mt-8">
+        <p className={`text-xs mt-8 ${isBlue ? 'text-white/50' : 'text-gray-500'}`}>
           You can manage these permissions in your device settings at any time.
         </p>
       </div>

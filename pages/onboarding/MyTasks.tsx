@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import type { Task, Notification, TaskStatus } from '../../types';
 import { Loader2, ListTodo, Bell } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -17,6 +18,7 @@ const TaskStatusChip: React.FC<{ status: TaskStatus }> = ({ status }) => {
 
 const Tasks: React.FC = () => {
     const { user } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
     const [activeTab, setActiveTab] = useState<'tasks' | 'notifications'>('tasks');
     const [tasks, setTasks] = useState<Task[]>([]);
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -52,7 +54,7 @@ const Tasks: React.FC = () => {
 
     return (
         <div>
-            <header className="p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 bg-[#041b0f]/80 backdrop-blur-sm z-10 border-b border-[#374151]">
+            <header className={`p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 ${colorScheme === 'blue' ? 'bg-[#1a3a6e]/80 border-blue-800' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm z-10 border-b`}>
                 <h1>Tasks</h1>
             </header>
 

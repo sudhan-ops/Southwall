@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Checkbox from '../../components/ui/Checkbox';
 import { useAuthStore } from '../../store/authStore';
+import { useBrandingStore } from '../../store/brandingStore'; // Add branding store import
 import { useDeviceFingerprint } from '../../hooks/useDeviceFingerprint';
 import type { User } from '../../types';
 import { Mail, Lock, AlertTriangle, Check } from 'lucide-react';
@@ -39,6 +40,7 @@ const getHomeRoute = (user: User) => {
 
 const Login: React.FC = () => {
     const { user, loginWithEmail, loginWithGoogle, error, setError, loading, setLoginAnimationPending, isLoginAnimationPending } = useAuthStore();
+    const { colorScheme } = useBrandingStore(); // Get color scheme
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -135,7 +137,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="space-y-3">
                 <fieldset disabled={isFormDisabled} className="space-y-3">
                     <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none" />
+                        <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 ${colorScheme === 'blue' ? 'group-focus-within:text-blue-500' : 'group-focus-within:text-[#22c55e]'} transition-colors pointer-events-none`} />
                         <Input
                             id="email"
                             type="email"
@@ -143,11 +145,11 @@ const Login: React.FC = () => {
                             placeholder="Email"
                             registration={registerEmail('email')}
                             error={emailErrors.email?.message}
-                            className="!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all"
+                            className={`!pl-12 !bg-black/60 !text-white !border-white/10 ${colorScheme === 'blue' ? 'focus:!border-blue-500' : 'focus:!border-[#22c55e]'} placeholder:!text-gray-500 !py-3 !rounded-xl transition-all`}
                         />
                     </div>
                     <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none" />
+                        <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 ${colorScheme === 'blue' ? 'group-focus-within:text-blue-500' : 'group-focus-within:text-[#22c55e]'} transition-colors pointer-events-none`} />
                         <Input
                             id="password"
                             type="password"
@@ -155,7 +157,7 @@ const Login: React.FC = () => {
                             placeholder="Password"
                             registration={registerEmail('password')}
                             error={emailErrors.password?.message}
-                            className="!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all"
+                            className={`!pl-12 !bg-black/60 !text-white !border-white/10 ${colorScheme === 'blue' ? 'focus:!border-blue-500' : 'focus:!border-[#22c55e]'} placeholder:!text-gray-500 !py-3 !rounded-xl transition-all`}
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
@@ -166,7 +168,7 @@ const Login: React.FC = () => {
                                 labelClassName="text-white font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
-                                inputClassName="text-[#22c55e] border-white/20 rounded bg-black/40 focus:ring-[#22c55e]"
+                                inputClassName={`${colorScheme === 'blue' ? 'text-blue-500 focus:ring-blue-500' : 'text-[#22c55e] focus:ring-[#22c55e]'} border-white/20 rounded bg-black/40`}
                             />
                         </div>
                         <Link
@@ -192,8 +194,10 @@ const Login: React.FC = () => {
                 <Button
                     type="submit"
                     className={`w-full !font-bold !py-3 !rounded-full shadow-lg transition-all transform hover:scale-[1.02] signin-btn ${isSuccess
-                        ? '!bg-[#22c55e] !border-[#22c55e] !text-white hover:!bg-[#22c55e]'
-                        : '!bg-transparent border border-[#22c55e] !text-[#22c55e] hover:!bg-[#22c55e] hover:!text-white shadow-green-500/20'
+                        ? (colorScheme === 'blue' ? '!bg-blue-600 !border-blue-600 !text-white hover:!bg-blue-600' : '!bg-[#22c55e] !border-[#22c55e] !text-white hover:!bg-[#22c55e]')
+                        : (colorScheme === 'blue' 
+                            ? '!bg-transparent border border-blue-500 !text-blue-500 hover:!bg-blue-600 hover:!text-white shadow-blue-500/20' 
+                            : '!bg-transparent border border-[#22c55e] !text-[#22c55e] hover:!bg-[#22c55e] hover:!text-white shadow-green-500/20')
                         }`}
                     isLoading={loading && !isSuccess}
                     size="lg"

@@ -11,6 +11,7 @@ import Toast from '../../components/ui/Toast';
 import Select from '../../components/ui/Select';
 
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useBrandingStore } from '../../store/brandingStore';
 
 const SiteDashboard: React.FC = () => {
     const [submissions, setSubmissions] = useState<OnboardingData[]>([]);
@@ -21,6 +22,7 @@ const SiteDashboard: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const isMobile = useMediaQuery('(max-width: 767px)');
+    const { colorScheme } = useBrandingStore();
 
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(user?.organizationId);
@@ -84,13 +86,13 @@ const SiteDashboard: React.FC = () => {
                     <div className="flex items-center gap-4">
                         {canSelectOrg && (
                             <div className="w-full sm:w-56">
-                                <Select label="" id="org-selector" value={selectedOrgId} onChange={e => setSelectedOrgId(e.target.value)}>
+                                <Select label="" id="org-selector" value={selectedOrgId || ''} onChange={e => setSelectedOrgId(e.target.value)}>
                                     <option value="">Select a Site</option>
                                     {organizations.map(o => <option key={o.id} value={o.id}>{o.shortName}</option>)}
                                 </Select>
                             </div>
                         )}
-                        <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
+                        <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
                     </div>
                 )}
             </div>
@@ -98,12 +100,12 @@ const SiteDashboard: React.FC = () => {
             {isMobile && (
                 <div className="flex flex-col gap-4 mt-6">
                     {canSelectOrg && (
-                        <Select label="Select Site" id="org-selector-mobile" value={selectedOrgId} onChange={e => setSelectedOrgId(e.target.value)}>
+                        <Select label="Select Site" id="org-selector-mobile" value={selectedOrgId || ''} onChange={e => setSelectedOrgId(e.target.value)}>
                             <option value="">Select a Site</option>
                             {organizations.map(o => <option key={o.id} value={o.id}>{o.shortName}</option>)}
                         </Select>
                     )}
-                    <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
+                    <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
                 </div>
             )}
 

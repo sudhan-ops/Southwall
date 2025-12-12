@@ -5,11 +5,35 @@ import { usePermissionsStore } from '../store/permissionsStore';
 import { allNavLinks } from '../components/layouts/MainLayout';
 import { LogOut } from 'lucide-react';
 import { ProfilePlaceholder } from '../components/ui/ProfilePlaceholder';
+import { useBrandingStore } from '../store/brandingStore';
 
 const MobileHome: React.FC = () => {
     const { user, logout } = useAuthStore();
     const { permissions } = usePermissionsStore();
+    const { colorScheme } = useBrandingStore();
     const navigate = useNavigate();
+
+    const themeColors = colorScheme === 'blue'
+        ? {
+            bg: 'bg-white',
+            cardBg: 'bg-[#0f2548]',
+            border: 'border-white/10',
+            highlightBorder: 'border-white',
+            iconColor: 'text-white',
+            textColor: 'text-white',
+            subTextColor: 'text-slate-300',
+            headingColor: 'text-white'
+        }
+        : {
+            bg: 'bg-[#041b0f]',
+            cardBg: 'bg-[#041b0f]',
+            border: 'border-[#1f3d2b]',
+            highlightBorder: 'border-[#22c55e]',
+            iconColor: 'text-[#22c55e]',
+            textColor: 'text-white',
+            subTextColor: 'text-gray-400',
+            headingColor: 'text-white'
+        };
 
     if (!user) return null;
 
@@ -24,15 +48,15 @@ const MobileHome: React.FC = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4 bg-[#041b0f]">
+        <div className={`min-h-[calc(100vh-180px)] flex flex-col pb-4 ${themeColors.bg}`}>
             {/* Header Section - No negative margin since main Header is hidden */}
-            <div className="bg-[#041b0f] p-6 rounded-3xl shadow-lg -mx-4 mb-6">
+            <div className={`${themeColors.cardBg} border ${themeColors.border} p-6 rounded-3xl shadow-lg -mx-4 mb-6`}>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                        <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className="h-14 w-14 rounded-full border-2 border-[#22c55e]" />
+                        <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className={`h-14 w-14 rounded-full border-2 ${themeColors.highlightBorder}`} />
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Hi, {user.name.split(' ')[0]}</h1>
-                            <p className="text-xs text-gray-400 uppercase tracking-wider">{user.role.replace(/_/g, ' ')}</p>
+                            <h1 className={`text-2xl font-bold ${themeColors.headingColor}`}>Hi, {user.name.split(' ')[0]}</h1>
+                            <p className={`text-xs ${themeColors.subTextColor} uppercase tracking-wider`}>{user.role.replace(/_/g, ' ')}</p>
                         </div>
                     </div>
                 </div>
@@ -40,18 +64,18 @@ const MobileHome: React.FC = () => {
 
             {/* Quick Actions Grid - Fill remaining space */}
             <div className="flex-1 flex flex-col">
-                <h2 className="text-lg font-semibold text-white mb-4 px-2">Apps & Features</h2>
+                <h2 className={`text-lg font-semibold ${themeColors.headingColor} mb-4 px-2`}>Apps & Features</h2>
                 <div className="grid grid-cols-3 gap-3 px-2 flex-1 content-start">
                     {availableLinks.map((link) => (
                         <div
                             key={link.to}
                             onClick={() => navigate(link.to)}
-                            className="flex flex-col items-center justify-center p-4 bg-[#041b0f] border border-[#1f3d2b] rounded-2xl active:scale-95 transition-transform duration-150 shadow-md min-h-[110px]"
+                            className={`flex flex-col items-center justify-center p-4 ${themeColors.cardBg} border ${themeColors.border} rounded-2xl active:scale-95 transition-transform duration-150 shadow-md min-h-[110px]`}
                         >
-                            <div className="p-3 bg-[#041b0f] rounded-full mb-2 text-[#22c55e]">
+                            <div className={`p-3 ${themeColors.cardBg} rounded-full mb-2 ${themeColors.iconColor} ${colorScheme === 'blue' ? 'bg-white/10' : ''}`}>
                                 <link.icon className="w-7 h-7" />
                             </div>
-                            <span className="text-xs text-center text-gray-300 font-medium leading-tight">{link.label}</span>
+                            <span className={`text-xs text-center ${colorScheme === 'blue' ? 'text-white font-medium' : 'text-gray-300 font-medium'} leading-tight`}>{link.label}</span>
                         </div>
                     ))}
                 </div>

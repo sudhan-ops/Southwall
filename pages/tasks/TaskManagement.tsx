@@ -12,6 +12,7 @@ import type { Task, EscalationStatus, TaskPriority, TaskStatus, User } from '../
 import { api } from '../../services/api';
 import { format, addDays } from 'date-fns';
 import { useThemeStore } from '../../store/themeStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import Select from '../../components/ui/Select';
 import TableSkeleton from '../../components/skeletons/TableSkeleton';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -65,7 +66,11 @@ const TaskManagement: React.FC = () => {
     const { user } = useAuthStore();
     const { tasks, isLoading, error, fetchTasks, deleteTask, runAutomaticEscalations } = useTaskStore();
     const { theme } = useThemeStore();
+    const { colorScheme } = useBrandingStore();
     const isDark = theme === 'dark';
+
+    const mobileAddBtnClass = colorScheme === 'blue' ? '!bg-blue-600 hover:!bg-blue-700 text-white' : '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D]';
+    const desktopAddBtnClass = colorScheme === 'blue' ? 'bg-[#1a3a6e] hover:bg-[#152b1b] text-white' : 'bg-emerald-600 text-white hover:bg-emerald-700';
 
 
 
@@ -175,7 +180,7 @@ const TaskManagement: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${isMobile ? 'bg-[#041b0f] text-white p-4 pb-24' : `p-4 ${isDark ? 'bg-[#041b0f] border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
+        <div className={`min-h-screen ${isMobile ? `${colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (colorScheme === 'blue' ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
@@ -199,59 +204,59 @@ const TaskManagement: React.FC = () => {
             </Modal>
 
             <div className="mb-6">
-                <h1 className={`text-2xl font-bold ${isMobile || isDark ? 'text-white' : 'text-gray-900'}`}>Task Management</h1>
+                <h1 className={`text-2xl font-bold ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-900' : 'text-white') : 'text-gray-900'}`}>Task Management</h1>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-end justify-between">
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Status</label>
+                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Status</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>All Statuses</option>
-                            <option value="To Do" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>To Do</option>
-                            <option value="In Progress" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>In Progress</option>
-                            <option value="Done" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>Done</option>
+                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Statuses</option>
+                            <option value="To Do" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>To Do</option>
+                            <option value="In Progress" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>In Progress</option>
+                            <option value="Done" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Done</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Priority</label>
+                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Priority</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
                             value={priorityFilter}
                             onChange={e => setPriorityFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>All Priorities</option>
-                            <option value="Low" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>Low</option>
-                            <option value="Medium" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>Medium</option>
-                            <option value="High" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>High</option>
+                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Priorities</option>
+                            <option value="Low" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Low</option>
+                            <option value="Medium" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Medium</option>
+                            <option value="High" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>High</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? 'text-gray-300' : 'text-gray-700'}`}>Filter by Assignee</label>
+                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Assignee</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? 'bg-[#152b1b] border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
                             value={assignedToFilter}
                             onChange={e => setAssignedToFilter(e.target.value)}
                         >
-                            <option value="all" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>All Users</option>
-                            <option value="unassigned" className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>Unassigned</option>
-                            {users.map(u => <option key={u.id} value={u.id} className={isMobile || isDark ? 'bg-[#041b0f]' : ''}>{u.name}</option>)}
+                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Users</option>
+                            <option value="unassigned" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Unassigned</option>
+                            {users.map(u => <option key={u.id} value={u.id} className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>{u.name}</option>)}
                         </select>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 mt-4 md:mt-0">
                     {areFiltersActive && (
-                        <Button variant="secondary" onClick={clearFilters} className={isMobile || isDark ? '!bg-[#152b1b] !text-white !border-white/10' : ''}>
+                        <Button variant="secondary" onClick={clearFilters} className={isMobile || isDark ? `${colorScheme === 'blue' ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b]'} !text-white !border-white/10` : ''}>
                             <X className="mr-2 h-4 w-4" /> Clear Filters
                         </Button>
                     )}
                     <button
                         onClick={handleAdd}
-                        className={`flex items-center justify-center transition-colors ${isMobile ? '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold !border-none shadow-none text-sm py-3 px-6 rounded-xl' : 'bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg px-6 py-2.5 font-medium'}`}
+                        className={`flex items-center justify-center transition-colors ${isMobile ? mobileAddBtnClass + ' !font-bold !border-none shadow-none text-sm py-3 px-6 rounded-xl' : desktopAddBtnClass + ' rounded-lg px-6 py-2.5 font-medium'}`}
                     >
                         <Plus className="mr-2 h-5 w-5" /> Add Task
                     </button>
@@ -283,29 +288,29 @@ const TaskManagement: React.FC = () => {
 
                             if (isMobile) {
                                 return (
-                                    <div key={task.id} className="bg-[#152b1b] p-4 rounded-xl border border-white/5 mb-4">
+                                    <div key={task.id} className={`${colorScheme === 'blue' ? 'bg-white border-gray-200 shadow-sm' : 'bg-[#152b1b] border-white/5'} p-4 rounded-xl border mb-4`}>
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
-                                                <h3 className="font-semibold text-white text-lg">{task.name}</h3>
-                                                <p className="text-sm text-gray-400 mt-1">Due: <span className={isOverdue ? 'text-red-400 font-bold' : ''}>{nextDueDate || '-'}</span></p>
+                                                <h3 className={`font-semibold text-lg ${colorScheme === 'blue' ? 'text-gray-900' : 'text-white'}`}>{task.name}</h3>
+                                                <p className={`text-sm mt-1 ${colorScheme === 'blue' ? 'text-gray-500' : 'text-gray-400'}`}>Due: <span className={isOverdue ? 'text-red-400 font-bold' : ''}>{nextDueDate || '-'}</span></p>
                                             </div>
                                             {getPriorityChip(task.priority)}
                                         </div>
                                         <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                                             <div>
                                                 <span className="text-gray-500 block text-xs">Assigned To</span>
-                                                <span className="text-gray-300">{task.assignedToName || '-'}</span>
+                                                <span className={`${colorScheme === 'blue' ? 'text-gray-700' : 'text-gray-300'}`}>{task.assignedToName || '-'}</span>
                                             </div>
                                             <div>
                                                 <span className="text-gray-500 block text-xs">Status</span>
-                                                <span className="text-gray-300">{task.status}</span>
+                                                <span className={`${colorScheme === 'blue' ? 'text-gray-700' : 'text-gray-300'}`}>{task.status}</span>
                                             </div>
                                         </div>
-                                        <div className="flex justify-end gap-2 border-t border-white/10 pt-3">
-                                            <button onClick={() => handleEdit(task)} className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg"><Edit className="h-4 w-4" /></button>
-                                            <button onClick={() => handleDelete(task)} className="p-2 text-red-400 hover:text-red-300 bg-red-500/10 rounded-lg"><Trash2 className="h-4 w-4" /></button>
+                                        <div className={`flex justify-end gap-2 border-t pt-3 ${colorScheme === 'blue' ? 'border-gray-200' : 'border-white/10'}`}>
+                                            <button onClick={() => handleEdit(task)} className={`p-2 rounded-lg ${colorScheme === 'blue' ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 bg-gray-50' : 'text-gray-400 hover:text-white bg-white/5'}`}><Edit className="h-4 w-4" /></button>
+                                            <button onClick={() => handleDelete(task)} className={`p-2 rounded-lg ${colorScheme === 'blue' ? 'text-red-600 hover:text-red-700 hover:bg-red-50 bg-red-50' : 'text-red-400 hover:text-red-300 bg-red-500/10'}`}><Trash2 className="h-4 w-4" /></button>
                                             {task.assignedToId === user?.id && task.status !== 'Done' && (
-                                                <button onClick={() => handleComplete(task)} className="flex items-center px-3 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm font-medium">
+                                                <button onClick={() => handleComplete(task)} className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium ${colorScheme === 'blue' ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
                                                     <CheckCircle className="h-4 w-4 mr-1.5" /> Complete
                                                 </button>
                                             )}

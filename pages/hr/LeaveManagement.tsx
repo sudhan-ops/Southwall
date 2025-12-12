@@ -12,6 +12,7 @@ import Select from '../../components/ui/Select';
 import TableSkeleton from '../../components/skeletons/TableSkeleton';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import RejectClaimModal from '../../components/hr/RejectClaimModal';
+import { useBrandingStore } from '../../store/brandingStore';
 
 const StatusChip: React.FC<{ status: LeaveRequestStatus }> = ({ status }) => {
     const styles: Record<LeaveRequestStatus, string> = {
@@ -37,6 +38,7 @@ const ClaimStatusChip: React.FC<{ status: ExtraWorkLog['status'] }> = ({ status 
 const LeaveManagement: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
     const [requests, setRequests] = useState<LeaveRequest[]>([]);
     const [claims, setClaims] = useState<ExtraWorkLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -189,7 +191,7 @@ const LeaveManagement: React.FC = () => {
                         onClick={() => navigate('/hr/leave-management/grant-comp-off')}
                         disabled={!isCompOffFeatureEnabled}
                         title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                         className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
@@ -203,7 +205,7 @@ const LeaveManagement: React.FC = () => {
                         onClick={() => navigate('/hr/leave-management/grant-comp-off')}
                         disabled={!isCompOffFeatureEnabled}
                         title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
                         className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Grant Comp Off

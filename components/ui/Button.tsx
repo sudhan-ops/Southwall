@@ -1,4 +1,5 @@
 import React from 'react';
+import { useBrandingStore } from '../../store/brandingStore';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'icon';
@@ -18,11 +19,30 @@ const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'btn';
   const variantStyles = `btn-${variant}`;
   const sizeStyles = `btn-${size}`;
+  const { colorScheme } = useBrandingStore();
+
+  const getDynamicStyles = () => {
+    if (variant === 'primary') {
+      return {
+        backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F',
+        borderColor: colorScheme === 'blue' ? '#0f2548' : '#005632',
+        color: '#FFFFFF'
+      };
+    }
+    if (variant === 'outline') {
+      return {
+        borderColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F',
+        color: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F'
+      };
+    }
+    return {};
+  };
 
   return (
     <button
       className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`}
       disabled={isLoading || props.disabled}
+      style={{ ...getDynamicStyles(), ...props.style }}
       {...props}
     >
       {isLoading ? (

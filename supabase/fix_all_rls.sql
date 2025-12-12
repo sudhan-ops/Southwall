@@ -43,6 +43,12 @@ CREATE POLICY "Authenticated users can read settings" ON public.settings
 CREATE POLICY "Service role has full access to settings" ON public.settings
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admins can update settings" ON public.settings;
+CREATE POLICY "Admins can update settings" ON public.settings
+  FOR UPDATE TO authenticated USING (
+    EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role_id IN ('admin', 'hr'))
+  );
+
 -- ============================================================================
 -- 3. ROLES TABLE (Everyone needs to read roles)
 -- ============================================================================
@@ -224,15 +230,17 @@ CREATE POLICY "Service role has full access to comp_off" ON public.comp_off_logs
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- ============================================================================
--- ALSO: Insert default settings if not exists
+-- ALSO: Insert default settings if not exists and set approval_workflow_settings
 -- ============================================================================
-INSERT INTO public.settings (id, attendance_settings, enrollment_rules)
+INSERT INTO public.settings (id, attendance_settings, enrollment_rules, approval_workflow_settings)
 VALUES (
   'singleton',
   '{"office": {"enableAttendanceNotifications": true}, "field": {"enableAttendanceNotifications": true}}'::jsonb,
-  '{}'::jsonb
+  '{}'::jsonb,
+  '{"final_confirmation_role": "hr"}'::jsonb
 )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  approval_workflow_settings = COALESCE(public.settings.approval_workflow_settings, '{"final_confirmation_role": "hr"}'::jsonb);
 
 -- ============================================================================
 -- VERIFICATION
