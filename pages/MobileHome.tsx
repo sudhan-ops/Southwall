@@ -15,18 +15,20 @@ const MobileHome: React.FC = () => {
 
     const themeColors = colorScheme === 'blue'
         ? {
-            bg: 'bg-white',
-            cardBg: 'bg-[#0f2548]',
-            border: 'border-white/10',
-            highlightBorder: 'border-white',
-            iconColor: 'text-white',
-            textColor: 'text-white',
-            subTextColor: 'text-slate-300',
-            headingColor: 'text-white'
+            bg: 'bg-slate-50',
+            cardBg: 'bg-white',
+            iconBg: 'bg-slate-100',
+            border: 'border-slate-200',
+            highlightBorder: 'border-[#1a3a6e]',
+            iconColor: '!text-[#1a3a6e]',
+            textColor: '!text-[#0f172a]',
+            subTextColor: '!text-slate-500',
+            headingColor: '!text-[#0f172a]'
         }
         : {
             bg: 'bg-[#041b0f]',
             cardBg: 'bg-[#041b0f]',
+            iconBg: 'bg-[#041b0f]',
             border: 'border-[#1f3d2b]',
             highlightBorder: 'border-[#22c55e]',
             iconColor: 'text-[#22c55e]',
@@ -72,10 +74,10 @@ const MobileHome: React.FC = () => {
                             onClick={() => navigate(link.to)}
                             className={`flex flex-col items-center justify-center p-4 ${themeColors.cardBg} border ${themeColors.border} rounded-2xl active:scale-95 transition-transform duration-150 shadow-md min-h-[110px]`}
                         >
-                            <div className={`p-3 ${themeColors.cardBg} rounded-full mb-2 ${themeColors.iconColor} ${colorScheme === 'blue' ? 'bg-white/10' : ''}`}>
+                            <div className={`p-3 ${themeColors.iconBg} rounded-full mb-2 ${themeColors.iconColor}`}>
                                 <link.icon className="w-7 h-7" />
                             </div>
-                            <span className={`text-xs text-center ${colorScheme === 'blue' ? 'text-white font-medium' : 'text-gray-300 font-medium'} leading-tight`}>{link.label}</span>
+                            <span className={`text-xs text-center ${themeColors.textColor} font-medium leading-tight`}>{link.label}</span>
                         </div>
                     ))}
                 </div>

@@ -84,20 +84,20 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
     return (
         <div className="flex flex-col">
             {hideHeader && isCollapsed && (
-                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-gray-200 bg-white' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
-                    <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md ${colorScheme === 'blue' ? 'text-gray-600 hover:bg-gray-100' : 'text-white hover:bg-white/10'} focus:outline-none`} aria-label="Go to profile page">
+                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
+                    <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md ${colorScheme === 'blue' ? 'text-white hover:bg-white/10' : 'text-white hover:bg-white/10'} focus:outline-none`} aria-label="Go to profile page">
                         <span className="sr-only">Go to profile</span>
                         <ArrowLeft className="block h-6 w-6" />
                     </button>
                 </div>
             )}
             {hideHeader && !isCollapsed && (
-                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-gray-200 bg-white' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
+                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
                     {/* Empty header - just background color */}
                 </div>
             )}
             {!hideHeader && (
-                <div className="p-4 border-b border-gray-200 bg-white flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0">
+                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-gray-200 bg-white'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
                     {isCollapsed ? (
                         <div className="h-8 w-8 overflow-hidden">
                             <Logo className="h-8 max-w-none object-left object-cover" />
@@ -119,8 +119,8 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                     ? '!text-white shadow-sm border'
                                     : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                 : isActive
-                                    ? 'bg-[#1c3a23] !text-white shadow-sm border border-white/5'
-                                    : 'text-white hover:bg-white/5 hover:text-white/90'
+                                    ? `${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
+                                    : 'text-white hover:bg-white/10 hover:text-white'
                             }`
                         }
                         style={({ isActive }) => {
@@ -240,18 +240,18 @@ const MainLayout: React.FC = () => {
             )}
 
             {/* Sidebar - Overlay on mobile, fixed on desktop */}
-            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? (colorScheme === 'blue' ? 'bg-white border-r border-gray-200' : 'bg-[#041b0f] border-r border-[#1f3d2b]') : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}>
+            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? (colorScheme === 'blue' ? 'bg-[#0f172a] border-r border-[#1e293b]' : 'bg-[#041b0f] border-r border-[#1f3d2b]') : (colorScheme === 'blue' ? 'bg-[#0f172a] border-r border-[#1e293b]' : 'bg-white border-r border-gray-200/60')} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarContent
                         isCollapsed={isSidebarCollapsed}
-                        mode={isMobile ? "dark" : "light"}
+                        mode={isMobile ? "dark" : (colorScheme === 'blue' ? 'dark' : 'light')} 
                         onLinkClick={isMobile ? () => setIsSidebarCollapsed(true) : undefined}
                         onExpand={() => setIsSidebarCollapsed(false)}
                         hideHeader={isMobile}
                         isMobile={isMobile}
                     />
                 </div>
-                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? (colorScheme === 'blue' ? 'border-t border-gray-200' : 'border-t border-[#1f3d2b]') : 'border-t border-border'}`}>
+                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? (colorScheme === 'blue' ? 'border-t border-[#1e293b]' : 'border-t border-[#1f3d2b]') : (colorScheme === 'blue' ? 'border-t border-[#1e293b]' : 'border-t border-border')}`}>
                     <button
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${isMobile ? 'text-white/70 hover:bg-white/10' : 'text-muted hover:bg-page'}`}

@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
                 Are you sure you want to log out?
             </Modal>
             <header
-                className={`sticky top-0 z-40 ${isMobile ? (colorScheme === 'blue' ? 'bg-[#1a3a6e] border-white/10' : 'bg-[#041b0f] border-[#1f3d2b]') : 'md:bg-gray-50/50 md:border-gray-200/50'} backdrop-blur-md border-b transition-all duration-200`}
+                className={`sticky top-0 z-40 ${isMobile ? (colorScheme !== 'green' ? 'bg-[#1a3a6e] border-white/10' : 'bg-[#041b0f] border-[#1f3d2b]') : 'md:bg-gray-50/50 md:border-gray-200/50'} backdrop-blur-md border-b transition-all duration-200`}
                 style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
                 <div className="px-4 sm:px-6 lg:px-8">

@@ -67,10 +67,11 @@ const TaskManagement: React.FC = () => {
     const { tasks, isLoading, error, fetchTasks, deleteTask, runAutomaticEscalations } = useTaskStore();
     const { theme } = useThemeStore();
     const { colorScheme } = useBrandingStore();
+    const isBlue = colorScheme !== 'green'; // Default to Blue for undefined/null to prevent green flash
     const isDark = theme === 'dark';
 
-    const mobileAddBtnClass = colorScheme === 'blue' ? '!bg-blue-600 hover:!bg-blue-700 text-white' : '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D]';
-    const desktopAddBtnClass = colorScheme === 'blue' ? 'bg-[#1a3a6e] hover:bg-[#152b1b] text-white' : 'bg-emerald-600 text-white hover:bg-emerald-700';
+    const mobileAddBtnClass = isBlue ? '!bg-blue-600 hover:!bg-blue-700 text-white' : '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D]';
+    const desktopAddBtnClass = isBlue ? 'bg-[#1a3a6e] hover:bg-[#152b1b] text-white' : 'bg-emerald-600 text-white hover:bg-emerald-700';
 
 
 
@@ -180,7 +181,7 @@ const TaskManagement: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${isMobile ? `${colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (colorScheme === 'blue' ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
+        <div className={`min-h-screen ${isMobile ? `${isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
@@ -204,22 +205,22 @@ const TaskManagement: React.FC = () => {
             </Modal>
 
             <div className="mb-6">
-                <h1 className={`text-2xl font-bold ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-900' : 'text-white') : 'text-gray-900'}`}>Task Management</h1>
+                <h1 className={`text-2xl font-bold ${isMobile || isDark ? (isBlue ? 'text-gray-900' : 'text-white') : 'text-gray-900'}`}>Task Management</h1>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-end justify-between">
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Status</label>
+                        <label className={`text-sm font-medium ${isMobile || isDark ? (isBlue ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Status</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${isBlue ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Statuses</option>
-                            <option value="To Do" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>To Do</option>
-                            <option value="In Progress" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>In Progress</option>
-                            <option value="Done" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Done</option>
+                            <option value="all" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Statuses</option>
+                            <option value="To Do" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>To Do</option>
+                            <option value="In Progress" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>In Progress</option>
+                            <option value="Done" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>Done</option>
                         </select>
                     </div>
                     <div className="space-y-1">
@@ -278,7 +279,7 @@ const TaskManagement: React.FC = () => {
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className={`divide-y md:divide-y-0 ${isMobile ? 'divide-white/10 space-y-4 block' : (isDark ? 'divide-white/10 bg-[#041b0f]' : 'divide-border md:bg-card')}`}>
+                    <tbody className={`divide-y md:divide-y-0 ${isMobile ? 'divide-white/10 space-y-4 block' : (isDark ? `divide-white/10 ${isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]'}` : 'divide-border md:bg-card')}`}>
                         {isLoading ? (
                             isMobile
                                 ? <tr><td colSpan={7}><TableSkeleton rows={3} cols={7} isMobile /></td></tr>
@@ -308,9 +309,9 @@ const TaskManagement: React.FC = () => {
                                         </div>
                                         <div className={`flex justify-end gap-2 border-t pt-3 ${colorScheme === 'blue' ? 'border-gray-200' : 'border-white/10'}`}>
                                             <button onClick={() => handleEdit(task)} className={`p-2 rounded-lg ${colorScheme === 'blue' ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 bg-gray-50' : 'text-gray-400 hover:text-white bg-white/5'}`}><Edit className="h-4 w-4" /></button>
-                                            <button onClick={() => handleDelete(task)} className={`p-2 rounded-lg ${colorScheme === 'blue' ? 'text-red-600 hover:text-red-700 hover:bg-red-50 bg-red-50' : 'text-red-400 hover:text-red-300 bg-red-500/10'}`}><Trash2 className="h-4 w-4" /></button>
+                                            <button onClick={() => handleDelete(task)} className={`p-2 rounded-lg ${isBlue ? 'text-red-600 hover:text-red-700 hover:bg-red-50 bg-red-50' : 'text-red-400 hover:text-red-300 bg-red-500/10'}`}><Trash2 className="h-4 w-4" /></button>
                                             {task.assignedToId === user?.id && task.status !== 'Done' && (
-                                                <button onClick={() => handleComplete(task)} className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium ${colorScheme === 'blue' ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                                <button onClick={() => handleComplete(task)} className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium ${isBlue ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
                                                     <CheckCircle className="h-4 w-4 mr-1.5" /> Complete
                                                 </button>
                                             )}

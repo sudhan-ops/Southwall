@@ -1442,7 +1442,7 @@ const AttendanceDashboard: React.FC = () => {
 
     if (isEmployeeView) {
         return (
-            <div className={`p-4 space-y-6 pb-24 md:bg-transparent ${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#041b0f]'}`}>
+            <div className={`p-4 space-y-6 pb-24 md:bg-transparent ${colorScheme === 'blue' ? '!bg-transparent' : 'bg-[#041b0f]'}`}>
                 <div className="flex flex-col gap-4">
                     <h2 className="text-2xl font-bold text-primary-text">My Attendance</h2>
 
@@ -1455,7 +1455,7 @@ const AttendanceDashboard: React.FC = () => {
                                 variant={activeDateFilter === filter ? 'primary' : 'outline'}
                                 onClick={() => handleSetDateFilter(filter)}
                                 className={activeDateFilter === filter
-                                    ? "text-white shadow-md border"
+                                    ? "!text-white shadow-md border"
                                     : "bg-card text-primary-text border border-border hover:bg-accent-light"
                                 }
                                 style={activeDateFilter === filter ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
@@ -1469,7 +1469,7 @@ const AttendanceDashboard: React.FC = () => {
                                 variant={activeDateFilter === 'Custom' ? 'primary' : 'outline'}
                                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                                 className={activeDateFilter === 'Custom'
-                                    ? "text-white shadow-md border"
+                                    ? "!text-white shadow-md border"
                                     : "bg-card text-primary-text border border-border hover:bg-accent-light"
                                 }
                                 style={activeDateFilter === 'Custom' ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
@@ -1588,7 +1588,7 @@ const AttendanceDashboard: React.FC = () => {
                             type="button"
                             onClick={() => handleSetDateFilter(filter)}
                             className={activeDateFilter === filter
-                                ? "text-white shadow-md border"
+                                ? "!text-white shadow-md border"
                                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                             }
                             style={activeDateFilter === filter ? { backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' } : {}}
@@ -1749,7 +1749,7 @@ const AttendanceDashboard: React.FC = () => {
                             onClick={handleDownloadCsv}
                             disabled={isDownloading}
                             style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
-                            className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="border hover:opacity-90 !text-white shadow-lg hover:shadow-xl transition-all duration-300"
                         >
                             {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileDown className="mr-2 h-4 w-4" />}
                             {isDownloading ? 'Generating...' : 'Download CSV'}

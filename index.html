@@ -526,7 +526,7 @@
           background-color: #041b0f !important;
         }
         .blue-theme #root {
-           background-color: #ffffff !important;
+          background-color: #ffffff !important;
         }
       }
 
@@ -838,14 +838,20 @@
       /* Global Text Override for Blue Theme (since it uses White BG on Mobile) */
       .blue-theme .text-primary-text,
       .blue-theme.pro-dark-theme .text-primary-text,
-      .blue-theme h1, .blue-theme h2, .blue-theme h3, .blue-theme h4, .blue-theme h5, .blue-theme h6 {
+      .blue-theme h1,
+      .blue-theme h2,
+      .blue-theme h3,
+      .blue-theme h4,
+      .blue-theme h5,
+      .blue-theme h6 {
         color: #0f172a !important;
       }
 
       .blue-theme .text-muted,
       .blue-theme.pro-dark-theme .text-muted,
-      .blue-theme p, .blue-theme span {
-         color: #64748b !important;
+      .blue-theme p,
+      .blue-theme span {
+        color: #64748b !important;
       }
 
       /* ENTITY MANAGEMENT: Subcategory nav button text colors */
@@ -860,6 +866,12 @@
         color: #334155 !important;
       }
 
+      /* SIDEBAR NAV (MainLayout): Always white text on Dark Sidebar */
+      .blue-theme nav a span,
+      nav a span {
+        color: #ffffff !important;
+      }
+
       /* PERMANENT FIX: Auth card text must always be white on login page */
       .blue-theme .auth-card-container h1,
       .blue-theme .auth-card-container h2,
@@ -870,6 +882,7 @@
       .blue-theme .auth-card-container p,
       .blue-theme .auth-card-container span,
       .blue-theme .auth-card-container label,
+      .blue-theme .auth-card-container .text-primary-text,
       .auth-card-container h1,
       .auth-card-container h2,
       .auth-card-container h3,
@@ -881,7 +894,7 @@
       .auth-card-container label {
         color: #ffffff !important;
       }
-      
+
       /* Specific override to keep white text on the dark cards in MobileHome if needed, 
          but MobileHome uses specific classes. 
          Let's ensure other white text elements are dark. */
@@ -904,17 +917,17 @@
         border-color: #e2e8f0 !important; /* slate-200 */
         color: #0f172a !important; /* Force dark text */
       }
-      
+
       .blue-theme .api-setting-item-bg .text-muted,
       .blue-theme.pro-dark-theme .api-setting-item-bg .text-muted {
-          color: #64748b !important; /* slate-500 */
+        color: #64748b !important; /* slate-500 */
       }
-      
+
       .blue-theme .api-setting-item-bg label,
       .blue-theme.pro-dark-theme .api-setting-item-bg label {
-          color: #0f172a !important;
+        color: #0f172a !important;
       }
-      
+
       /* Form Input Override - Ensure White/Gray inputs for Blue Theme even in Dark Mode context */
       .blue-theme .form-input,
       .blue-theme.pro-dark-theme .form-input {
@@ -922,7 +935,7 @@
         border-color: #e2e8f0 !important;
         color: #0f172a !important;
       }
-      
+
       .blue-theme .form-input:focus,
       .blue-theme.pro-dark-theme .form-input:focus {
         border-color: #1a3a6e !important;
@@ -938,14 +951,14 @@
         border-color: rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
       }
-      
+
       .blue-theme .auth-card-container .form-input::placeholder,
       .blue-theme .auth-card-container input::placeholder,
       .auth-card-container .form-input::placeholder,
       .auth-card-container input::placeholder {
         color: rgba(156, 163, 175, 0.8) !important;
       }
-      
+
       .blue-theme .auth-card-container .form-input:focus,
       .blue-theme .auth-card-container input:focus,
       .auth-card-container .form-input:focus,
@@ -1301,6 +1314,58 @@
           background-color: #041b0f !important;
         }
 
+        /* RESTORE BLUE THEME ON MOBILE: Force white backgrounds and dark text */
+        .blue-theme body,
+        .blue-theme #root,
+        .blue-theme .bg-page,
+        .blue-theme main,
+        .blue-theme [class*="page"],
+        .blue-theme [class*="container"],
+        .blue-theme .bg-white,
+        .blue-theme .bg-card,
+        .blue-theme [class*="card"] {
+          background-color: #ffffff !important;
+          color: #0f172a;
+        }
+
+        /* Ensure Blue Theme Modal Backgrounds are White */
+        .blue-theme [role="dialog"],
+        .blue-theme .modal-content,
+        .blue-theme div[role="dialog"],
+        .blue-theme .fixed > div[role="dialog"] {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important; 
+        }
+
+        /* Ensure Blue Theme Modal Text is Dark */
+        .blue-theme [role="dialog"] h2,
+        .blue-theme [role="dialog"] h3,
+        .blue-theme [role="dialog"] p,
+        .blue-theme [role="dialog"] span,
+        .blue-theme [role="dialog"] div,
+        .blue-theme .modal-content *,
+        .blue-theme div[role="dialog"] * {
+             color: #0f172a !important;
+        }
+
+        /* Fix Bottom Nav Text Color to allow inheritance (Blue/Gray) */
+        #mobile-bottom-nav a span,
+        .blue-theme #mobile-bottom-nav a span {
+             color: inherit !important;
+        }
+
+        /* Fix Profile Attendance Card Background (Force Light) */
+        .blue-theme .fo-attendance-card,
+        .blue-theme [class*="attendance-card"] {
+             background-color: #f9fafb !important;
+             border: 1px solid #e5e7eb !important;
+             color: #111827 !important;
+        }
+        .blue-theme .fo-attendance-card p, 
+        .blue-theme .fo-attendance-card strong {
+              color: #111827 !important;
+        }
+
         /* Light gray backgrounds to dark green */
         .bg-gray-50,
         .bg-gray-100,
@@ -1504,7 +1569,6 @@
         .auth-card-container div {
           color: #ffffff !important;
         }
-
 
         /* Fix Avatar Upload Buttons - Override mobile defaults */
         .avatar-capture-btn {

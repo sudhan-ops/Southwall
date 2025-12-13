@@ -43,7 +43,7 @@ const BottomNav: React.FC = () => {
     ];
 
     // Dynamic colors
-    const themeColors = colorScheme === 'blue'
+    const themeColors = colorScheme !== 'green'
         ? {
             bg: '#FFFFFF',
             border: '#e2e8f0',
@@ -59,6 +59,7 @@ const BottomNav: React.FC = () => {
 
     return (
         <nav
+            id="mobile-bottom-nav"
             className="fixed bottom-0 left-0 right-0 z-40 transition-colors duration-300"
             style={{ 
                 paddingBottom: 'env(safe-area-inset-bottom)',

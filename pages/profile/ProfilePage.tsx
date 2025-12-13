@@ -216,7 +216,7 @@ const ProfilePage: React.FC = () => {
 
     if (isMobileView) {
         return (
-            <div className={`p-4 space-y-8 md:bg-transparent ${colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]'}`}>
+            <div className={`p-4 space-y-8 md:bg-transparent ${colorScheme !== 'green' ? '!bg-white' : 'bg-[#041b0f]'}`}>
                 {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
                 {/* Logout Modal removed */}
                 {/* Attendance Confirmation Modal removed */}
@@ -224,25 +224,25 @@ const ProfilePage: React.FC = () => {
                 <div className="flex flex-col items-center text-center gap-4">
                     <AvatarUpload file={avatarFile} onFileChange={handlePhotoChange} />
                     <div>
-                        <h2 className={`text-2xl font-bold ${colorScheme === 'blue' ? 'text-gray-900' : 'text-white'}`}>{user.name}</h2>
-                        <p className={`${colorScheme === 'blue' ? 'text-gray-500' : 'text-muted'}`}>{user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                        <h2 className={`text-2xl font-bold ${colorScheme !== 'green' ? 'text-gray-900' : 'text-white'}`}>{user.name}</h2>
+                        <p className={`${colorScheme !== 'green' ? 'text-gray-500' : 'text-muted'}`}>{user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
                     </div>
                 </div>
 
                 <div className="space-y-6">
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme === 'blue' ? 'text-gray-900 border-gray-200' : ''}`}>Profile Details</h3>
+                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Profile Details</h3>
                         <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-4">
-                            <Input label="Full Name" id="name" error={profileErrors.name?.message} registration={register('name')} className={colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme === 'blue' ? 'text-gray-700' : ''} />
-                            <Input label="Email Address" id="email" type="email" error={profileErrors.email?.message} registration={register('email')} readOnly className={colorScheme === 'blue' ? '!bg-gray-100/50 text-gray-500 border-gray-200' : '!bg-gray-700/50'} labelClassName={colorScheme === 'blue' ? 'text-gray-700' : ''} />
-                            <Input label="Phone Number" id="phone" type="tel" error={profileErrors.phone?.message} registration={register('phone')} className={colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme === 'blue' ? 'text-gray-700' : ''} />
+                            <Input label="Full Name" id="name" error={profileErrors.name?.message} registration={register('name')} className={colorScheme !== 'green' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
+                            <Input label="Email Address" id="email" type="email" error={profileErrors.email?.message} registration={register('email')} readOnly className={colorScheme !== 'green' ? '!bg-gray-100/50 text-gray-500 border-gray-200' : '!bg-gray-700/50'} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
+                            <Input label="Phone Number" id="phone" type="tel" error={profileErrors.phone?.message} registration={register('phone')} className={colorScheme !== 'green' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
                             <div className="flex justify-end pt-2"><Button type="submit" isLoading={isSaving} disabled={!isDirty}>Save Changes</Button></div>
                         </form>
                     </section>
 
                     <section className="hidden md:block">
-                        <h3 className={`fo-section-title mb-4 ${colorScheme === 'blue' ? 'text-gray-900' : ''}`}>Appearance</h3>
-                        <div className={`p-4 rounded-lg border space-y-4 ${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200' : 'bg-[#041b0f] md:bg-[#243524] border-[#374151]'}`}>
+                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}>Appearance</h3>
+                        <div className={`p-4 rounded-lg border space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border-gray-200' : 'bg-[#041b0f] md:bg-[#243524] border-[#374151]'}`}>
                             <Checkbox
                                 id="theme-automatic-mobile"
                                 label="Automatic"
@@ -262,16 +262,16 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme === 'blue' ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
-                        <div className={`fo-attendance-card space-y-4 ${colorScheme === 'blue' ? 'bg-gray-50 border border-gray-200' : ''}`}>
+                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
+                        <div className={`fo-attendance-card space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : ''}`}>
                             <div className="flex justify-around">
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? 'text-gray-500' : ''}`}>Last Check In</p>
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check In</p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
                                 </div>
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? 'text-gray-500' : ''}`}>Last Check Out</p>
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check Out</p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
                                 </div>
                             </div>
 
@@ -301,9 +301,9 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme === 'blue' ? 'text-gray-900 border-gray-200' : ''}`}>Account Actions</h3>
+                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Account Actions</h3>
                         <div className="space-y-4">
-                            <Button onClick={() => navigate('/leaves/dashboard')} variant="secondary" className={`w-full justify-center !py-3 ${colorScheme === 'blue' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}`} title="View your leave history and balances"><Crosshair className="mr-2 h-5 w-5" /> Leave Tracker</Button>
+                            <Button onClick={() => navigate('/leaves/dashboard')} variant="secondary" className={`w-full justify-center !py-3 ${colorScheme !== 'green' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}`} title="View your leave history and balances"><Crosshair className="mr-2 h-5 w-5" /> Leave Tracker</Button>
                             <Button onClick={handleLogoutClick} variant="danger" className="w-full justify-center !py-3"><LogOut className="mr-2 h-5 w-5" /> Log Out</Button>
                         </div>
                     </section>
@@ -319,7 +319,7 @@ const ProfilePage: React.FC = () => {
             {/* Attendance Confirmation Modal removed */}
 
             <div className="relative overflow-hidden md:bg-white md:p-6 md:rounded-2xl md:shadow-lg flex flex-col md:flex-row items-center gap-6 border border-gray-100">
-                <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006b3f', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}></div>
+                <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ backgroundColor: colorScheme !== 'green' ? '#1a3a6e' : '#006b3f', borderColor: colorScheme !== 'green' ? '#0f264a' : '#005632' }}></div>
                 <div className="relative z-10">
                     <AvatarUpload file={avatarFile} onFileChange={handlePhotoChange} />
                 </div>

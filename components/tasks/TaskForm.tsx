@@ -12,6 +12,7 @@ import DatePicker from '../ui/DatePicker';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { useThemeStore } from '../../store/themeStore';
+import { useBrandingStore } from '../../store/brandingStore';
 
 const validationSchema = yup.object({
     name: yup.string().required('Task name is required'),
@@ -55,6 +56,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
     const { permissions } = usePermissionsStore();
     const { fetchNotifications } = useNotificationStore();
     const { theme } = useThemeStore();
+    const { colorScheme } = useBrandingStore();
 
     const { register, handleSubmit, formState: { errors }, reset, control, watch } = useForm<TaskFormInputs>({
         resolver: yupResolver(validationSchema) as Resolver<TaskFormInputs>,
@@ -116,9 +118,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
 
     const isDark = theme === 'dark';
 
+    // Dynamic styles based on color scheme
+    const isBlue = colorScheme === 'blue';
+    const darkBgColor = isBlue ? 'bg-[#0f172a]' : 'bg-[#041b0f]'; 
+    const darkOptionClass = isBlue ? 'bg-[#0f172a]' : 'bg-[#041b0f]';
+    const darkInputBg = isBlue ? '!bg-[#0f172a]' : '!bg-[#041b0f]';
+    const darkRingColor = isBlue ? 'focus:!ring-blue-500 focus:!border-blue-500' : 'focus:!ring-emerald-500 focus:!border-emerald-500';
+    const buttonClass = isBlue 
+        ? "w-full !bg-[#1a3a6e] hover:!bg-[#152e5a] !text-white !font-bold !rounded-xl py-3 shadow-lg shadow-blue-900/20 transition-all transform active:scale-[0.98]"
+        : "w-full !bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold !rounded-xl py-3 shadow-lg shadow-green-900/20 transition-all transform active:scale-[0.98]";
+
     // Styles for Dark Mode (Premium)
-    // UPDATED: Changed background to #041b0f to match main page green as requested
-    const darkInputStyle = "!bg-[#041b0f] !border-white/10 !text-white !placeholder-gray-500 !rounded-xl focus:!ring-emerald-500 focus:!border-emerald-500";
+    const darkInputStyle = `${darkInputBg} !border-white/10 !text-white !placeholder-gray-500 !rounded-xl ${darkRingColor}`;
     const darkLabelStyle = "text-gray-300 font-medium mb-1.5 block";
 
     // Styles for Light Mode (Standard)
@@ -129,10 +140,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
     const labelStyle = isDark ? darkLabelStyle : lightLabelStyle;
 
     return (
-        <div className={`fixed inset-0 z-50 ${isDark ? 'bg-[#041b0f]' : 'flex items-center justify-center'}`} onClick={onClose}>
+        <div className={`fixed inset-0 z-50 ${isDark ? darkBgColor : 'flex items-center justify-center'}`} onClick={onClose}>
             <div
-                className={`${isDark ? 'w-full h-full bg-[#041b0f] p-6 overflow-y-auto scrollbar-hide' : 'bg-card rounded-xl shadow-card p-6 w-full max-w-2xl m-4 animate-fade-in-scale overflow-y-auto max-h-[90vh] scrollbar-hide'}`}
-                style={isDark ? { backgroundColor: '#041b0f' } : {}}
+                className={`${isDark ? `w-full h-full ${darkBgColor} p-6 overflow-y-auto scrollbar-hide` : 'bg-card rounded-xl shadow-card p-6 w-full max-w-2xl m-4 animate-fade-in-scale overflow-y-auto max-h-[90vh] scrollbar-hide'}`}
+                style={isDark ? {} : {}}
                 onClick={e => e.stopPropagation()}
             >
                 <form onSubmit={handleSubmit(onSubmit)} className={isDark ? "space-y-5" : ""}>
@@ -189,9 +200,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
                             <div>
                                 <label htmlFor="priority" className={isDark ? labelStyle : "hidden"}>Priority</label>
                                 <Select label={isDark ? undefined : "Priority"} id="priority" registration={register('priority')} error={errors.priority?.message} className={inputStyle}>
-                                    <option value="Low" className={isDark ? "bg-[#041b0f]" : ""}>Low</option>
-                                    <option value="Medium" className={isDark ? "bg-[#041b0f]" : ""}>Medium</option>
-                                    <option value="High" className={isDark ? "bg-[#041b0f]" : ""}>High</option>
+                                    <option value="Low" className={isDark ? darkOptionClass : ""}>Low</option>
+                                    <option value="Medium" className={isDark ? darkOptionClass : ""}>Medium</option>
+                                    <option value="High" className={isDark ? darkOptionClass : ""}>High</option>
                                 </Select>
                             </div>
                         </div>
@@ -199,9 +210,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
                         <div>
                             <label htmlFor="assignedToId" className={isDark ? labelStyle : "hidden"}>Assign To</label>
                             <Select label={isDark ? undefined : "Assign To"} id="assignedToId" registration={register('assignedToId')} error={errors.assignedToId?.message} className={inputStyle}>
-                                <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
+                                <option value="" className={isDark ? darkOptionClass : ""}>Select User</option>
                                 {users.map(user => (
-                                    <option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
+                                    <option key={user.id} value={user.id} className={isDark ? darkOptionClass : ""}>{user.name} ({user.role.replace(/_/g, ' ')})</option>
                                 ))}
                             </Select>
                         </div>
@@ -214,8 +225,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
                                 <div>
                                     <label htmlFor="escalationLevel1UserId" className={isDark ? labelStyle : "hidden"}>Escalation Level 1</label>
                                     <Select label={isDark ? undefined : "Escalation Level 1"} id="escalationLevel1UserId" registration={register('escalationLevel1UserId')} error={errors.escalationLevel1UserId?.message} className={inputStyle}>
-                                        <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
-                                        {users.map(user => (<option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name}</option>))}
+                                        <option value="" className={isDark ? darkOptionClass : ""}>Select User</option>
+                                        {users.map(user => (<option key={user.id} value={user.id} className={isDark ? darkOptionClass : ""}>{user.name}</option>))}
                                     </Select>
                                 </div>
 
@@ -229,8 +240,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
                                 <div>
                                     <label htmlFor="escalationLevel2UserId" className={isDark ? labelStyle : "hidden"}>Escalation Level 2</label>
                                     <Select label={isDark ? undefined : "Escalation Level 2"} id="escalationLevel2UserId" registration={register('escalationLevel2UserId')} error={errors.escalationLevel2UserId?.message} className={inputStyle}>
-                                        <option value="" className={isDark ? "bg-[#041b0f]" : ""}>Select User</option>
-                                        {users.map(user => (<option key={user.id} value={user.id} className={isDark ? "bg-[#041b0f]" : ""}>{user.name}</option>))}
+                                        <option value="" className={isDark ? darkOptionClass : ""}>Select User</option>
+                                        {users.map(user => (<option key={user.id} value={user.id} className={isDark ? darkOptionClass : ""}>{user.name}</option>))}
                                     </Select>
                                 </div>
 
@@ -258,7 +269,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, initialData, setTo
 
                     <div className={isDark ? "pt-2" : "mt-6 flex justify-end space-x-3"}>
                         {!isDark && <Button type="button" onClick={onClose} variant="secondary">Cancel</Button>}
-                        <Button type="submit" isLoading={isSaving} className={isDark ? "w-full !bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D] !font-bold !rounded-xl py-3 shadow-lg shadow-green-900/20 transition-all transform active:scale-[0.98]" : ""}>
+                        <Button type="submit" isLoading={isSaving} className={isDark ? buttonClass : ""}>
                             {isEditing ? 'Save Changes' : 'Create Task'}
                         </Button>
                     </div>
