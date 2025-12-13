@@ -263,15 +263,15 @@ const ProfilePage: React.FC = () => {
 
                     <section>
                         <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
-                        <div className={`fo-attendance-card space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : ''}`}>
+                        <div className={`fo-attendance-card space-y-4 ${colorScheme === 'blue' ? '!bg-blue-500 !text-white border-0 shadow-lg' : (colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : '')}`}>
                             <div className="flex justify-around">
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check In</p>
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-500' : '')}`}>Last Check In</p>
+                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-900' : '')}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
                                 </div>
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check Out</p>
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-500' : '')}`}>Last Check Out</p>
+                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-900' : '')}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
                                 </div>
                             </div>
 

@@ -53,22 +53,22 @@ const Tasks: React.FC = () => {
     }
 
     return (
-        <div>
-            <header className={`p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 ${colorScheme === 'blue' ? 'bg-[#1a3a6e]/80 border-blue-800' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm z-10 border-b`}>
-                <h1>Tasks</h1>
+        <div className={`${colorScheme === 'blue' ? 'bg-slate-50 text-slate-900' : 'text-white'}`}>
+            <header className={`p-4 flex-shrink-0 text-center fo-mobile-header sticky top-0 ${colorScheme === 'blue' ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm z-10 border-b`}>
+                <h1 className="font-semibold text-lg">Tasks</h1>
             </header>
 
             <div className="flex-shrink-0 p-4">
-                <div className="fo-tabs-container">
+                <div className={`fo-tabs-container ${colorScheme === 'blue' ? '!bg-white !border-slate-200' : ''}`}>
                     <button
                         onClick={() => setActiveTab('tasks')}
-                        className={`fo-tab-button ${activeTab === 'tasks' ? 'active' : ''}`}
+                        className={`fo-tab-button ${activeTab === 'tasks' ? 'active' : ''} ${colorScheme === 'blue' && activeTab === 'tasks' ? '!bg-slate-100 !text-slate-900' : ''} ${colorScheme === 'blue' && activeTab !== 'tasks' ? '!text-slate-500' : ''}`}
                     >
                         Tasks
                     </button>
                     <button
                         onClick={() => setActiveTab('notifications')}
-                        className={`fo-tab-button ${activeTab === 'notifications' ? 'active' : ''}`}
+                        className={`fo-tab-button ${activeTab === 'notifications' ? 'active' : ''} ${colorScheme === 'blue' && activeTab === 'notifications' ? '!bg-slate-100 !text-slate-900' : ''} ${colorScheme === 'blue' && activeTab !== 'notifications' ? '!text-slate-500' : ''}`}
                     >
                         Notifications
                     </button>
@@ -84,13 +84,13 @@ const Tasks: React.FC = () => {
                     tasks.length > 0 ? (
                         <div className="space-y-4">
                             {tasks.map(task => (
-                                <div key={task.id} className="fo-task-card">
+                                <div key={task.id} className={`fo-task-card ${colorScheme === 'blue' ? '!bg-white !border-slate-200' : ''}`}>
                                     <div className="fo-task-header">
-                                        <p className="fo-task-title">{task.name}</p>
+                                        <p className={`fo-task-title ${colorScheme === 'blue' ? '!text-slate-900' : ''}`}>{task.name}</p>
                                         <TaskStatusChip status={task.status} />
                                     </div>
-                                    <p className="text-sm text-gray-400 mb-2">{task.description}</p>
-                                    <div className="fo-task-meta flex justify-between items-center">
+                                    <p className={`text-sm mb-2 ${colorScheme === 'blue' ? 'text-slate-500' : 'text-gray-400'}`}>{task.description}</p>
+                                    <div className={`fo-task-meta flex justify-between items-center ${colorScheme === 'blue' ? '!text-slate-400' : ''}`}>
                                         <span>Due: {task.dueDate ? format(new Date(task.dueDate), 'dd MMM, yyyy') : 'N/A'}</span>
                                         <span>Assigned by: {getAssignedBy(task.id)}</span>
                                     </div>
@@ -98,7 +98,7 @@ const Tasks: React.FC = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center text-muted pt-16">
+                        <div className={`text-center pt-16 ${colorScheme === 'blue' ? 'text-slate-400' : 'text-muted'}`}>
                             <ListTodo className="h-12 w-12 mx-auto mb-4" />
                             <p>You have no assigned tasks.</p>
                         </div>
@@ -110,14 +110,14 @@ const Tasks: React.FC = () => {
                                 <div key={notif.id} className="fo-notification-item">
                                     <Bell className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                                     <div className="flex-grow">
-                                        <p className="text-sm text-gray-300">{notif.message}</p>
+                                        <p className={`text-sm ${colorScheme === 'blue' ? 'text-slate-700' : 'text-gray-300'}`}>{notif.message}</p>
                                         <p className="text-xs text-muted mt-1">{formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center text-muted pt-16">
+                        <div className={`text-center pt-16 ${colorScheme === 'blue' ? 'text-slate-400' : 'text-muted'}`}>
                             <Bell className="h-12 w-12 mx-auto mb-4" />
                             <p>You have no notifications.</p>
                         </div>

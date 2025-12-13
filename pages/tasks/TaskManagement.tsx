@@ -181,9 +181,7 @@ const TaskManagement: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${isMobile ? `${isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
-            {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
-
+        <div className={`min-h-screen ${isMobile ? `${isBlue ? '!bg-white !text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             {isCompleteFormOpen && currentTask && (
@@ -205,53 +203,53 @@ const TaskManagement: React.FC = () => {
             </Modal>
 
             <div className="mb-6">
-                <h1 className={`text-2xl font-bold ${isMobile || isDark ? (isBlue ? 'text-gray-900' : 'text-white') : 'text-gray-900'}`}>Task Management</h1>
+                <h1 className={`text-2xl font-bold ${isMobile ? (isBlue ? '!text-gray-900' : 'text-white') : (isDark ? (isBlue ? 'text-gray-900' : 'text-white') : 'text-gray-900')}`}>Task Management</h1>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-end justify-between">
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? (isBlue ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Status</label>
+                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (isBlue ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Status</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${isBlue ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${isBlue ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Statuses</option>
-                            <option value="To Do" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>To Do</option>
-                            <option value="In Progress" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>In Progress</option>
-                            <option value="Done" className={isMobile || isDark ? (isBlue ? 'bg-white' : 'bg-[#041b0f]') : ''}>Done</option>
+                            <option value="all" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Statuses</option>
+                            <option value="To Do" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>To Do</option>
+                            <option value="In Progress" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>In Progress</option>
+                            <option value="Done" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Done</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Priority</label>
+                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Priority</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
                             value={priorityFilter}
                             onChange={e => setPriorityFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Priorities</option>
-                            <option value="Low" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Low</option>
-                            <option value="Medium" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Medium</option>
-                            <option value="High" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>High</option>
+                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Priorities</option>
+                            <option value="Low" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Low</option>
+                            <option value="Medium" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Medium</option>
+                            <option value="High" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>High</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile || isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700'}`}>Filter by Assignee</label>
+                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Assignee</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile || isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900'}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
                             value={assignedToFilter}
                             onChange={e => setAssignedToFilter(e.target.value)}
                         >
-                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>All Users</option>
-                            <option value="unassigned" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>Unassigned</option>
+                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Users</option>
+                            <option value="unassigned" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Unassigned</option>
                             {users.map(u => <option key={u.id} value={u.id} className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>{u.name}</option>)}
                         </select>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 mt-4 md:mt-0">
                     {areFiltersActive && (
-                        <Button variant="secondary" onClick={clearFilters} className={isMobile || isDark ? `${colorScheme === 'blue' ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b]'} !text-white !border-white/10` : ''}>
+                        <Button variant="secondary" onClick={clearFilters} className={isMobile ? (isBlue ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b] !text-white !border-white/10') : (isDark ? `${colorScheme === 'blue' ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b]'} !text-white !border-white/10` : '')}>
                             <X className="mr-2 h-4 w-4" /> Clear Filters
                         </Button>
                     )}

@@ -111,6 +111,7 @@ import ScrollToTop from './components/ScrollToTop';
 // Theme Manager
 const ThemeManager: React.FC = () => {
   const { theme, isAutomatic, _setThemeInternal } = useThemeStore();
+  const { colorScheme } = useBrandingStore();
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   useEffect(() => {
@@ -118,7 +119,12 @@ const ThemeManager: React.FC = () => {
     let newTheme = 'light';
 
     if (isAutomatic) {
-      newTheme = isMobile ? 'dark' : 'light';
+      // FIX: Force Light mode for Blue theme on mobile, keep Dark for Green/Default
+      if (isMobile) {
+        newTheme = colorScheme === 'blue' ? 'light' : 'dark';
+      } else {
+        newTheme = 'light';
+      }
     } else {
       newTheme = theme;
     }
@@ -130,7 +136,7 @@ const ThemeManager: React.FC = () => {
     } else {
       body.classList.remove('pro-dark-theme');
     }
-  }, [theme, isAutomatic, isMobile, _setThemeInternal]);
+  }, [theme, isAutomatic, isMobile, _setThemeInternal, colorScheme]);
 
   return null;
 };

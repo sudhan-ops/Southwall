@@ -132,22 +132,22 @@ const MySubmissions: React.FC = () => {
     ];
 
     return (
-        <div className={`h-full flex flex-col ${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#041b0f]'} text-white`}>
+        <div className={`h-full flex flex-col ${colorScheme === 'blue' ? 'bg-slate-50 text-slate-900' : 'bg-[#041b0f] text-white'}`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
-            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 ${colorScheme === 'blue' ? 'bg-[#1a3a6e]/80 border-blue-800' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm border-b`}>
-                <button onClick={() => navigate('/onboarding')} aria-label="Go back" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
+            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 ${colorScheme === 'blue' ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#041b0f]/80 border-[#374151]'} backdrop-blur-sm border-b`}>
+                <button onClick={() => navigate('/onboarding')} aria-label="Go back" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${colorScheme === 'blue' ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-white/10'}`}>
                     <ArrowLeft className="h-6 w-6" />
                 </button>
                 <h1 className="text-lg font-semibold">On Boarding</h1>
                 <div className="flex items-center gap-1">
-                    <button onClick={handleSearchIconClick} aria-label="Search employee" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
+                    <button onClick={handleSearchIconClick} aria-label="Search employee" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${colorScheme === 'blue' ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-white/10'}`}>
                         <Search className="h-6 w-6" />
                     </button>
-                    <button onClick={handleAddNew} aria-label="Add new employee" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
+                    <button onClick={handleAddNew} aria-label="Add new employee" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${colorScheme === 'blue' ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-white/10'}`}>
                         <UserPlus className="h-6 w-6" />
                     </button>
-                    <button onClick={() => navigate('/profile')} aria-label="Exit to profile" className="p-2 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
+                    <button onClick={() => navigate('/profile')} aria-label="Exit to profile" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${colorScheme === 'blue' ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-white/10'}`}>
                         <X className="h-6 w-6" />
                     </button>
                 </div>
@@ -160,8 +160,8 @@ const MySubmissions: React.FC = () => {
                             key={tab.key}
                             onClick={() => setStatusFilter(tab.key)}
                             className={`flex-1 py-2 text-sm font-semibold uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-sm ${statusFilter === tab.key
-                                ? 'border-b-2 border-emerald-400 text-emerald-400'
-                                : 'border-b-2 border-transparent text-gray-400 hover:text-white'
+                                ? 'border-b-2 border-emerald-500 text-emerald-600'
+                                : `border-b-2 border-transparent ${colorScheme === 'blue' ? 'text-slate-500 hover:text-slate-900' : 'text-gray-400 hover:text-white'}`
                                 }`}
                         >
                             {tab.label}
@@ -172,14 +172,14 @@ const MySubmissions: React.FC = () => {
 
             <main className="flex-1 overflow-y-auto px-4 space-y-2.5 pb-24">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${colorScheme === 'blue' ? 'text-slate-400' : 'text-gray-500'}`} />
                     <input
                         ref={searchInputRef}
                         type="text"
                         placeholder="Search by name or number..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="form-input w-full !pl-10 !h-12 !rounded-md"
+                        className={`form-input w-full !pl-10 !h-12 !rounded-md ${colorScheme === 'blue' ? '!bg-white !border-slate-200 !text-slate-900' : ''}`}
                     />
                 </div>
 
@@ -194,7 +194,7 @@ const MySubmissions: React.FC = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center pt-16 text-gray-500">
+                    <div className={`text-center pt-16 ${colorScheme === 'blue' ? 'text-slate-500' : 'text-gray-500'}`}>
                         <p>No {statusFilter.replace('-', ' ')} submissions found.</p>
                     </div>
                 )}

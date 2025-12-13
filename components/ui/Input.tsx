@@ -6,10 +6,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   registration?: UseFormRegisterReturn;
+  labelClassName?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, error, registration, className, ...props }, ref) => {
+  ({ label, id, error, registration, className, labelClassName, ...props }, ref) => {
     const baseClass = 'form-input';
     const errorClass = 'form-input--error';
     const finalClassName = `${baseClass} ${error ? errorClass : ''} ${className || ''}`;
@@ -17,7 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div>
         {label && (
-          <label htmlFor={id} className="block text-sm font-medium text-muted">
+          <label htmlFor={id} className={`block text-sm font-medium text-muted ${labelClassName || ''}`}>
             {label}
           </label>
         )}

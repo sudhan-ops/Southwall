@@ -16,14 +16,15 @@ const MobileHome: React.FC = () => {
     const themeColors = colorScheme === 'blue'
         ? {
             bg: 'bg-slate-50',
-            cardBg: 'bg-white',
-            iconBg: 'bg-slate-100',
-            border: 'border-slate-200',
-            highlightBorder: 'border-[#1a3a6e]',
-            iconColor: '!text-[#1a3a6e]',
-            textColor: '!text-[#0f172a]',
-            subTextColor: '!text-slate-500',
-            headingColor: '!text-[#0f172a]'
+            cardBg: '!bg-blue-500 shadow-md',
+            iconBg: 'bg-white/10',
+            border: 'border-blue-500/10',
+            highlightBorder: 'border-white/20',
+            iconColor: '!text-white',
+            textColor: '!text-white',
+            subTextColor: '!text-white',
+            headingColor: '!text-[#0f172a]',
+            cardHeadingColor: '!text-white'
         }
         : {
             bg: 'bg-[#041b0f]',
@@ -34,7 +35,8 @@ const MobileHome: React.FC = () => {
             iconColor: 'text-[#22c55e]',
             textColor: 'text-white',
             subTextColor: 'text-gray-400',
-            headingColor: 'text-white'
+            headingColor: 'text-white',
+            cardHeadingColor: 'text-white'
         };
 
     if (!user) return null;
@@ -57,7 +59,7 @@ const MobileHome: React.FC = () => {
                     <div className="flex items-center space-x-3">
                         <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className={`h-14 w-14 rounded-full border-2 ${themeColors.highlightBorder}`} />
                         <div>
-                            <h1 className={`text-2xl font-bold ${themeColors.headingColor}`}>Hi, {user.name.split(' ')[0]}</h1>
+                            <h1 className={`text-2xl font-bold ${themeColors.cardHeadingColor}`}>Hi, {user.name.split(' ')[0]}</h1>
                             <p className={`text-xs ${themeColors.subTextColor} uppercase tracking-wider`}>{user.role.replace(/_/g, ' ')}</p>
                         </div>
                     </div>
