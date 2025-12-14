@@ -134,7 +134,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                         className={({ isActive }) =>
                             `group flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out ${isCollapsed ? 'justify-center' : ''} ${mode === 'light'
                                 ? isActive
-                                    ? '!text-white shadow-sm border'
+                                    ? '!text-white shadow-sm border bg-accent'
                                     : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                 : isActive
                                     ? `${colorScheme === 'purple' ? 'bg-[#5B21B6]' : colorScheme === 'red' ? 'bg-[#991B1B]' : colorScheme === 'amber' ? 'bg-[#B45309]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
