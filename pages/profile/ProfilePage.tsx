@@ -285,8 +285,8 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section className="hidden md:block">
-                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}>Appearance</h3>
-                        <div className={`p-4 rounded-lg border space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border-gray-200' : 'bg-[#041b0f] md:bg-[#243524] border-[#374151]'}`}>
+                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900' : ''}`}>Appearance</h3>
+                        <div className="p-4 rounded-lg border space-y-4" style={{ backgroundColor: themeColors.isDark ? themeColors.sidebarBg : '#f9fafb', borderColor: themeColors.isDark ? '#374151' : '#e5e7eb' }}>
                             <Checkbox
                                 id="theme-automatic-mobile"
                                 label="Automatic"
@@ -306,16 +306,16 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
-                        <div className={`fo-attendance-card space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : ''}`}>
+                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
+                        <div className="fo-attendance-card space-y-4" style={{ backgroundColor: themeColors.isDark ? 'transparent' : '#f9fafb', borderColor: themeColors.isDark ? undefined : '#e5e7eb', borderWidth: themeColors.isDark ? 0 : 1 }}>
                             <div className="flex justify-around">
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check In</p>
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
+                                    <p className="fo-attendance-time" style={{ color: themeColors.isDark ? undefined : '#6b7280' }}>Last Check In</p>
+                                    <p className="fo-attendance-time" style={{ color: themeColors.isDark ? undefined : '#111827' }}><strong>{formatTime(lastCheckInTime)}</strong></p>
                                 </div>
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check Out</p>
-                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
+                                    <p className="fo-attendance-time" style={{ color: themeColors.isDark ? undefined : '#6b7280' }}>Last Check Out</p>
+                                    <p className="fo-attendance-time" style={{ color: themeColors.isDark ? undefined : '#111827' }}><strong>{formatTime(lastCheckOutTime)}</strong></p>
                                 </div>
                             </div>
 
@@ -345,9 +345,9 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Account Actions</h3>
+                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`}>Account Actions</h3>
                         <div className="space-y-4">
-                            <Button onClick={() => navigate('/leaves/dashboard')} variant="secondary" className={`w-full justify-center !py-3 ${colorScheme !== 'green' ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : ''}`} title="View your leave history and balances"><Crosshair className="mr-2 h-5 w-5" /> Leave Tracker</Button>
+                            <Button onClick={() => navigate('/leaves/dashboard')} variant="secondary" className="w-full justify-center !py-3" style={!themeColors.isDark ? { backgroundColor: '#f3f4f6', color: '#1f2937' } : {}} title="View your leave history and balances"><Crosshair className="mr-2 h-5 w-5" /> Leave Tracker</Button>
                             <Button onClick={handleLogoutClick} variant="danger" className="w-full justify-center !py-3"><LogOut className="mr-2 h-5 w-5" /> Log Out</Button>
                         </div>
                     </section>
@@ -364,44 +364,8 @@ const ProfilePage: React.FC = () => {
 
             <div className="relative overflow-hidden md:bg-white md:p-6 md:rounded-2xl md:shadow-lg flex flex-col md:flex-row items-center gap-6 border border-gray-100">
                 <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ 
-                    backgroundColor: (() => {
-                        const themeColors: Record<string, string> = {
-                            green: '#006b3f',
-                            purple: '#5B21B6',
-                            red: '#dc2626',
-                            amber: '#d97706',
-                            'professional-blue': '#2563EB',
-                            'dark-saas': '#0F172A',
-                            'teal-mint': '#0D9488',
-                            'indigo-violet': '#4F46E5',
-                            'green-finance': '#15803D',
-                            'orange-energy': '#EA580C',
-                            'red-alert': '#DC2626',
-                            'neutral-gray': '#374151',
-                            'cyan-tech': '#0891B2',
-                            'black-gold': '#111827'
-                        };
-                        return themeColors[colorScheme] || '#006b3f';
-                    })(), 
-                    borderColor: (() => {
-                        const themeBorders: Record<string, string> = {
-                            green: '#005632',
-                            purple: '#4C1D95',
-                            red: '#b91c1c',
-                            amber: '#b45309',
-                            'professional-blue': '#1E40AF',
-                            'dark-saas': '#1E293B',
-                            'teal-mint': '#0F766E',
-                            'indigo-violet': '#4338CA',
-                            'green-finance': '#14532D',
-                            'orange-energy': '#C2410C',
-                            'red-alert': '#991B1B',
-                            'neutral-gray': '#1F2937',
-                            'cyan-tech': '#0E7490',
-                            'black-gold': '#FACC15'
-                        };
-                        return themeBorders[colorScheme] || '#005632';
-                    })() 
+                    backgroundColor: themeColors.mobileBg, 
+                    borderColor: themeColors.sidebarBorder || themeColors.mobileBg
                 }}></div>
                 <div className="relative z-10">
                     <AvatarUpload file={avatarFile} onFileChange={handlePhotoChange} />

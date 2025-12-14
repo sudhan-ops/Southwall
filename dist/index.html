@@ -157,6 +157,34 @@
       href="https://aistudiocdn.com/leaflet@1.9.4/dist/leaflet.css"
     />
     <style>
+      /* Force login page text colors - Universal Override for All Themes */
+      /* Using 'body' prefix increases specificity (0-2-1 or 0-1-2) to override 
+         theme-specific class rules (e.g. .red-theme h1 is 0-1-1) defined later in this file. */
+      body .auth-card-container h1,
+      body .auth-card-container h2,
+      body .auth-card-container h3,
+      body .auth-card-container h4,
+      body .auth-card-container h5,
+      body .auth-card-container h6,
+      body .auth-card-container p,
+      body .auth-card-container label,
+      body .auth-card-container span,
+      body .auth-card-container .text-primary-text,
+      body .auth-card-container .text-muted,
+      body .auth-card-container div:not(input):not(.google-btn):not(.form-input) {
+        color: #ffffff !important;
+      }
+      
+      /* Ensure links in the auth card are white */
+      body .auth-card-container a,
+      body .auth-card-container a:hover {
+        color: #ffffff !important;
+      }
+
+      /* Ensure Google button text remains dark */
+      .google-btn {
+        color: #1f2937 !important; /* gray-900 */
+      }
       /* Custom map marker styles */
       .user-marker {
         position: relative;
@@ -783,7 +811,10 @@
       .green-theme nav a[class*="bg-accent"] span,
       .green-theme nav a[class~="bg-accent"] span,
       .green-theme aside nav a.bg-accent span,
-      .green-theme aside nav a[class*="bg-accent"] span {
+      .green-theme aside nav a[class*="bg-accent"] span,
+      .green-theme nav button.bg-accent span,
+      .green-theme nav button[class*="bg-accent"] span,
+      .green-theme nav button[class~="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -922,7 +953,9 @@
 
       /* Blue theme active/selected nav - white text */
       .blue-theme nav a.bg-accent span,
-      .blue-theme nav a[class*="bg-accent"] span {
+      .blue-theme nav a[class*="bg-accent"] span,
+      .blue-theme nav button.bg-accent span,
+      .blue-theme nav button[class*="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -1194,7 +1227,10 @@
       .purple-theme nav a[class*="bg-accent"] span,
       .purple-theme nav a[class~="bg-accent"] span,
       .purple-theme aside nav a.bg-accent span,
-      .purple-theme aside nav a[class*="bg-accent"] span {
+      .purple-theme aside nav a[class*="bg-accent"] span,
+      .purple-theme nav button.bg-accent span,
+      .purple-theme nav button[class*="bg-accent"] span,
+      .purple-theme nav button[class~="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -1288,7 +1324,10 @@
       .red-theme nav a[class*="bg-accent"] span,
       .red-theme nav a[class~="bg-accent"] span,
       .red-theme aside nav a.bg-accent span,
-      .red-theme aside nav a[class*="bg-accent"] span {
+      .red-theme aside nav a[class*="bg-accent"] span,
+      .red-theme nav button.bg-accent span,
+      .red-theme nav button[class*="bg-accent"] span,
+      .red-theme nav button[class~="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -1382,7 +1421,10 @@
       .amber-theme nav a[class*="bg-accent"] span,
       .amber-theme nav a[class~="bg-accent"] span,
       .amber-theme aside nav a.bg-accent span,
-      .amber-theme aside nav a[class*="bg-accent"] span {
+      .amber-theme aside nav a[class*="bg-accent"] span,
+      .amber-theme nav button.bg-accent span,
+      .amber-theme nav button[class*="bg-accent"] span,
+      .amber-theme nav button[class~="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -3121,8 +3163,8 @@
         /* White text */
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-jupANev_.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-tn0RQdqM.css">
+    <script type="module" crossorigin src="./assets/index-DvcrNR-N.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BC8vAfbM.css">
   </head>
 
   <body class="text-primary-text">

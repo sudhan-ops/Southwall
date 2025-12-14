@@ -4,6 +4,7 @@ import { User, LogOut, Crosshair, ChevronDown, Menu, X, ArrowLeft, Bell } from '
 import { useAuthStore } from '../../store/authStore';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 import Logo from '../ui/Logo';
 import NotificationBell from '../notifications/NotificationBell';
 import Button from '../ui/Button';
@@ -56,6 +57,8 @@ const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
         navigate('/profile');
     };
 
+    const themeColors = getThemeColors(colorScheme);
+
     return (
         <>
             <Modal
@@ -67,8 +70,13 @@ const Header: React.FC<HeaderProps> = ({ setIsMobileMenuOpen }) => {
                 Are you sure you want to log out?
             </Modal>
             <header
-                className={`sticky top-0 z-40 ${isMobile ? (colorScheme !== 'green' ? 'bg-[#1a3a6e] border-white/10' : 'bg-[#041b0f] border-[#1f3d2b]') : 'md:bg-gray-50/50 md:border-gray-200/50'} backdrop-blur-md border-b transition-all duration-200`}
-                style={{ paddingTop: 'env(safe-area-inset-top)' }}
+                className={`sticky top-0 z-40 ${isMobile ? '' : 'md:bg-gray-50/50 md:border-gray-200/50'} backdrop-blur-md border-b transition-all duration-200`}
+                style={{ 
+                    paddingTop: 'env(safe-area-inset-top)',
+                    backgroundColor: isMobile ? themeColors.sidebarBg : undefined,
+                    borderColor: isMobile ? themeColors.sidebarBorder : undefined,
+                    color: isMobile ? 'white' : undefined 
+                }}
             >
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-16">

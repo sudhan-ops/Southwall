@@ -304,7 +304,9 @@ const MainLayout: React.FC = () => {
                         isMobile={isMobile}
                     />
                 </div>
-                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? 'border-t border-[#1f3d2b]' : 'border-t border-border'}`}>
+                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? 'border-t' : 'border-t border-border'}`}
+                    style={isMobile ? { borderColor: themeColors.sidebarBorder } : undefined}
+                >
                     <button
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${isMobile ? 'text-white/70 hover:bg-white/10' : 'text-muted hover:bg-page'}`}
@@ -315,11 +317,15 @@ const MainLayout: React.FC = () => {
                 </div>
             </aside>
 
-            <div className={`flex-1 flex flex-col ${isMobile ? 'bg-[#041b0f]' : 'bg-gray-50/50'} ${isMobile && isSidebarCollapsed ? 'ml-16' : ''}`}>
+            <div className={`flex-1 flex flex-col ${isMobile ? '' : 'bg-gray-50/50'} ${isMobile && isSidebarCollapsed ? 'ml-16' : ''}`}
+                style={isMobile ? { backgroundColor: themeColors.mobileBg } : undefined}
+            >
                 <Header />
 
                 {/* Main Content */}
-                <main ref={mainContentRef} className={`flex-1 overflow-y-auto ${isMobile ? 'bg-[#041b0f]' : 'bg-page'}`}>
+                <main ref={mainContentRef} className={`flex-1 overflow-y-auto ${isMobile ? '' : 'bg-page'}`}
+                    style={isMobile && themeColors.isDark ? { backgroundColor: themeColors.mobileBg } : undefined}
+                >
                     <div className="p-4">
                         {/* Bordered Card Container removed to fix white screen issue */}
                         <Outlet />

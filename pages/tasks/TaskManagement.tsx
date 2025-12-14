@@ -13,6 +13,7 @@ import { api } from '../../services/api';
 import { format, addDays } from 'date-fns';
 import { useThemeStore } from '../../store/themeStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 import Select from '../../components/ui/Select';
 import TableSkeleton from '../../components/skeletons/TableSkeleton';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -67,11 +68,16 @@ const TaskManagement: React.FC = () => {
     const { tasks, isLoading, error, fetchTasks, deleteTask, runAutomaticEscalations } = useTaskStore();
     const { theme } = useThemeStore();
     const { colorScheme } = useBrandingStore();
-    const isBlue = colorScheme !== 'green'; // Default to Blue for undefined/null to prevent green flash
-    const isDark = theme === 'dark';
+    const themeColors = getThemeColors(colorScheme);
+    const isDark = theme === 'dark' || themeColors.isDark; // Consolidated dark mode check
 
-    const mobileAddBtnClass = isBlue ? '!bg-blue-600 hover:!bg-blue-700 text-white' : '!bg-[#32CD32] hover:!bg-[#28a428] !text-[#0D1A0D]';
-    const desktopAddBtnClass = isBlue ? 'bg-[#1a3a6e] hover:bg-[#152b1b] text-white' : 'bg-emerald-600 text-white hover:bg-emerald-700';
+    // Dynamic button classes based on theme
+    const mobileAddBtnClass = `!text-white`;
+    const mobileAddBtnStyle = { backgroundColor: themeColors.primary };
+    
+    // Desktop button usually follows success/primary pattern
+    const desktopAddBtnClass = `text-white transition-colors`;
+    const desktopAddBtnStyle = { backgroundColor: themeColors.activeItemBg };
 
 
 
@@ -181,7 +187,13 @@ const TaskManagement: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen ${isMobile ? `${isBlue ? '!bg-white !text-gray-900' : 'bg-[#041b0f] text-white'} p-4 pb-24` : `p-4 ${isDark ? (isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]') + ' border border-white/10' : 'md:bg-card'} md:p-6 md:rounded-xl md:shadow-card`}`}>
+        <div 
+            className={`min-h-screen p-4 pb-24 md:p-6 md:rounded-xl md:shadow-card ${!isMobile && !isDark ? 'md:bg-card' : ''} ${isMobile || isDark ? 'border border-white/10' : ''}`}
+            style={{ 
+                backgroundColor: isMobile || isDark ? themeColors.mobileBg : undefined,
+                color: isMobile || isDark ? (themeColors.isDark ? 'white' : '#111827') : undefined
+            }}
+        >
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
             {isCompleteFormOpen && currentTask && (
@@ -203,59 +215,77 @@ const TaskManagement: React.FC = () => {
             </Modal>
 
             <div className="mb-6">
-                <h1 className={`text-2xl font-bold ${isMobile ? (isBlue ? '!text-gray-900' : 'text-white') : (isDark ? (isBlue ? 'text-gray-900' : 'text-white') : 'text-gray-900')}`}>Task Management</h1>
+                <h1 className={`text-2xl font-bold ${isMobile || isDark || themeColors.isDark ? 'text-white' : 'text-gray-900'}`}
+                    style={{ color: (isMobile || isDark || themeColors.isDark) ? 'white' : '#111827' }}
+                >Task Management</h1>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-end justify-between">
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (isBlue ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Status</label>
+                        <label className={`text-sm font-medium`} style={{ color: isMobile || isDark ? 'white' : '#374151' }}>Filter by Status</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${isBlue ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500`}
+                            style={{ 
+                                backgroundColor: isMobile || isDark ? themeColors.sidebarBg : 'white', 
+                                borderColor: isMobile || isDark ? themeColors.sidebarBorder : '#d1d5db',
+                                color: isMobile || isDark ? 'white' : '#111827'
+                            }}
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Statuses</option>
-                            <option value="To Do" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>To Do</option>
-                            <option value="In Progress" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>In Progress</option>
-                            <option value="Done" className={isMobile || isDark ? (isBlue ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Done</option>
+                            <option value="all" style={{ backgroundColor: themeColors.sidebarBg }}>All Statuses</option>
+                            <option value="To Do" style={{ backgroundColor: themeColors.sidebarBg }}>To Do</option>
+                            <option value="In Progress" style={{ backgroundColor: themeColors.sidebarBg }}>In Progress</option>
+                            <option value="Done" style={{ backgroundColor: themeColors.sidebarBg }}>Done</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Priority</label>
+                        <label className={`text-sm font-medium`} style={{ color: isMobile || isDark ? 'white' : '#374151' }}>Filter by Priority</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500`}
+                            style={{ 
+                                backgroundColor: isMobile || isDark ? themeColors.sidebarBg : 'white', 
+                                borderColor: isMobile || isDark ? themeColors.sidebarBorder : '#d1d5db',
+                                color: isMobile || isDark ? 'white' : '#111827'
+                            }}
                             value={priorityFilter}
                             onChange={e => setPriorityFilter(e.target.value as any)}
                         >
-                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Priorities</option>
-                            <option value="Low" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Low</option>
-                            <option value="Medium" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Medium</option>
-                            <option value="High" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>High</option>
+                            <option value="all" style={{ backgroundColor: themeColors.sidebarBg }}>All Priorities</option>
+                            <option value="Low" style={{ backgroundColor: themeColors.sidebarBg }}>Low</option>
+                            <option value="Medium" style={{ backgroundColor: themeColors.sidebarBg }}>Medium</option>
+                            <option value="High" style={{ backgroundColor: themeColors.sidebarBg }}>High</option>
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={`text-sm font-medium ${isMobile ? (isBlue ? '!text-gray-900' : 'text-gray-300') : (isDark ? (colorScheme === 'blue' ? 'text-gray-600' : 'text-gray-300') : 'text-gray-700')}`}>Filter by Assignee</label>
+                        <label className={`text-sm font-medium`} style={{ color: isMobile || isDark ? 'white' : '#374151' }}>Filter by Assignee</label>
                         <select
-                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 ${isMobile ? `${isBlue ? '!bg-gray-50 !border-gray-200 !text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : (isDark ? `${colorScheme === 'blue' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-[#152b1b] border-white/10 text-white'}` : 'bg-white border-gray-300 text-gray-900')}`}
+                            className={`w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500`}
+                            style={{ 
+                                backgroundColor: isMobile || isDark ? themeColors.sidebarBg : 'white', 
+                                borderColor: isMobile || isDark ? themeColors.sidebarBorder : '#d1d5db',
+                                color: isMobile || isDark ? 'white' : '#111827'
+                            }}
                             value={assignedToFilter}
                             onChange={e => setAssignedToFilter(e.target.value)}
                         >
-                            <option value="all" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>All Users</option>
-                            <option value="unassigned" className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white text-gray-900' : 'bg-[#041b0f]') : ''}>Unassigned</option>
-                            {users.map(u => <option key={u.id} value={u.id} className={isMobile || isDark ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : ''}>{u.name}</option>)}
+                            <option value="all" style={{ backgroundColor: themeColors.sidebarBg }}>All Users</option>
+                            <option value="unassigned" style={{ backgroundColor: themeColors.sidebarBg }}>Unassigned</option>
+                            {users.map(u => <option key={u.id} value={u.id} style={{ backgroundColor: themeColors.sidebarBg }}>{u.name}</option>)}
                         </select>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 mt-4 md:mt-0">
                     {areFiltersActive && (
-                        <Button variant="secondary" onClick={clearFilters} className={isMobile ? (isBlue ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b] !text-white !border-white/10') : (isDark ? `${colorScheme === 'blue' ? '!bg-gray-100 !text-gray-700 !border-gray-200' : '!bg-[#152b1b]'} !text-white !border-white/10` : '')}>
+                        <Button variant="secondary" onClick={clearFilters} className={isMobile ? '!bg-card !border-border' : '!text-white !border-white/10'} style={!isMobile && isDark ? { backgroundColor: themeColors.sidebarBg } : {}}>
                             <X className="mr-2 h-4 w-4" /> Clear Filters
                         </Button>
                     )}
                     <button
                         onClick={handleAdd}
                         className={`flex items-center justify-center transition-colors ${isMobile ? mobileAddBtnClass + ' !font-bold !border-none shadow-none text-sm py-3 px-6 rounded-xl' : desktopAddBtnClass + ' rounded-lg px-6 py-2.5 font-medium'}`}
+                        style={isMobile ? mobileAddBtnStyle : desktopAddBtnStyle}
                     >
                         <Plus className="mr-2 h-5 w-5" /> Add Task
                     </button>
@@ -266,18 +296,22 @@ const TaskManagement: React.FC = () => {
 
             <div className="overflow-x-auto">
                 <table className="min-w-full responsive-table">
-                    <thead className={isMobile ? 'hidden' : (isDark ? 'bg-white/5 text-white' : 'bg-page')}>
+                    <thead className={isMobile ? 'hidden' : 'bg-transparent border-b'} style={{ 
+                        backgroundColor: !isMobile && isDark ? 'rgba(255,255,255,0.05)' : undefined, 
+                        color: isMobile || isDark ? 'white' : '#6b7280',
+                        borderColor: isMobile || isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb'
+                    }}>
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Task Name</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Priority</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Next Due Date</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Assigned To</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Escalation</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Actions</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Task Name</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Priority</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Next Due Date</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Assigned To</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Escalation</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className={`divide-y md:divide-y-0 ${isMobile ? 'divide-white/10 space-y-4 block' : (isDark ? `divide-white/10 ${isBlue ? 'bg-[#0a1628]' : 'bg-[#041b0f]'}` : 'divide-border md:bg-card')}`}>
+                    <tbody className={`divide-y md:divide-y-0 ${isMobile ? 'space-y-4 block' : ''}`} style={{ borderColor: isMobile || isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb' }}>
                         {isLoading ? (
                             isMobile
                                 ? <tr><td colSpan={7}><TableSkeleton rows={3} cols={7} isMobile /></td></tr>
@@ -287,29 +321,33 @@ const TaskManagement: React.FC = () => {
 
                             if (isMobile) {
                                 return (
-                                    <div key={task.id} className={`${colorScheme === 'blue' ? 'bg-white border-gray-200 shadow-sm' : 'bg-[#152b1b] border-white/5'} p-4 rounded-xl border mb-4`}>
+                                    <div key={task.id} className="p-4 rounded-xl border mb-4" style={{ 
+                                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'white',
+                                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb',
+                                        color: isDark ? 'white' : '#111827'
+                                    }}>
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
-                                                <h3 className={`font-semibold text-lg ${colorScheme === 'blue' ? 'text-gray-900' : 'text-white'}`}>{task.name}</h3>
-                                                <p className={`text-sm mt-1 ${colorScheme === 'blue' ? 'text-gray-500' : 'text-gray-400'}`}>Due: <span className={isOverdue ? 'text-red-400 font-bold' : ''}>{nextDueDate || '-'}</span></p>
+                                                <h3 className="font-semibold text-lg">{task.name}</h3>
+                                                <p className="text-sm mt-1" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>Due: <span className={isOverdue ? 'text-red-400 font-bold' : ''}>{nextDueDate || '-'}</span></p>
                                             </div>
                                             {getPriorityChip(task.priority)}
                                         </div>
                                         <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                                             <div>
-                                                <span className="text-gray-500 block text-xs">Assigned To</span>
-                                                <span className={`${colorScheme === 'blue' ? 'text-gray-700' : 'text-gray-300'}`}>{task.assignedToName || '-'}</span>
+                                                <span className="block text-xs" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>Assigned To</span>
+                                                <span className="">{task.assignedToName || '-'}</span>
                                             </div>
                                             <div>
-                                                <span className="text-gray-500 block text-xs">Status</span>
-                                                <span className={`${colorScheme === 'blue' ? 'text-gray-700' : 'text-gray-300'}`}>{task.status}</span>
+                                                <span className="block text-xs" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>Status</span>
+                                                <span className="">{task.status}</span>
                                             </div>
                                         </div>
-                                        <div className={`flex justify-end gap-2 border-t pt-3 ${colorScheme === 'blue' ? 'border-gray-200' : 'border-white/10'}`}>
-                                            <button onClick={() => handleEdit(task)} className={`p-2 rounded-lg ${colorScheme === 'blue' ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 bg-gray-50' : 'text-gray-400 hover:text-white bg-white/5'}`}><Edit className="h-4 w-4" /></button>
-                                            <button onClick={() => handleDelete(task)} className={`p-2 rounded-lg ${isBlue ? 'text-red-600 hover:text-red-700 hover:bg-red-50 bg-red-50' : 'text-red-400 hover:text-red-300 bg-red-500/10'}`}><Trash2 className="h-4 w-4" /></button>
+                                        <div className="flex justify-end gap-2 border-t pt-3" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb' }}>
+                                            <button onClick={() => handleEdit(task)} className="p-2 rounded-lg transition-colors" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6', color: isDark ? '#d1d5db' : '#6b7280' }}><Edit className="h-4 w-4" /></button>
+                                            <button onClick={() => handleDelete(task)} className="p-2 rounded-lg transition-colors" style={{ backgroundColor: isDark ? 'rgba(239,68,68,0.1)' : '#fef2f2', color: isDark ? '#f87171' : '#dc2626' }}><Trash2 className="h-4 w-4" /></button>
                                             {task.assignedToId === user?.id && task.status !== 'Done' && (
-                                                <button onClick={() => handleComplete(task)} className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium ${isBlue ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                                <button onClick={() => handleComplete(task)} className="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors" style={{ backgroundColor: themeColors.primary + '20', color: themeColors.primary }}>
                                                     <CheckCircle className="h-4 w-4 mr-1.5" /> Complete
                                                 </button>
                                             )}
@@ -319,19 +357,19 @@ const TaskManagement: React.FC = () => {
                             }
 
                             return (
-                                <tr key={task.id} className={isOverdue ? 'bg-red-50' : (isDark ? 'text-gray-300 hover:bg-white/5' : '')}>
-                                    <td data-label="Task Name" className="px-6 py-4 font-medium">{task.name}</td>
+                                <tr key={task.id} className={`${isOverdue ? 'bg-red-50' : 'hover:bg-black/5'} transition-colors`} style={!isOverdue && isDark ? { backgroundColor: 'transparent' } : {}}>
+                                    <td data-label="Task Name" className="px-6 py-4 font-medium" style={{ color: isDark ? 'white' : '#111827' }}>{task.name}</td>
                                     <td data-label="Priority" className="px-6 py-4">{getPriorityChip(task.priority)}</td>
-                                    <td data-label="Next Due Date" className={`px-6 py-4 text-sm ${isOverdue ? 'font-bold text-red-600' : 'text-muted'}`}>{nextDueDate || '-'}</td>
-                                    <td data-label="Assigned To" className="px-6 py-4 text-sm text-muted">{task.assignedToName || '-'}</td>
-                                    <td data-label="Status" className="px-6 py-4 text-sm text-muted">{getStatusChip(task.status)}</td>
-                                    <td data-label="Escalation" className="px-6 py-4 text-sm text-muted">{getEscalationChip(task.escalationStatus)}</td>
+                                    <td data-label="Next Due Date" className={`px-6 py-4 text-sm ${isOverdue ? 'font-bold text-red-600' : ''}`} style={{ color: !isOverdue ? (isDark ? '#9ca3af' : '#6b7280') : undefined }}>{nextDueDate || '-'}</td>
+                                    <td data-label="Assigned To" className="px-6 py-4 text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>{task.assignedToName || '-'}</td>
+                                    <td data-label="Status" className="px-6 py-4 text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>{getStatusChip(task.status)}</td>
+                                    <td data-label="Escalation" className="px-6 py-4 text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>{getEscalationChip(task.escalationStatus)}</td>
                                     <td data-label="Actions" className="px-6 py-4">
                                         <div className="flex items-center gap-2 justify-end md:justify-start">
                                             <Button variant="icon" size="sm" onClick={() => handleEdit(task)} title="Edit Task"><Edit className="h-4 w-4" /></Button>
                                             <Button variant="icon" size="sm" onClick={() => handleDelete(task)} title="Delete Task"><Trash2 className="h-4 w-4 text-red-600" /></Button>
                                             {task.assignedToId === user?.id && task.status !== 'Done' && (
-                                                <Button variant="outline" size="sm" onClick={() => handleComplete(task)}>
+                                                <Button variant="outline" size="sm" onClick={() => handleComplete(task)} style={{ borderColor: themeColors.primary, color: themeColors.primary }}>
                                                     <CheckCircle className="h-4 w-4 mr-2" /> Complete
                                                 </Button>
                                             )}
