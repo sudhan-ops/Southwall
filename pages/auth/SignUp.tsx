@@ -40,12 +40,12 @@ const SignUp: React.FC = () => {
         return (
             <div className="text-center">
                 <MailCheck className="mx-auto h-12 w-12 text-accent" />
-                <h3 className="mt-4 text-lg font-semibold text-white">Confirm your email</h3>
-                <p className="mt-2 text-sm text-gray-300">
+                <h3 className="mt-4 text-lg font-semibold text-white" style={{ color: '#ffffff' }}>Confirm your email</h3>
+                <p className="mt-2 text-sm text-gray-300" style={{ color: '#ffffff' }}>
                     We've sent a confirmation link to your email address. Please click the link to activate your account.
                 </p>
                 <div className="mt-6">
-                    <Link to="/auth/login" className="font-medium text-white/80 hover:text-white">
+                    <Link to="/auth/login" className="font-medium text-white/80 hover:text-white" style={{ color: '#ffffff' }}>
                         &larr; Back to Login
                     </Link>
                 </div>
@@ -81,7 +81,7 @@ const SignUp: React.FC = () => {
             </div>
 
             <div className="text-center pt-2">
-                <Link to="/auth/login" className="text-sm font-medium text-white/80 hover:text-white">
+                <Link to="/auth/login" className="text-sm font-medium text-white/80 hover:text-white" style={{ color: '#ffffff' }}>
                     Already have an account? Sign In
                 </Link>
             </div>

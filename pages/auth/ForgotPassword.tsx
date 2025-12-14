@@ -63,8 +63,8 @@ const ForgotPassword = () => {
         return (
             <div className="text-center">
                 <MailCheck className="mx-auto h-12 w-12 text-accent" />
-                <h3 className="mt-4 text-lg font-semibold text-white">Check your email</h3>
-                <p className="mt-2 text-sm text-gray-300">
+                <h3 className="mt-4 text-lg font-semibold text-white" style={{ color: '#ffffff' }}>Check your email</h3>
+                <p className="mt-2 text-sm text-gray-300" style={{ color: '#ffffff' }}>
                     If an account exists for the email you provided, we've sent password reset instructions. Redirecting to login...
                 </p>
             </div>
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
                 </div>
 
                 <div className="text-center">
-                    <Link to="/auth/login" className="text-sm font-medium text-white/80 hover:text-white">
+                    <Link to="/auth/login" className="text-sm font-medium text-white/80 hover:text-white" style={{ color: '#ffffff' }}>
                         &larr; Back to Login
                     </Link>
                 </div>

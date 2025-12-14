@@ -157,6 +157,19 @@
       href="https://aistudiocdn.com/leaflet@1.9.4/dist/leaflet.css"
     />
     <style>
+      /* Force login page text colors */
+      .auth-card-container h1,
+      .auth-card-container h2,
+      .auth-card-container p,
+      .auth-card-container label,
+      .auth-card-container span,
+      .auth-card-container div:not(input):not(.google-btn) {
+        color: #ffffff !important;
+      }
+      /* Ensure Google button text remains dark */
+      .google-btn {
+        color: #1f2937 !important; /* gray-900 */
+      }
       /* Custom map marker styles */
       .user-marker {
         position: relative;

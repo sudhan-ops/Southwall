@@ -59,25 +59,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
     const { colorScheme } = useBrandingStore();
     const location = useLocation();
 
-    useEffect(() => {
-        // Force text color for active items to overcome stubborn global styles
-        const applyForceColor = () => {
-             const activeElements = document.querySelectorAll('.nav-active-white span, .nav-active-white svg');
-             activeElements.forEach((el) => {
-                 (el as HTMLElement).style.setProperty('color', '#ffffff', 'important');
-                 if (el.tagName === 'svg') {
-                     (el as HTMLElement).style.setProperty('fill', '#ffffff', 'important');
-                 }
-             });
-        };
-        
-        // Apply immediately and after short delays to handle transitions
-        applyForceColor();
-        const t1 = setTimeout(applyForceColor, 50);
-        const t2 = setTimeout(applyForceColor, 150);
-        
-        return () => { clearTimeout(t1); clearTimeout(t2); };
-    }, [location.pathname, mode]);
+
 
     const availableNavLinks = user ? allNavLinks
         .filter(link => permissions[user.role]?.includes(link.permission))
@@ -191,11 +173,11 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
 
             {/* Force override for active menu items in light mode using high specificity */}
             <style dangerouslySetInnerHTML={{__html: `
-                .nav-active-white span, 
-                .nav-active-white svg,
-                a.nav-active-white > span {
+                .nav-active-white,
+                .nav-active-white *,
+                a[aria-current="page"] span,
+                a[aria-current="page"] svg {
                     color: #ffffff !important;
-                    fill: #ffffff !important;
                 }
             `}} />
         </div>
