@@ -321,20 +321,42 @@ const ProfilePage: React.FC = () => {
             <div className="relative overflow-hidden md:bg-white md:p-6 md:rounded-2xl md:shadow-lg flex flex-col md:flex-row items-center gap-6 border border-gray-100">
                 <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ 
                     backgroundColor: (() => {
-                        switch (colorScheme) {
-                            case 'purple': return '#5B21B6';
-                            case 'red': return '#dc2626'; // Red-600 to match button
-                            case 'amber': return '#d97706'; // Amber-600
-                            default: return '#006b3f';
-                        }
+                        const themeColors: Record<string, string> = {
+                            green: '#006b3f',
+                            purple: '#5B21B6',
+                            red: '#dc2626',
+                            amber: '#d97706',
+                            'professional-blue': '#2563EB',
+                            'dark-saas': '#0F172A',
+                            'teal-mint': '#0D9488',
+                            'indigo-violet': '#4F46E5',
+                            'green-finance': '#15803D',
+                            'orange-energy': '#EA580C',
+                            'red-alert': '#DC2626',
+                            'neutral-gray': '#374151',
+                            'cyan-tech': '#0891B2',
+                            'black-gold': '#111827'
+                        };
+                        return themeColors[colorScheme] || '#006b3f';
                     })(), 
                     borderColor: (() => {
-                        switch (colorScheme) {
-                            case 'purple': return '#4C1D95';
-                            case 'red': return '#b91c1c'; // Red-700
-                            case 'amber': return '#b45309'; // Amber-700
-                            default: return '#005632';
-                        }
+                        const themeBorders: Record<string, string> = {
+                            green: '#005632',
+                            purple: '#4C1D95',
+                            red: '#b91c1c',
+                            amber: '#b45309',
+                            'professional-blue': '#1E40AF',
+                            'dark-saas': '#1E293B',
+                            'teal-mint': '#0F766E',
+                            'indigo-violet': '#4338CA',
+                            'green-finance': '#14532D',
+                            'orange-energy': '#C2410C',
+                            'red-alert': '#991B1B',
+                            'neutral-gray': '#1F2937',
+                            'cyan-tech': '#0E7490',
+                            'black-gold': '#FACC15'
+                        };
+                        return themeBorders[colorScheme] || '#005632';
                     })() 
                 }}></div>
                 <div className="relative z-10">

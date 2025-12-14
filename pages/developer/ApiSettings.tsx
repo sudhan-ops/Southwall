@@ -60,6 +60,16 @@ export const ApiSettings: React.FC = () => {
         purple: 'Royal Purple',
         red: 'Crimson Red',
         amber: 'Amber Gold',
+        'professional-blue': 'Professional Blue',
+        'dark-saas': 'Dark SaaS',
+        'teal-mint': 'Teal & Mint',
+        'indigo-violet': 'Indigo & Violet',
+        'green-finance': 'Green Finance',
+        'orange-energy': 'Orange Energy',
+        'red-alert': 'Red Alert',
+        'neutral-gray': 'Neutral Gray',
+        'cyan-tech': 'Cyan Tech',
+        'black-gold': 'Premium Black & Gold',
     };
 
     const colorSchemeDescriptions: Record<ColorScheme, string> = {
@@ -67,6 +77,16 @@ export const ApiSettings: React.FC = () => {
         purple: 'Premium theme',
         red: 'Bold theme',
         amber: 'Warm theme',
+        'professional-blue': 'Enterprise / Admin',
+        'dark-saas': 'Modern / Developer',
+        'teal-mint': 'Health / Facility',
+        'indigo-violet': 'HR / Productivity',
+        'green-finance': 'Billing / Payroll',
+        'orange-energy': 'Operations / Field',
+        'red-alert': 'Security / Critical',
+        'neutral-gray': 'Minimal / Data',
+        'cyan-tech': 'Smart Systems',
+        'black-gold': 'Management / Exec',
     };
 
     const handleColorSchemeChange = async (scheme: ColorScheme) => {
@@ -109,81 +129,44 @@ export const ApiSettings: React.FC = () => {
                     <SettingsCard title="Color Scheme" icon={Palette}>
                         <p className="text-sm text-muted -mt-2">Choose the application's primary color scheme.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                            {/* Paradigm Green */}
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('green')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'green' 
-                                        ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
-                                        : 'border-border hover:border-green-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#006B3F] flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white font-bold text-sm">P</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">Paradigm Green</p>
-                                    <p className="text-xs text-muted">Nature theme</p>
-                                </div>
-                            </button>
-
-                            {/* Royal Purple */}
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('purple')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'purple' 
-                                        ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200' 
-                                        : 'border-border hover:border-purple-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#5B21B6] flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white font-bold text-sm">R</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">Royal Purple</p>
-                                    <p className="text-xs text-muted">Premium theme</p>
-                                </div>
-                            </button>
-
-                            {/* Crimson Red */}
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('red')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'red' 
-                                        ? 'border-red-500 bg-red-50 ring-2 ring-red-200' 
-                                        : 'border-border hover:border-red-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#991B1B] flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white font-bold text-sm">C</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">Crimson Red</p>
-                                    <p className="text-xs text-muted">Bold theme</p>
-                                </div>
-                            </button>
-
-                            {/* Amber Gold */}
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('amber')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'amber' 
-                                        ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200' 
-                                        : 'border-border hover:border-orange-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#B45309] flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white font-bold text-sm">A</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">Amber Gold</p>
-                                    <p className="text-xs text-muted">Warm theme</p>
-                                </div>
-                            </button>
+                            {[
+                                { id: 'green', label: 'Paradigm Green', desc: 'Nature theme', color: '#006B3F', border: 'border-green-500', bg: 'bg-green-50', ring: 'ring-green-200', icon: 'P' },
+                                { id: 'professional-blue', label: 'Professional Blue', desc: 'Enterprise / Admin', color: '#2563EB', border: 'border-blue-600', bg: 'bg-blue-50', ring: 'ring-blue-200', icon: 'B' },
+                                { id: 'purple', label: 'Royal Purple', desc: 'Premium theme', color: '#5B21B6', border: 'border-purple-500', bg: 'bg-purple-50', ring: 'ring-purple-200', icon: 'R' },
+                                { id: 'red', label: 'Crimson Red', desc: 'Bold theme', color: '#991B1B', border: 'border-red-500', bg: 'bg-red-50', ring: 'ring-red-200', icon: 'C' },
+                                { id: 'amber', label: 'Amber Gold', desc: 'Warm theme', color: '#B45309', border: 'border-orange-500', bg: 'bg-orange-50', ring: 'ring-orange-200', icon: 'A' },
+                                { id: 'dark-saas', label: 'Dark SaaS', desc: 'Modern / Developer', color: '#0F172A', border: 'border-slate-800', bg: 'bg-slate-900', ring: 'ring-slate-700', icon: 'D' },
+                                { id: 'teal-mint', label: 'Teal & Mint', desc: 'Health / Facility', color: '#0D9488', border: 'border-teal-500', bg: 'bg-teal-50', ring: 'ring-teal-200', icon: 'T' },
+                                { id: 'indigo-violet', label: 'Indigo & Violet', desc: 'HR / Productivity', color: '#4F46E5', border: 'border-indigo-500', bg: 'bg-indigo-50', ring: 'ring-indigo-200', icon: 'I' },
+                                { id: 'green-finance', label: 'Green Finance', desc: 'Billing / Payroll', color: '#15803D', border: 'border-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200', icon: 'G' },
+                                { id: 'orange-energy', label: 'Orange Energy', desc: 'Operations / Field', color: '#EA580C', border: 'border-orange-600', bg: 'bg-orange-50', ring: 'ring-orange-200', icon: 'O' },
+                                { id: 'red-alert', label: 'Red Alert', desc: 'Security / Critical', color: '#DC2626', border: 'border-red-600', bg: 'bg-red-50', ring: 'ring-red-200', icon: 'R' },
+                                { id: 'neutral-gray', label: 'Neutral Gray', desc: 'Minimal / Data', color: '#374151', border: 'border-gray-500', bg: 'bg-gray-50', ring: 'ring-gray-200', icon: 'N' },
+                                { id: 'cyan-tech', label: 'Cyan Tech', desc: 'Smart Systems', color: '#0891B2', border: 'border-cyan-500', bg: 'bg-cyan-50', ring: 'ring-cyan-200', icon: 'C' },
+                                { id: 'black-gold', label: 'Premium Black & Gold', desc: 'Management / Exec', color: '#111827', border: 'border-yellow-600', bg: 'bg-gray-900', ring: 'ring-yellow-500', icon: 'G' },
+                            ].map((theme) => (
+                                <button
+                                    key={theme.id}
+                                    type="button"
+                                    onClick={() => handleColorSchemeChange(theme.id as ColorScheme)}
+                                    className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                        colorScheme === theme.id 
+                                            ? `${theme.border} ${theme.bg} ring-2 ${theme.ring}` 
+                                            : 'border-border hover:border-gray-300'
+                                    }`}
+                                >
+                                    <div 
+                                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                        style={{ backgroundColor: theme.color }}
+                                    >
+                                        <span className={`font-bold text-sm ${['dark-saas', 'black-gold'].includes(theme.id) ? 'text-white' : 'text-white'}`}>{theme.icon}</span>
+                                    </div>
+                                    <div className="text-left">
+                                        <p className={`font-semibold ${['dark-saas', 'black-gold'].includes(theme.id) && colorScheme === theme.id ? 'text-primary-text' : 'text-primary-text'}`}>{theme.label}</p>
+                                        <p className="text-xs text-muted">{theme.desc}</p>
+                                    </div>
+                                </button>
+                            ))}
                             
                              <div className="col-span-1 sm:col-span-2 mt-4 pt-4 border-t border-border">
                                 <Checkbox 

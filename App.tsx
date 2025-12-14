@@ -150,7 +150,11 @@ const BrandingManager: React.FC = () => {
     const body = document.body;
     
     // Remove all theme classes first
-    body.classList.remove('blue-theme', 'green-theme', 'purple-theme', 'red-theme', 'amber-theme');
+    body.classList.remove(
+      'blue-theme', 'green-theme', 'purple-theme', 'red-theme', 'amber-theme',
+      'professional-blue-theme', 'dark-saas-theme', 'teal-mint-theme', 'indigo-violet-theme', 'green-finance-theme',
+      'orange-energy-theme', 'red-alert-theme', 'neutral-gray-theme', 'cyan-tech-theme', 'black-gold-theme'
+    );
     
     // Add the current theme class
     body.classList.add(`${colorScheme}-theme`);

@@ -1,8 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, X } from 'lucide-react';
-import { useBrandingStore } from '../../store/brandingStore';
-
 interface ToastProps {
   message: string;
   type: 'success' | 'error';
@@ -10,7 +8,6 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ message, type, onDismiss }) => {
-  const { colorScheme } = useBrandingStore();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,20 +19,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onDismiss }) => {
     };
   }, [onDismiss]);
 
-  const getBgColor = () => {
-    if (type === 'error') return 'bg-red-500';
-    // Success color depends on theme
-    const themeColors: Record<string, string> = {
-      blue: 'bg-[#1a3a6e]',
-      green: 'bg-green-500',
-      purple: 'bg-[#5B21B6]',
-      red: 'bg-[#991B1B]',
-      amber: 'bg-[#B45309]'
-    };
-    return themeColors[colorScheme] || 'bg-green-500';
-  };
-
-  const bgColor = getBgColor();
+  const bgColor = type === 'error' ? 'bg-red-500' : 'bg-accent';
   const Icon = type === 'success' ? CheckCircle : XCircle;
 
   return (

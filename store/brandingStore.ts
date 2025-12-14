@@ -1,7 +1,21 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type ColorScheme = "green" | "purple" | "red" | "amber";
+export type ColorScheme =
+    | "green"
+    | "purple"
+    | "red"
+    | "amber"
+    | "professional-blue"
+    | "dark-saas"
+    | "teal-mint"
+    | "indigo-violet"
+    | "green-finance"
+    | "orange-energy"
+    | "red-alert"
+    | "neutral-gray"
+    | "cyan-tech"
+    | "black-gold";
 
 interface BrandingState {
     colorScheme: ColorScheme;

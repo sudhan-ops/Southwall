@@ -1,0 +1,226 @@
+/* =========================================
+   1. Professional Blue
+   P: #2563EB, S: #1E40AF, A: #38BDF8, BG: #F8FAFC, T: #0F172A
+   ========================================= */
+
+.professional-blue-theme .bg-accent { background-color: #2563EB !important; }
+.professional-blue-theme .bg-accent-light { background-color: rgba(37, 99, 235, 0.1) !important; }
+.professional-blue-theme .text-accent { color: #2563EB !important; }
+.professional-blue-theme .text-accent-dark { color: #1E40AF !important; }
+.professional-blue-theme .btn-primary { background-color: #2563EB !important; border-color: #1E40AF !important; }
+.professional-blue-theme .btn-primary:hover { background-color: #1E40AF !important; }
+.professional-blue-theme .btn-outline { border-color: #2563EB !important; color: #2563EB !important; }
+.professional-blue-theme .btn-outline:hover { background-color: rgba(37, 99, 235, 0.1) !important; }
+.professional-blue-theme .border-accent { border-color: #2563EB !important; }
+.professional-blue-theme .form-input:focus { border-color: #2563EB !important; box-shadow: 0 0 0 1px #2563EB !important; }
+.professional-blue-theme input[type="checkbox"]:checked { background-color: #2563EB !important; border-color: #2563EB !important; }
+.professional-blue-theme .form-header-title::after { background-color: #2563EB !important; }
+/* Sidebar & Nav */
+.professional-blue-theme nav a.bg-accent, .professional-blue-theme nav button.bg-accent, .professional-blue-theme nav a[class*="bg-accent"] { background-color: #2563EB !important; }
+.professional-blue-theme nav a.bg-accent span, .professional-blue-theme nav button.bg-accent span, .professional-blue-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+/* Body */
+.professional-blue-theme body, .professional-blue-theme { background-color: #F8FAFC !important; color: #0F172A !important; }
+
+
+/* =========================================
+   2. Dark SaaS (Modern / Developer Tools)
+   Action Color: Cyan (#22D3EE) for visibility on Dark BG
+   ========================================= */
+
+.dark-saas-theme body, .dark-saas-theme, .dark-saas-theme #root { background-color: #020617 !important; color: #E5E7EB !important; }
+.dark-saas-theme .bg-card, .dark-saas-theme .bg-page { background-color: #0F172A !important; }
+.dark-saas-theme .bg-accent { background-color: #22D3EE !important; color: #020617 !important; }
+.dark-saas-theme .bg-accent-light { background-color: rgba(34, 211, 238, 0.1) !important; }
+.dark-saas-theme .text-accent { color: #22D3EE !important; }
+.dark-saas-theme .text-primary-text { color: #E5E7EB !important; }
+.dark-saas-theme .text-muted { color: #94a3b8 !important; }
+.dark-saas-theme .btn-primary { background-color: #22D3EE !important; color: #020617 !important; border-color: #22D3EE !important; }
+.dark-saas-theme .btn-primary:hover { background-color: #06b6d4 !important; }
+.dark-saas-theme .btn-outline { border-color: #22D3EE !important; color: #22D3EE !important; }
+.dark-saas-theme .btn-outline:hover { background-color: rgba(34, 211, 238, 0.1) !important; }
+.dark-saas-theme .form-input { background-color: #1E293B !important; border-color: #334155 !important; color: #E5E7EB !important; }
+.dark-saas-theme .form-input:focus { border-color: #22D3EE !important; box-shadow: 0 0 0 1px #22D3EE !important; }
+.dark-saas-theme input[type="checkbox"]:checked { background-color: #22D3EE !important; border-color: #22D3EE !important; }
+/* Override cards to be dark */
+.dark-saas-theme .bg-white, .dark-saas-theme .md\:bg-white { background-color: #0F172A !important; color: #E5E7EB !important; border-color: #1e293b !important; }
+.dark-saas-theme nav a span, .dark-saas-theme nav button span { color: #94a3b8 !important; }
+.dark-saas-theme nav a.bg-accent span, .dark-saas-theme nav button.bg-accent span { color: #020617 !important; }
+
+
+/* =========================================
+   3. Teal & Mint
+   P: #0D9488, S: #14B8A6
+   ========================================= */
+
+.teal-mint-theme .bg-accent { background-color: #0D9488 !important; }
+.teal-mint-theme .bg-accent-light { background-color: rgba(13, 148, 136, 0.1) !important; }
+.teal-mint-theme .text-accent { color: #0D9488 !important; }
+.teal-mint-theme .text-accent-dark { color: #14B8A6 !important; }
+.teal-mint-theme .btn-primary { background-color: #0D9488 !important; border-color: #14B8A6 !important; }
+.teal-mint-theme .btn-primary:hover { background-color: #115e59 !important; }
+.teal-mint-theme .btn-outline { border-color: #0D9488 !important; color: #0D9488 !important; }
+.teal-mint-theme .btn-outline:hover { background-color: rgba(13, 148, 136, 0.1) !important; }
+.teal-mint-theme .border-accent { border-color: #0D9488 !important; }
+.teal-mint-theme .form-input:focus { border-color: #0D9488 !important; box-shadow: 0 0 0 1px #0D9488 !important; }
+.teal-mint-theme input[type="checkbox"]:checked { background-color: #0D9488 !important; border-color: #0D9488 !important; }
+.teal-mint-theme .form-header-title::after { background-color: #0D9488 !important; }
+.teal-mint-theme nav a.bg-accent, .teal-mint-theme nav button.bg-accent, .teal-mint-theme nav a[class*="bg-accent"] { background-color: #0D9488 !important; }
+.teal-mint-theme nav a.bg-accent span, .teal-mint-theme nav button.bg-accent span, .teal-mint-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.teal-mint-theme body, .teal-mint-theme { background-color: #F0FDFA !important; color: #134E4A !important; }
+
+
+/* =========================================
+   4. Indigo & Violet
+   P: #4F46E5, S: #4338CA
+   ========================================= */
+
+.indigo-violet-theme .bg-accent { background-color: #4F46E5 !important; }
+.indigo-violet-theme .bg-accent-light { background-color: rgba(79, 70, 229, 0.1) !important; }
+.indigo-violet-theme .text-accent { color: #4F46E5 !important; }
+.indigo-violet-theme .text-accent-dark { color: #4338CA !important; }
+.indigo-violet-theme .btn-primary { background-color: #4F46E5 !important; border-color: #4338CA !important; }
+.indigo-violet-theme .btn-primary:hover { background-color: #4338CA !important; }
+.indigo-violet-theme .btn-outline { border-color: #4F46E5 !important; color: #4F46E5 !important; }
+.indigo-violet-theme .btn-outline:hover { background-color: rgba(79, 70, 229, 0.1) !important; }
+.indigo-violet-theme .border-accent { border-color: #4F46E5 !important; }
+.indigo-violet-theme .form-input:focus { border-color: #4F46E5 !important; box-shadow: 0 0 0 1px #4F46E5 !important; }
+.indigo-violet-theme input[type="checkbox"]:checked { background-color: #4F46E5 !important; border-color: #4F46E5 !important; }
+.indigo-violet-theme .form-header-title::after { background-color: #4F46E5 !important; }
+.indigo-violet-theme nav a.bg-accent, .indigo-violet-theme nav button.bg-accent, .indigo-violet-theme nav a[class*="bg-accent"] { background-color: #4F46E5 !important; }
+.indigo-violet-theme nav a.bg-accent span, .indigo-violet-theme nav button.bg-accent span, .indigo-violet-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.indigo-violet-theme body, .indigo-violet-theme { background-color: #EEF2FF !important; color: #1E1B4B !important; }
+
+
+/* =========================================
+   5. Green Finance
+   P: #15803D, S: #166534
+   ========================================= */
+
+.green-finance-theme .bg-accent { background-color: #15803D !important; }
+.green-finance-theme .bg-accent-light { background-color: rgba(21, 128, 61, 0.1) !important; }
+.green-finance-theme .text-accent { color: #15803D !important; }
+.green-finance-theme .text-accent-dark { color: #166534 !important; }
+.green-finance-theme .btn-primary { background-color: #15803D !important; border-color: #166534 !important; }
+.green-finance-theme .btn-primary:hover { background-color: #166534 !important; }
+.green-finance-theme .btn-outline { border-color: #15803D !important; color: #15803D !important; }
+.green-finance-theme .btn-outline:hover { background-color: rgba(21, 128, 61, 0.1) !important; }
+.green-finance-theme .border-accent { border-color: #15803D !important; }
+.green-finance-theme .form-input:focus { border-color: #15803D !important; box-shadow: 0 0 0 1px #15803D !important; }
+.green-finance-theme input[type="checkbox"]:checked { background-color: #15803D !important; border-color: #15803D !important; }
+.green-finance-theme .form-header-title::after { background-color: #15803D !important; }
+.green-finance-theme nav a.bg-accent, .green-finance-theme nav button.bg-accent, .green-finance-theme nav a[class*="bg-accent"] { background-color: #15803D !important; }
+.green-finance-theme nav a.bg-accent span, .green-finance-theme nav button.bg-accent span, .green-finance-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.green-finance-theme body, .green-finance-theme { background-color: #F0FDF4 !important; color: #052E16 !important; }
+
+
+/* =========================================
+   6. Orange Energy
+   P: #EA580C, S: #C2410C
+   ========================================= */
+
+.orange-energy-theme .bg-accent { background-color: #EA580C !important; }
+.orange-energy-theme .bg-accent-light { background-color: rgba(234, 88, 12, 0.1) !important; }
+.orange-energy-theme .text-accent { color: #EA580C !important; }
+.orange-energy-theme .text-accent-dark { color: #C2410C !important; }
+.orange-energy-theme .btn-primary { background-color: #EA580C !important; border-color: #C2410C !important; }
+.orange-energy-theme .btn-primary:hover { background-color: #C2410C !important; }
+.orange-energy-theme .btn-outline { border-color: #EA580C !important; color: #EA580C !important; }
+.orange-energy-theme .btn-outline:hover { background-color: rgba(234, 88, 12, 0.1) !important; }
+.orange-energy-theme .border-accent { border-color: #EA580C !important; }
+.orange-energy-theme .form-input:focus { border-color: #EA580C !important; box-shadow: 0 0 0 1px #EA580C !important; }
+.orange-energy-theme input[type="checkbox"]:checked { background-color: #EA580C !important; border-color: #EA580C !important; }
+.orange-energy-theme .form-header-title::after { background-color: #EA580C !important; }
+.orange-energy-theme nav a.bg-accent, .orange-energy-theme nav button.bg-accent, .orange-energy-theme nav a[class*="bg-accent"] { background-color: #EA580C !important; }
+.orange-energy-theme nav a.bg-accent span, .orange-energy-theme nav button.bg-accent span, .orange-energy-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.orange-energy-theme body, .orange-energy-theme { background-color: #FFF7ED !important; color: #431407 !important; }
+
+
+/* =========================================
+   7. Red Alert
+   P: #DC2626, S: #991B1B
+   ========================================= */
+
+.red-alert-theme .bg-accent { background-color: #DC2626 !important; }
+.red-alert-theme .bg-accent-light { background-color: rgba(220, 38, 38, 0.1) !important; }
+.red-alert-theme .text-accent { color: #DC2626 !important; }
+.red-alert-theme .text-accent-dark { color: #991B1B !important; }
+.red-alert-theme .btn-primary { background-color: #DC2626 !important; border-color: #991B1B !important; }
+.red-alert-theme .btn-primary:hover { background-color: #991B1B !important; }
+.red-alert-theme .btn-outline { border-color: #DC2626 !important; color: #DC2626 !important; }
+.red-alert-theme .btn-outline:hover { background-color: rgba(220, 38, 38, 0.1) !important; }
+.red-alert-theme .border-accent { border-color: #DC2626 !important; }
+.red-alert-theme .form-input:focus { border-color: #DC2626 !important; box-shadow: 0 0 0 1px #DC2626 !important; }
+.red-alert-theme input[type="checkbox"]:checked { background-color: #DC2626 !important; border-color: #DC2626 !important; }
+.red-alert-theme .form-header-title::after { background-color: #DC2626 !important; }
+.red-alert-theme nav a.bg-accent, .red-alert-theme nav button.bg-accent, .red-alert-theme nav a[class*="bg-accent"] { background-color: #DC2626 !important; }
+.red-alert-theme nav a.bg-accent span, .red-alert-theme nav button.bg-accent span, .red-alert-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.red-alert-theme body, .red-alert-theme { background-color: #FEF2F2 !important; color: #450A0A !important; }
+
+
+/* =========================================
+   8. Neutral Gray
+   P: #374151, S: #111827
+   ========================================= */
+
+.neutral-gray-theme .bg-accent { background-color: #374151 !important; }
+.neutral-gray-theme .bg-accent-light { background-color: rgba(55, 65, 81, 0.1) !important; }
+.neutral-gray-theme .text-accent { color: #374151 !important; }
+.neutral-gray-theme .text-accent-dark { color: #111827 !important; }
+.neutral-gray-theme .btn-primary { background-color: #374151 !important; border-color: #111827 !important; }
+.neutral-gray-theme .btn-primary:hover { background-color: #111827 !important; }
+.neutral-gray-theme .btn-outline { border-color: #374151 !important; color: #374151 !important; }
+.neutral-gray-theme .btn-outline:hover { background-color: rgba(55, 65, 81, 0.1) !important; }
+.neutral-gray-theme .border-accent { border-color: #374151 !important; }
+.neutral-gray-theme .form-input:focus { border-color: #374151 !important; box-shadow: 0 0 0 1px #374151 !important; }
+.neutral-gray-theme input[type="checkbox"]:checked { background-color: #374151 !important; border-color: #374151 !important; }
+.neutral-gray-theme .form-header-title::after { background-color: #374151 !important; }
+.neutral-gray-theme nav a.bg-accent, .neutral-gray-theme nav button.bg-accent, .neutral-gray-theme nav a[class*="bg-accent"] { background-color: #374151 !important; }
+.neutral-gray-theme nav a.bg-accent span, .neutral-gray-theme nav button.bg-accent span, .neutral-gray-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.neutral-gray-theme body, .neutral-gray-theme { background-color: #F9FAFB !important; color: #030712 !important; }
+
+
+/* =========================================
+   9. Cyan Tech
+   P: #0891B2, S: #0E7490
+   ========================================= */
+
+.cyan-tech-theme .bg-accent { background-color: #0891B2 !important; }
+.cyan-tech-theme .bg-accent-light { background-color: rgba(8, 145, 178, 0.1) !important; }
+.cyan-tech-theme .text-accent { color: #0891B2 !important; }
+.cyan-tech-theme .text-accent-dark { color: #0E7490 !important; }
+.cyan-tech-theme .btn-primary { background-color: #0891B2 !important; border-color: #0E7490 !important; }
+.cyan-tech-theme .btn-primary:hover { background-color: #0E7490 !important; }
+.cyan-tech-theme .btn-outline { border-color: #0891B2 !important; color: #0891B2 !important; }
+.cyan-tech-theme .btn-outline:hover { background-color: rgba(8, 145, 178, 0.1) !important; }
+.cyan-tech-theme .border-accent { border-color: #0891B2 !important; }
+.cyan-tech-theme .form-input:focus { border-color: #0891B2 !important; box-shadow: 0 0 0 1px #0891B2 !important; }
+.cyan-tech-theme input[type="checkbox"]:checked { background-color: #0891B2 !important; border-color: #0891B2 !important; }
+.cyan-tech-theme .form-header-title::after { background-color: #0891B2 !important; }
+.cyan-tech-theme nav a.bg-accent, .cyan-tech-theme nav button.bg-accent, .cyan-tech-theme nav a[class*="bg-accent"] { background-color: #0891B2 !important; }
+.cyan-tech-theme nav a.bg-accent span, .cyan-tech-theme nav button.bg-accent span, .cyan-tech-theme nav a[class*="bg-accent"] span { color: #ffffff !important; }
+.cyan-tech-theme body, .cyan-tech-theme { background-color: #ECFEFF !important; color: #083344 !important; }
+
+
+/* =========================================
+   10. Premium Black & Gold
+   P: #111827 (BG/Cards), Accent: #FACC15
+   ========================================= */
+
+.black-gold-theme body, .black-gold-theme, .black-gold-theme #root { background-color: #0B0F19 !important; color: #F9FAFB !important; }
+.black-gold-theme .bg-card, .black-gold-theme .bg-page { background-color: #111827 !important; }
+.black-gold-theme .bg-accent { background-color: #FACC15 !important; color: #000000 !important; }
+.black-gold-theme .bg-accent-light { background-color: rgba(250, 204, 21, 0.1) !important; }
+.black-gold-theme .text-accent { color: #FACC15 !important; }
+.black-gold-theme .text-primary-text { color: #F9FAFB !important; }
+.black-gold-theme .text-muted { color: #9ca3af !important; }
+.black-gold-theme .btn-primary { background-color: #FACC15 !important; color: #000000 !important; border-color: #ca8a04 !important; }
+.black-gold-theme .btn-primary:hover { background-color: #eab308 !important; }
+.black-gold-theme .btn-outline { border-color: #FACC15 !important; color: #FACC15 !important; }
+.black-gold-theme .btn-outline:hover { background-color: rgba(250, 204, 21, 0.1) !important; }
+.black-gold-theme .form-input { background-color: #1F2933 !important; border-color: #374151 !important; color: #F9FAFB !important; }
+.black-gold-theme .form-input:focus { border-color: #FACC15 !important; box-shadow: 0 0 0 1px #FACC15 !important; }
+.black-gold-theme input[type="checkbox"]:checked { background-color: #FACC15 !important; border-color: #FACC15 !important; }
+/* Override cards to be dark */
+.black-gold-theme .bg-white, .black-gold-theme .md\:bg-white { background-color: #111827 !important; color: #F9FAFB !important; border-color: #374151 !important; }
+.black-gold-theme nav a span, .black-gold-theme nav button span { color: #9ca3af !important; }
+.black-gold-theme nav a.bg-accent span, .black-gold-theme nav button.bg-accent span { color: #000000 !important; }
