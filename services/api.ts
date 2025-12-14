@@ -283,6 +283,14 @@ export const api = {
     };
   },
 
+  updateSettings: async (settings: any): Promise<void> => {
+    const { error } = await supabase
+      .from("settings")
+      .update(toSnakeCase(settings))
+      .eq("id", "singleton");
+    if (error) throw error;
+  },
+
   // --- Onboarding & Verification ---
   getVerificationSubmissions: async (
     status?: string,
@@ -2215,9 +2223,9 @@ export const api = {
     const normalizeCoord = (n: number) => parseFloat(n.toFixed(6));
 
     const uniqueCoords = Array.from(
-      new Set(coords.map((c) =>
-        `${normalizeCoord(c.lat)},${normalizeCoord(c.lon)}`
-      )),
+      new Set(
+        coords.map((c) => `${normalizeCoord(c.lat)},${normalizeCoord(c.lon)}`),
+      ),
     )
       .map((s) => {
         const [lat, lon] = s.split(",").map(Number);

@@ -7,6 +7,7 @@ import { useEnrollmentRulesStore } from './store/enrollmentRulesStore';
 import { usePermissionsStore } from './store/permissionsStore';
 import { useSettingsStore } from './store/settingsStore';
 import { useBrandingStore } from './store/brandingStore';
+import { useLogoStore } from './store/logoStore';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { supabase } from './services/supabase';
 import { authService } from './services/authService';
@@ -121,7 +122,7 @@ const ThemeManager: React.FC = () => {
     if (isAutomatic) {
       // FIX: Force Light mode for Blue theme on mobile, keep Dark for Green/Default
       if (isMobile) {
-        newTheme = colorScheme === 'blue' ? 'light' : 'dark';
+        newTheme = 'dark';
       } else {
         newTheme = 'light';
       }
@@ -141,9 +142,9 @@ const ThemeManager: React.FC = () => {
   return null;
 };
 
-// Branding Manager - applies color scheme class to body
+// Branding Manager - applies color scheme class to body and updates document title
 const BrandingManager: React.FC = () => {
-  const { colorScheme } = useBrandingStore();
+  const { colorScheme, appTitle } = useBrandingStore();
 
   useEffect(() => {
     const body = document.body;
@@ -153,7 +154,12 @@ const BrandingManager: React.FC = () => {
     
     // Add the current theme class
     body.classList.add(`${colorScheme}-theme`);
-  }, [colorScheme]);
+
+    // Update document title
+    if (appTitle) {
+      document.title = appTitle;
+    }
+  }, [colorScheme, appTitle]);
 
   return null;
 };
@@ -212,6 +218,7 @@ const App: React.FC = () => {
   const { init: initEnrollmentRules } = useEnrollmentRulesStore();
   const { initRoles } = usePermissionsStore();
   const { initSettings } = useSettingsStore();
+  const { initBranding } = useBrandingStore();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -391,6 +398,13 @@ const App: React.FC = () => {
             recurringHolidays: recurringHolidays || []
           });
         }
+        if (settings.apiSettings?.colorScheme) {
+          initBranding(settings.apiSettings.colorScheme, settings.apiSettings.appTitle);
+        }
+        // Hydrate global logo if available
+        if (settings.apiSettings?.globalLogo) {
+             useLogoStore.getState().setCurrentLogo(settings.apiSettings.globalLogo);
+        }
       } catch (error) {
         console.error('Failed to load initial application data:', error);
       }
@@ -400,7 +414,7 @@ const App: React.FC = () => {
       fetchInitialData();
       useAuthStore.getState().checkAttendanceStatus();
     }
-  }, [user, isInitialized, initEnrollmentRules, initRoles, initSettings]);
+  }, [user, isInitialized, initEnrollmentRules, initRoles, initSettings, initBranding]);
 
   // Post-initialization navigation logic.
   useEffect(() => {

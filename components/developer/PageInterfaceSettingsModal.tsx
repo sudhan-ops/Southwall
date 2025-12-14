@@ -8,6 +8,9 @@ import UploadDocument from '../UploadDocument';
 import Button from '../ui/Button';
 import Checkbox from '../ui/Checkbox';
 import Toast from '../ui/Toast';
+import { api } from '../../services/api';
+import Input from '../ui/Input';
+import { useBrandingStore } from '../../store/brandingStore';
 
 interface PageInterfaceSettingsModalProps {
   isOpen: boolean;
@@ -37,7 +40,32 @@ const PageInterfaceSettingsModal: React.FC<PageInterfaceSettingsModalProps> = ({
     } = useLogoStore();
     const { backgroundImages, addBackgroundImage, removeBackgroundImage } = useAuthLayoutStore();
     const uiSettings = useUiSettingsStore();
+    const { appTitle, setAppTitle } = useBrandingStore();
+    const [titleInput, setTitleInput] = useState(appTitle);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    React.useEffect(() => {
+        setTitleInput(appTitle);
+    }, [appTitle]);
+
+    const handleSaveTitle = async () => {
+        setAppTitle(titleInput);
+        try {
+            const { settings } = await api.getInitialAppData();
+            const currentApiSettings = settings.apiSettings || {};
+            
+            await api.updateSettings({
+                apiSettings: {
+                    ...currentApiSettings,
+                    appTitle: titleInput
+                }
+            });
+            setToast({ message: 'Application title updated globally.', type: 'success' });
+        } catch (error) {
+            console.error('Failed to save app title:', error);
+            setToast({ message: 'Title set locally, but failed to save globally.', type: 'error' });
+        }
+    };
 
     const handleLogoUpload = (uploadedFile: UploadedFile | null) => {
         if (uploadedFile) {
@@ -54,9 +82,23 @@ const PageInterfaceSettingsModal: React.FC<PageInterfaceSettingsModalProps> = ({
         }
     };
     
-    const handleSetDefault = () => {
+    const handleSetDefault = async () => {
         setDefaultLogo();
-        setToast({ message: 'Active logo has been set as the new default.', type: 'success' });
+        try {
+            const { settings } = await api.getInitialAppData();
+            const currentApiSettings = settings.apiSettings || {};
+            
+            await api.updateSettings({
+                apiSettings: {
+                    ...currentApiSettings,
+                    globalLogo: currentLogo
+                }
+            });
+            setToast({ message: 'Active logo has been set as the global default.', type: 'success' });
+        } catch (error) {
+            console.error('Failed to save global logo:', error);
+            setToast({ message: 'Logo set locally, but failed to save globally.', type: 'error' });
+        }
     }
 
     const handleResetToDefault = () => {
@@ -105,6 +147,21 @@ const PageInterfaceSettingsModal: React.FC<PageInterfaceSettingsModalProps> = ({
                 <div className="flex-grow overflow-y-auto p-6 space-y-6 max-h-[75vh]">
                     <SettingsCard title="Branding & Logo" icon={Image}>
                         <p className="text-sm text-muted -mt-2">Manage the active and default logos for your application.</p>
+                        
+                        <div className="pt-2 pb-4 border-b mb-4">
+                            <h4 className="font-semibold text-primary-text mb-2">Application Title</h4>
+                            <div className="flex gap-2 items-end">
+                              <div className="flex-grow">
+                                <Input 
+                                    value={titleInput} 
+                                    onChange={(e) => setTitleInput(e.target.value)} 
+                                    placeholder="Enter App Title (e.g. Paradigm Employee Onboarding)" 
+                                />
+                              </div>
+                              <Button onClick={handleSaveTitle}>Save Title</Button>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 items-start">
                             {/* Active Logo Section */}
                             <div className="space-y-4">
@@ -176,14 +233,14 @@ const PageInterfaceSettingsModal: React.FC<PageInterfaceSettingsModalProps> = ({
                                 label="Enable Auto-Click on Hover"
                                 description="Automatically switch tabs or pages by hovering over them."
                                 checked={uiSettings.autoClickOnHover}
-                                onChange={uiSettings.setAutoClickOnHover}
+                                onChange={(e) => uiSettings.setAutoClickOnHover(e.target.checked)}
                             />
                             <Checkbox
                                 id="auto-scroll-hover-modal"
                                 label="Enable Auto-Scroll on Hover"
                                 description="Automatically scroll the page by hovering over the up/down arrows."
                                 checked={uiSettings.autoScrollOnHover}
-                                onChange={uiSettings.setAutoScrollOnHover}
+                                onChange={(e) => uiSettings.setAutoScrollOnHover(e.target.checked)}
                             />
                         </div>
                     </SettingsCard>

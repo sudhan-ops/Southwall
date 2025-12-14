@@ -263,15 +263,15 @@ const ProfilePage: React.FC = () => {
 
                     <section>
                         <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
-                        <div className={`fo-attendance-card space-y-4 ${colorScheme === 'blue' ? '!bg-blue-500 !text-white border-0 shadow-lg' : (colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : '')}`}>
+                        <div className={`fo-attendance-card space-y-4 ${colorScheme !== 'green' ? 'bg-gray-50 border border-gray-200' : ''}`}>
                             <div className="flex justify-around">
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-500' : '')}`}>Last Check In</p>
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-900' : '')}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check In</p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckInTime)}</strong></p>
                                 </div>
                                 <div className="text-center">
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-500' : '')}`}>Last Check Out</p>
-                                    <p className={`fo-attendance-time ${colorScheme === 'blue' ? '!text-white' : (colorScheme !== 'green' ? 'text-gray-900' : '')}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-500' : ''}`}>Last Check Out</p>
+                                    <p className={`fo-attendance-time ${colorScheme !== 'green' ? 'text-gray-900' : ''}`}><strong>{formatTime(lastCheckOutTime)}</strong></p>
                                 </div>
                             </div>
 
@@ -319,7 +319,24 @@ const ProfilePage: React.FC = () => {
             {/* Attendance Confirmation Modal removed */}
 
             <div className="relative overflow-hidden md:bg-white md:p-6 md:rounded-2xl md:shadow-lg flex flex-col md:flex-row items-center gap-6 border border-gray-100">
-                <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ backgroundColor: colorScheme !== 'green' ? '#1a3a6e' : '#006b3f', borderColor: colorScheme !== 'green' ? '#0f264a' : '#005632' }}></div>
+                <div className="absolute top-0 left-0 w-full h-32 border-b-4 shadow-lg" style={{ 
+                    backgroundColor: (() => {
+                        switch (colorScheme) {
+                            case 'purple': return '#5B21B6';
+                            case 'red': return '#dc2626'; // Red-600 to match button
+                            case 'amber': return '#d97706'; // Amber-600
+                            default: return '#006b3f';
+                        }
+                    })(), 
+                    borderColor: (() => {
+                        switch (colorScheme) {
+                            case 'purple': return '#4C1D95';
+                            case 'red': return '#b91c1c'; // Red-700
+                            case 'amber': return '#b45309'; // Amber-700
+                            default: return '#005632';
+                        }
+                    })() 
+                }}></div>
                 <div className="relative z-10">
                     <AvatarUpload file={avatarFile} onFileChange={handlePhotoChange} />
                 </div>

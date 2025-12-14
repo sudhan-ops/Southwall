@@ -53,13 +53,18 @@ export const allNavLinks: NavLinkConfig[] = [
 ];
 
 
+import { useLogoStore } from '../../store/logoStore';
+import { originalDefaultLogoBase64 } from '../ui/logoData';
+
 const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void, onExpand?: () => void, hideHeader?: boolean, mode?: 'light' | 'dark', isMobile?: boolean }> = ({ isCollapsed, onLinkClick, onExpand, hideHeader = false, mode = 'light', isMobile = false }) => {
     const { user } = useAuthStore();
     const { permissions } = usePermissionsStore();
     const { colorScheme } = useBrandingStore();
+    const { currentLogo } = useLogoStore();
     const location = useLocation();
 
-
+    // Check if we are using a custom logo
+    const isCustomLogo = currentLogo && currentLogo !== originalDefaultLogoBase64;
 
     const availableNavLinks = user ? allNavLinks
         .filter(link => permissions[user.role]?.includes(link.permission))
@@ -115,13 +120,21 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                 </div>
             )}
             {!hideHeader && (
-                <div className={`p-4 border-b border-gray-200 bg-white flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
+                <div className={`p-4 border-b border-gray-200 bg-white flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0 overlay-hidden`}>
                     {isCollapsed ? (
-                        <div className="h-8 w-8 overflow-hidden">
-                            <Logo className="h-8 max-w-none object-left object-cover" />
+                        <div className="h-8 w-8 overflow-hidden flex items-center justify-center">
+                            {isCustomLogo ? (
+                                <img src={currentLogo} alt="Logo" className="h-8 w-auto object-contain" />
+                            ) : (
+                                <Logo className="h-8 max-w-none object-left object-cover" />
+                            )}
                         </div>
                     ) : (
-                        <Logo className="h-14 lg:h-16" />
+                        isCustomLogo ? (
+                             <img src={currentLogo} alt="Logo" className="h-14 lg:h-16 w-auto object-contain" />
+                        ) : (
+                             <Logo className="h-14 lg:h-16" />
+                        )
                     )}
                 </div>
             )}

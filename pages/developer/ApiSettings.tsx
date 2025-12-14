@@ -33,6 +33,7 @@ export const ApiSettings: React.FC = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [isInterfaceModalOpen, setIsInterfaceModalOpen] = useState(false);
+    const [updateGlobal, setUpdateGlobal] = useState(false);
 
     const handleExport = async () => {
         setIsExporting(true);
@@ -68,9 +69,28 @@ export const ApiSettings: React.FC = () => {
         amber: 'Warm theme',
     };
 
-    const handleColorSchemeChange = (scheme: ColorScheme) => {
+    const handleColorSchemeChange = async (scheme: ColorScheme) => {
         setColorScheme(scheme);
-        setToast({ message: `Color scheme changed to ${colorSchemeLabels[scheme]}!`, type: 'success' });
+        
+        if (updateGlobal) {
+            try {
+                const { settings } = await api.getInitialAppData();
+                const currentApiSettings = settings.apiSettings || {};
+                
+                await api.updateSettings({
+                    apiSettings: {
+                        ...currentApiSettings,
+                        colorScheme: scheme
+                    }
+                });
+                setToast({ message: `Global theme updated to ${colorSchemeLabels[scheme]}!`, type: 'success' });
+            } catch (error) {
+                console.error('Failed to save theme globally:', error);
+                setToast({ message: 'Failed to save theme setting globally.', type: 'error' });
+            }
+        } else {
+             setToast({ message: `Color scheme changed to ${colorSchemeLabels[scheme]}!`, type: 'success' });
+        }
     };
 
     return (
@@ -164,6 +184,16 @@ export const ApiSettings: React.FC = () => {
                                     <p className="text-xs text-muted">Warm theme</p>
                                 </div>
                             </button>
+                            
+                             <div className="col-span-1 sm:col-span-2 mt-4 pt-4 border-t border-border">
+                                <Checkbox 
+                                    id="global-theme-default" 
+                                    label="Set as Global Default" 
+                                    description="If checked, the selected color scheme will be applied to all users who haven't set a preference."
+                                    checked={updateGlobal}
+                                    onChange={(e) => setUpdateGlobal(e.target.checked)}
+                                />
+                            </div>
                         </div>
                     </SettingsCard>
 
