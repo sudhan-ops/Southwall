@@ -133,7 +133,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                     ? '!text-white shadow-sm border'
                                     : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                 : isActive
-                                    ? `${colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
+                                    ? `${colorScheme === 'purple' ? 'bg-[#5B21B6]' : colorScheme === 'red' ? 'bg-[#991B1B]' : colorScheme === 'amber' ? 'bg-[#B45309]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
                                     : 'text-white hover:bg-white/10 hover:text-white'
                             }`
                         }
@@ -153,7 +153,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                         : isActive ? 'text-white' : 'text-white group-hover:text-white'
                                         } ${isCollapsed ? '' : 'mr-3'}`}
                                 />
-                                {!isCollapsed && <span>{link.label}</span>}
+                                {!isCollapsed && <span className={isActive && mode === 'light' ? 'text-white' : ''}>{link.label}</span>}
                             </>
                         )}
                     </NavLink>
