@@ -4,6 +4,7 @@ import Header from './Header';
 import BottomNav from './BottomNav';
 
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const MobileLayout: React.FC = () => {
     const { colorScheme } = useBrandingStore();
@@ -37,8 +38,10 @@ const MobileLayout: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const themeColors = getThemeColors(colorScheme);
+
     return (
-        <div className={`flex flex-col min-h-screen ${colorScheme !== 'green' ? '!bg-white' : '!bg-[#041b0f]'}`}>
+        <div className="flex flex-col min-h-screen" style={{ backgroundColor: themeColors.mobileBg }}>
             {/* Mobile Header - Auto-hide on scroll (FAST) */}
             <div
                 className={`sticky top-0 z-50 transition-transform duration-200 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
@@ -50,8 +53,8 @@ const MobileLayout: React.FC = () => {
             {/* Main Content Area */}
             {/* Increased bottom padding by 30% (9.1rem = 7rem * 1.3) for more clearance */}
             <main
-                className={`flex-1 overflow-y-auto px-4 pt-2 ${colorScheme !== 'green' ? '!bg-white' : '!bg-[#041b0f]'}`}
-                style={{ paddingBottom: 'calc(9.1rem + env(safe-area-inset-bottom))' }}
+                className="flex-1 overflow-y-auto px-4 pt-2"
+                style={{ paddingBottom: 'calc(9.1rem + env(safe-area-inset-bottom))', backgroundColor: themeColors.mobileBg }}
             >
                 <Outlet />
             </main>

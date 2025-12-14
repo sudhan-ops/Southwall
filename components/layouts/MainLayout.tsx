@@ -13,6 +13,7 @@ import { useNotificationStore } from '../../store/notificationStore';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import Header from './Header';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 export interface NavLinkConfig {
     to: string;
@@ -72,15 +73,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
         : [];
 
     // Dynamic accent colors based on branding
-    const accentColors = (() => {
-        switch (colorScheme) {
-
-            case 'purple': return { bg: '#5B21B6', border: '#4C1D95' };
-            case 'red': return { bg: '#991B1B', border: '#7F1D1D' };
-            case 'amber': return { bg: '#B45309', border: '#92400E' };
-            default: return { bg: '#006B3F', border: '#005632' }; // green
-        }
-    })();
+    const themeColors = getThemeColors(colorScheme);
 
     const handleLinkClick = (e: React.MouseEvent) => {
         // On mobile, if collapsed, clicking an icon should expand the sidebar instead of navigating
@@ -101,8 +94,8 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
             {hideHeader && isCollapsed && (
                 <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
                     style={{
-                        borderColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
-                        backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                        borderColor: themeColors.sidebarBorder,
+                        backgroundColor: themeColors.sidebarBg
                     }}>
                     <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/10 focus:outline-none`} aria-label="Go to profile page">
                         <span className="sr-only">Go to profile</span>
@@ -113,8 +106,8 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
             {hideHeader && !isCollapsed && (
                 <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
                     style={{
-                        borderColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
-                        backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                        borderColor: themeColors.sidebarBorder,
+                        backgroundColor: themeColors.sidebarBg
                     }}>
                     {/* Empty header - just background color */}
                 </div>
@@ -150,15 +143,18 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                     ? '!text-white shadow-sm border bg-accent'
                                     : 'text-slate-700 hover:bg-gray-100 hover:text-slate-900'
                                 : isActive
-                                    ? `${colorScheme === 'purple' ? 'bg-[#5B21B6]' : colorScheme === 'red' ? 'bg-[#991B1B]' : colorScheme === 'amber' ? 'bg-[#B45309]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
+                                    ? '!text-white shadow-sm border border-white/5'
                                     : 'text-white hover:bg-white/10 hover:text-white'
                             } ${isActive && mode === 'light' ? 'nav-active-white' : ''}`
                         }
                         style={({ isActive }) => {
                             if (!isActive) return {};
-                            return mode === 'light'
-                                ? { backgroundColor: accentColors.bg, borderColor: accentColors.border, color: '#ffffff' }
-                                : {}; // Dark mode bg is handled by class
+                            if (mode === 'light') {
+                                return { backgroundColor: themeColors.activeItemBg, borderColor: themeColors.sidebarBorder, color: '#ffffff' };
+                            } else {
+                                // Dark mode (Mobile sidebar)
+                                return { backgroundColor: themeColors.activeItemBg, color: themeColors.activeItemText };
+                            }
                         }}
                         title={link.label}
                     >
@@ -275,9 +271,14 @@ const MainLayout: React.FC = () => {
         return <Navigate to="/auth/login" replace />;
     }
 
+    // Dynamic accent colors based on branding for the main layout wrapper
+    const themeColors = getThemeColors(colorScheme);
+
     return (
         // ensures the container grows as needed instead of forcing a fixed height.
-        <div className={`flex min-h-screen ${isMobile ? 'bg-[#041b0f]' : 'bg-page'} ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}>
+        <div className={`flex min-h-screen ${isMobile ? themeColors.mobileBg : 'bg-page'} ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}
+             style={isMobile && themeColors.isDark ? { backgroundColor: themeColors.mobileBg } : {}}
+        >
 
             {/* Backdrop for mobile when sidebar is expanded */}
             {isMobile && !isSidebarCollapsed && (
@@ -290,8 +291,8 @@ const MainLayout: React.FC = () => {
             {/* Sidebar - Overlay on mobile, fixed on desktop */}
             <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? 'border-r' : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}
                 style={isMobile ? {
-                    backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f',
-                    borderRightColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b'
+                    backgroundColor: themeColors.sidebarBg,
+                    borderRightColor: themeColors.sidebarBorder
                 } : undefined}>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarContent

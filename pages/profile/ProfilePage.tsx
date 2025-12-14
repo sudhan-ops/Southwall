@@ -18,6 +18,7 @@ import Modal from '../../components/ui/Modal';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useThemeStore } from '../../store/themeStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 import Checkbox from '../../components/ui/Checkbox';
 
 // --- Profile Section ---
@@ -37,6 +38,7 @@ const ProfilePage: React.FC = () => {
     const navigate = useNavigate();
     const { theme, setTheme, isAutomatic, setAutomatic } = useThemeStore();
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
 
     const [isSaving, setIsSaving] = useState(false);
     const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
@@ -216,7 +218,7 @@ const ProfilePage: React.FC = () => {
 
     if (isMobileView) {
         return (
-            <div className={`p-4 space-y-8 md:bg-transparent ${colorScheme !== 'green' ? '!bg-white' : 'bg-[#041b0f]'}`}>
+            <div className="p-4 space-y-8 md:bg-transparent" style={{ backgroundColor: themeColors.mobileBg }}>
                 {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
                 {/* Logout Modal removed */}
                 {/* Attendance Confirmation Modal removed */}
@@ -224,18 +226,60 @@ const ProfilePage: React.FC = () => {
                 <div className="flex flex-col items-center text-center gap-4">
                     <AvatarUpload file={avatarFile} onFileChange={handlePhotoChange} />
                     <div>
-                        <h2 className={`text-2xl font-bold ${colorScheme !== 'green' ? 'text-gray-900' : 'text-white'}`}>{user.name}</h2>
-                        <p className={`${colorScheme !== 'green' ? 'text-gray-500' : 'text-muted'}`}>{user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                        <h2 className="text-2xl font-bold" style={{ color: themeColors.isDark ? 'white' : '#111827' }}>{user.name}</h2>
+                        <p style={{ color: themeColors.isDark ? '#9ca3af' : '#6b7280' }}>{user.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
                     </div>
                 </div>
 
                 <div className="space-y-6">
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${colorScheme !== 'green' ? 'text-gray-900 border-gray-200' : ''}`}>Profile Details</h3>
+                        <h3 className="fo-section-title mb-4" style={{ 
+                            color: themeColors.isDark ? 'white' : '#111827',
+                            borderColor: themeColors.isDark ? '#374151' : '#e5e7eb'
+                        }}>Profile Details</h3>
                         <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-4">
-                            <Input label="Full Name" id="name" error={profileErrors.name?.message} registration={register('name')} className={colorScheme !== 'green' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
-                            <Input label="Email Address" id="email" type="email" error={profileErrors.email?.message} registration={register('email')} readOnly className={colorScheme !== 'green' ? '!bg-gray-100/50 text-gray-500 border-gray-200' : '!bg-gray-700/50'} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
-                            <Input label="Phone Number" id="phone" type="tel" error={profileErrors.phone?.message} registration={register('phone')} className={colorScheme !== 'green' ? 'bg-gray-50 border-gray-200 text-gray-900' : ''} labelClassName={colorScheme !== 'green' ? 'text-gray-700' : ''} />
+                            <Input 
+                                label="Full Name" 
+                                id="name" 
+                                error={profileErrors.name?.message} 
+                                registration={register('name')} 
+                                className="" 
+                                style={{ 
+                                    backgroundColor: themeColors.isDark ? '#1f2937' : '#f9fafb',
+                                    borderColor: themeColors.isDark ? '#374151' : '#e5e7eb',
+                                    color: themeColors.isDark ? 'white' : '#111827'
+                                }}
+                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                            />
+                            <Input 
+                                label="Email Address" 
+                                id="email" 
+                                type="email" 
+                                error={profileErrors.email?.message} 
+                                registration={register('email')} 
+                                readOnly 
+                                className=""
+                                style={{ 
+                                    backgroundColor: themeColors.isDark ? '#374151' : '#f3f4f6',
+                                    borderColor: themeColors.isDark ? '#4b5563' : '#e5e7eb',
+                                    color: themeColors.isDark ? '#9ca3af' : '#6b7280'
+                                }}
+                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                            />
+                            <Input 
+                                label="Phone Number" 
+                                id="phone" 
+                                type="tel" 
+                                error={profileErrors.phone?.message} 
+                                registration={register('phone')} 
+                                className=""
+                                style={{ 
+                                    backgroundColor: themeColors.isDark ? '#1f2937' : '#f9fafb',
+                                    borderColor: themeColors.isDark ? '#374151' : '#e5e7eb',
+                                    color: themeColors.isDark ? 'white' : '#111827'
+                                }}
+                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                            />
                             <div className="flex justify-end pt-2"><Button type="submit" isLoading={isSaving} disabled={!isDirty}>Save Changes</Button></div>
                         </form>
                     </section>
