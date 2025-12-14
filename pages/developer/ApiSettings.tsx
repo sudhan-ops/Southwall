@@ -54,17 +54,23 @@ export const ApiSettings: React.FC = () => {
         }
     };
 
-    const themeNames: Record<ColorScheme, string> = {
-        blue: 'SouthWall Blue',
+    const colorSchemeLabels: Record<ColorScheme, string> = {
         green: 'Paradigm Green',
         purple: 'Royal Purple',
         red: 'Crimson Red',
-        amber: 'Amber Gold'
+        amber: 'Amber Gold',
+    };
+
+    const colorSchemeDescriptions: Record<ColorScheme, string> = {
+        green: 'Nature theme',
+        purple: 'Premium theme',
+        red: 'Bold theme',
+        amber: 'Warm theme',
     };
 
     const handleColorSchemeChange = (scheme: ColorScheme) => {
         setColorScheme(scheme);
-        setToast({ message: `Color scheme changed to ${themeNames[scheme]}`, type: 'success' });
+        setToast({ message: `Color scheme changed to ${colorSchemeLabels[scheme]}!`, type: 'success' });
     };
 
     return (
@@ -82,26 +88,7 @@ export const ApiSettings: React.FC = () => {
                     {/* Color Scheme Selection */}
                     <SettingsCard title="Color Scheme" icon={Palette}>
                         <p className="text-sm text-muted -mt-2">Choose the application's primary color scheme.</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-                            {/* SouthWall Blue */}
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('blue')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'blue' 
-                                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
-                                        : 'border-border hover:border-blue-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#1a3a6e] flex items-center justify-center flex-shrink-0">
-                                    <span className="text-white font-bold text-sm">S</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">SouthWall Blue</p>
-                                    <p className="text-xs text-muted">Security theme</p>
-                                </div>
-                            </button>
-                            
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                             {/* Paradigm Green */}
                             <button
                                 type="button"

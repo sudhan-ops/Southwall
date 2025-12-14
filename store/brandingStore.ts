@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type ColorScheme = "blue" | "green" | "purple" | "red" | "amber";
+export type ColorScheme = "green" | "purple" | "red" | "amber";
 
 interface BrandingState {
     colorScheme: ColorScheme;
@@ -12,7 +12,7 @@ interface BrandingState {
 export const useBrandingStore = create<BrandingState>()(
     persist(
         (set) => ({
-            colorScheme: "blue", // Default to blue (SouthWall)
+            colorScheme: "green", // Default to green (Paradigm)
             setColorScheme: (scheme) => set({ colorScheme: scheme }),
             initBranding: (scheme) => set({ colorScheme: scheme }),
         }),
