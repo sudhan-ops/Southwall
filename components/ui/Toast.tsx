@@ -25,7 +25,14 @@ const Toast: React.FC<ToastProps> = ({ message, type, onDismiss }) => {
   const getBgColor = () => {
     if (type === 'error') return 'bg-red-500';
     // Success color depends on theme
-    return colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-green-500';
+    const themeColors: Record<string, string> = {
+      blue: 'bg-[#1a3a6e]',
+      green: 'bg-green-500',
+      purple: 'bg-[#5B21B6]',
+      red: 'bg-[#991B1B]',
+      amber: 'bg-[#B45309]'
+    };
+    return themeColors[colorScheme] || 'bg-green-500';
   };
 
   const bgColor = getBgColor();

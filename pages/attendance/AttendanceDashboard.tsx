@@ -1503,33 +1503,45 @@ const AttendanceDashboard: React.FC = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className={`p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow ${colorScheme === 'blue' ? '!bg-blue-500 !text-white' : 'bg-card'}`}>
-                        <div className={`p-4 rounded-full mb-3 shadow-lg ${colorScheme === 'blue' ? 'bg-white/20 text-white' : 'bg-emerald-600 text-white shadow-emerald-200 dark:shadow-none'}`}>
+                    <div className="p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow bg-card">
+                        <div className="p-4 rounded-full mb-3 shadow-lg text-white"
+                            style={{
+                                backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : colorScheme === 'purple' ? '#5B21B6' : colorScheme === 'red' ? '#991B1B' : colorScheme === 'amber' ? '#B45309' : '#006B3F'
+                            }}>
                             <UserCheck className="h-8 w-8" />
                         </div>
-                        <p className={`text-sm font-medium mb-1 ${colorScheme === 'blue' ? '!text-white' : 'text-muted'}`}>Present</p>
-                        <p className={`text-2xl font-bold ${colorScheme === 'blue' ? '!text-white' : 'text-primary-text'}`}>{employeeStats.present}</p>
+                        <p className="text-sm font-medium mb-1 text-muted">Present</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.present}</p>
                     </div>
-                    <div className={`p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow ${colorScheme === 'blue' ? '!bg-blue-500 !text-white' : 'bg-card'}`}>
-                        <div className={`p-4 rounded-full mb-3 shadow-lg ${colorScheme === 'blue' ? 'bg-white/20 text-white' : 'bg-rose-600 text-white shadow-rose-200 dark:shadow-none'}`}>
+                    <div className="p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow bg-card">
+                        <div className="p-4 rounded-full mb-3 shadow-lg text-white"
+                            style={{
+                                backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : colorScheme === 'purple' ? '#5B21B6' : colorScheme === 'red' ? '#991B1B' : colorScheme === 'amber' ? '#B45309' : '#006B3F'
+                            }}>
                             <UserX className="h-8 w-8" />
                         </div>
-                        <p className={`text-sm font-medium mb-1 ${colorScheme === 'blue' ? '!text-white' : 'text-muted'}`}>Absent</p>
-                        <p className={`text-2xl font-bold ${colorScheme === 'blue' ? '!text-white' : 'text-primary-text'}`}>{employeeStats.absent}</p>
+                        <p className="text-sm font-medium mb-1 text-muted">Absent</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.absent}</p>
                     </div>
-                    <div className={`p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow ${colorScheme === 'blue' ? '!bg-blue-500 !text-white' : 'bg-card'}`}>
-                        <div className={`p-4 rounded-full mb-3 shadow-lg ${colorScheme === 'blue' ? 'bg-white/20 text-white' : 'bg-blue-600 text-white shadow-blue-200 dark:shadow-none'}`}>
+                    <div className="p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow bg-card">
+                        <div className="p-4 rounded-full mb-3 shadow-lg text-white"
+                            style={{
+                                backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : colorScheme === 'purple' ? '#5B21B6' : colorScheme === 'red' ? '#991B1B' : colorScheme === 'amber' ? '#B45309' : '#006B3F'
+                            }}>
                             <Clock className="h-8 w-8" />
                         </div>
-                        <p className={`text-sm font-medium mb-1 ${colorScheme === 'blue' ? '!text-white' : 'text-muted'}`}>Overtime</p>
-                        <p className={`text-2xl font-bold ${colorScheme === 'blue' ? '!text-white' : 'text-primary-text'}`}>{employeeStats.ot}h</p>
+                        <p className="text-sm font-medium mb-1 text-muted">Overtime</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.ot}h</p>
                     </div>
-                    <div className={`p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow ${colorScheme === 'blue' ? '!bg-blue-500 !text-white' : 'bg-card'}`}>
-                        <div className={`p-4 rounded-full mb-3 shadow-lg ${colorScheme === 'blue' ? 'bg-white/20 text-white' : 'bg-purple-600 text-white shadow-purple-200 dark:shadow-none'}`}>
+                    <div className="p-6 rounded-xl shadow-sm border border-border flex flex-col items-center justify-center text-center hover:shadow-md transition-shadow bg-card">
+                        <div className="p-4 rounded-full mb-3 shadow-lg text-white"
+                            style={{
+                                backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : colorScheme === 'purple' ? '#5B21B6' : colorScheme === 'red' ? '#991B1B' : colorScheme === 'amber' ? '#B45309' : '#006B3F'
+                            }}>
                             <TrendingUp className="h-8 w-8" />
                         </div>
-                        <p className={`text-sm font-medium mb-1 ${colorScheme === 'blue' ? '!text-white' : 'text-muted'}`}>Comp Offs</p>
-                        <p className={`text-2xl font-bold ${colorScheme === 'blue' ? '!text-white' : 'text-primary-text'}`}>{employeeStats.compOff}</p>
+                        <p className="text-sm font-medium mb-1 text-muted">Comp Offs</p>
+                        <p className="text-2xl font-bold text-primary-text">{employeeStats.compOff}</p>
                     </div>
                 </div>
 

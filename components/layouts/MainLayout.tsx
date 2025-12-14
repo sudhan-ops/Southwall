@@ -63,9 +63,15 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
         : [];
 
     // Dynamic accent colors based on branding
-    const accentColors = colorScheme === 'blue' 
-        ? { bg: '#1a3a6e', border: '#0f2548' }
-        : { bg: '#006B3F', border: '#005632' };
+    const accentColors = (() => {
+        switch (colorScheme) {
+            case 'blue': return { bg: '#1a3a6e', border: '#0f2548' };
+            case 'purple': return { bg: '#5B21B6', border: '#4C1D95' };
+            case 'red': return { bg: '#991B1B', border: '#7F1D1D' };
+            case 'amber': return { bg: '#B45309', border: '#92400E' };
+            default: return { bg: '#006B3F', border: '#005632' }; // green
+        }
+    })();
 
     const handleLinkClick = (e: React.MouseEvent) => {
         // On mobile, if collapsed, clicking an icon should expand the sidebar instead of navigating
@@ -84,20 +90,28 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
     return (
         <div className="flex flex-col">
             {hideHeader && isCollapsed && (
-                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
-                    <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md ${colorScheme === 'blue' ? 'text-white hover:bg-white/10' : 'text-white hover:bg-white/10'} focus:outline-none`} aria-label="Go to profile page">
+                <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
+                    style={{
+                        borderColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
+                        backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                    }}>
+                    <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/10 focus:outline-none`} aria-label="Go to profile page">
                         <span className="sr-only">Go to profile</span>
                         <ArrowLeft className="block h-6 w-6" />
                     </button>
                 </div>
             )}
             {hideHeader && !isCollapsed && (
-                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-[#1f3d2b] bg-[#041b0f]'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
+                <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
+                    style={{
+                        borderColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
+                        backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                    }}>
                     {/* Empty header - just background color */}
                 </div>
             )}
             {!hideHeader && (
-                <div className={`p-4 border-b ${colorScheme === 'blue' ? 'border-[#1e293b] bg-[#0f172a]' : 'border-gray-200 bg-white'} flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
+                <div className={`p-4 border-b border-gray-200 bg-white flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}>
                     {isCollapsed ? (
                         <div className="h-8 w-8 overflow-hidden">
                             <Logo className="h-8 max-w-none object-left object-cover" />
@@ -240,7 +254,11 @@ const MainLayout: React.FC = () => {
             )}
 
             {/* Sidebar - Overlay on mobile, fixed on desktop */}
-            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? (colorScheme === 'blue' ? 'bg-[#0f172a] border-r border-[#1e293b]' : 'bg-[#041b0f] border-r border-[#1f3d2b]') : (colorScheme === 'blue' ? 'bg-[#0f172a] border-r border-[#1e293b]' : 'bg-white border-r border-gray-200/60')} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}>
+            <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? 'border-r' : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}
+                style={isMobile ? {
+                    backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f',
+                    borderRightColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b'
+                } : undefined}>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarContent
                         isCollapsed={isSidebarCollapsed}

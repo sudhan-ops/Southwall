@@ -147,11 +147,12 @@ const BrandingManager: React.FC = () => {
 
   useEffect(() => {
     const body = document.body;
-    if (colorScheme === 'blue') {
-      body.classList.add('blue-theme');
-    } else {
-      body.classList.remove('blue-theme');
-    }
+    
+    // Remove all theme classes first
+    body.classList.remove('blue-theme', 'green-theme', 'purple-theme', 'red-theme', 'amber-theme');
+    
+    // Add the current theme class
+    body.classList.add(`${colorScheme}-theme`);
   }, [colorScheme]);
 
   return null;

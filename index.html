@@ -761,6 +761,44 @@
         cursor: not-allowed;
       }
 
+      /* Default nav text - dark for unselected items */
+      nav a span,
+      nav button span {
+        color: #334155 !important;
+      }
+
+      /* =========================================
+         GREEN THEME (Paradigm Nature) - Default
+         Apply .green-theme class to body to activate
+         ========================================= */
+
+      /* Green theme sidebar nav - unselected items have dark text */
+      .green-theme nav a span,
+      .green-theme nav button span {
+        color: #334155 !important;
+      }
+
+      /* Green theme active/selected nav - white text */
+      .green-theme nav a.bg-accent span,
+      .green-theme nav a[class*="bg-accent"] span {
+        color: #ffffff !important;
+      }
+
+      .green-theme nav a.bg-accent,
+      .green-theme nav a[class*="bg-accent"] {
+        background-color: #006B3F !important;
+      }
+
+      /* Green theme - force active nav background */
+      .green-theme nav a[class~="bg-accent"],
+      .green-theme nav button[class~="bg-accent"] {
+        background-color: #006B3F !important;
+      }
+
+      .green-theme .text-muted {
+        color: #64748b !important;
+      }
+
       /* =========================================
          BLUE THEME (SouthWall Security)
          Apply .blue-theme class to body to activate
@@ -819,9 +857,16 @@
         --tw-ring-color: #1a3a6e !important;
       }
 
-      /* Sidebar active link */
+      /* Blue theme active nav background */
       .blue-theme nav a.bg-accent,
       .blue-theme nav a[class*="bg-accent"] {
+        background-color: #1a3a6e !important;
+      }
+
+      /* Blue theme - force active nav background */
+      .blue-theme nav a[class~="bg-accent"],
+      .blue-theme nav button[class~="bg-accent"],
+      .blue-theme .bg-accent {
         background-color: #1a3a6e !important;
       }
 
@@ -866,9 +911,15 @@
         color: #334155 !important;
       }
 
-      /* SIDEBAR NAV (MainLayout): Always white text on Dark Sidebar */
+      /* Blue theme sidebar nav - unselected items have dark text */
       .blue-theme nav a span,
-      nav a span {
+      .blue-theme nav button span {
+        color: #334155 !important;
+      }
+
+      /* Blue theme active/selected nav - white text */
+      .blue-theme nav a.bg-accent span,
+      .blue-theme nav a[class*="bg-accent"] span {
         color: #ffffff !important;
       }
 
@@ -1066,9 +1117,331 @@
         animation: pulse-bg-blue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
 
+      /* =========================================
+         PURPLE THEME (Royal Premium)
+         Apply .purple-theme class to body to activate
+         ========================================= */
+
+      .purple-theme .bg-accent-light {
+        background-color: rgba(91, 33, 182, 0.1) !important;
+      }
+
+      .purple-theme .bg-accent {
+        background-color: #5b21b6 !important;
+      }
+
+      .purple-theme .text-accent {
+        color: #5b21b6 !important;
+      }
+
+      .purple-theme .text-accent-dark {
+        color: #4c1d95 !important;
+      }
+
+      .purple-theme .btn-primary {
+        background-color: #5b21b6 !important;
+        border-color: #4c1d95 !important;
+      }
+
+      .purple-theme .btn-primary:hover {
+        background-color: #4c1d95 !important;
+      }
+
+      .purple-theme .btn-outline {
+        border-color: #5b21b6 !important;
+        color: #5b21b6 !important;
+      }
+
+      .purple-theme .btn-outline:hover {
+        background-color: rgba(91, 33, 182, 0.1) !important;
+      }
+
+      .purple-theme .border-accent {
+        border-color: #5b21b6 !important;
+      }
+
+      .purple-theme input[type="checkbox"]:checked {
+        background-color: #5b21b6 !important;
+        border-color: #5b21b6 !important;
+      }
+
+      .purple-theme .form-input:focus {
+        border-color: #5b21b6 !important;
+        box-shadow: 0 0 0 1px #5b21b6 !important;
+      }
+
+      .purple-theme .text-primary-text,
+      .purple-theme h1,
+      .purple-theme h2,
+      .purple-theme h3,
+      .purple-theme h4,
+      .purple-theme h5,
+      .purple-theme h6 {
+        color: #0f172a !important;
+      }
+
+      /* Purple theme sidebar nav - unselected items have dark text */
+      .purple-theme nav a span,
+      .purple-theme nav button span {
+        color: #334155 !important;
+      }
+
+      /* Purple theme active/selected nav - white text */
+      .purple-theme nav a.bg-accent span,
+      .purple-theme nav a[class*="bg-accent"] span {
+        color: #ffffff !important;
+      }
+
+      .purple-theme nav a.bg-accent,
+      .purple-theme nav a[class*="bg-accent"] {
+        background-color: #5B21B6 !important;
+      }
+
+      /* Purple theme - force active nav background */
+      .purple-theme nav a[class~="bg-accent"],
+      .purple-theme nav button[class~="bg-accent"],
+      .purple-theme .bg-accent {
+        background-color: #5B21B6 !important;
+      }
+
+      .purple-theme .text-muted {
+        color: #64748b !important;
+      }
+
+      /* =========================================
+         RED THEME (Crimson Bold)
+         Apply .red-theme class to body to activate
+         ========================================= */
+
+      .red-theme .bg-accent-light {
+        background-color: rgba(153, 27, 27, 0.1) !important;
+      }
+
+      .red-theme .bg-accent {
+        background-color: #991b1b !important;
+      }
+
+      .red-theme .text-accent {
+        color: #991b1b !important;
+      }
+
+      .red-theme .text-accent-dark {
+        color: #7f1d1d !important;
+      }
+
+      .red-theme .btn-primary {
+        background-color: #991b1b !important;
+        border-color: #7f1d1d !important;
+      }
+
+      .red-theme .btn-primary:hover {
+        background-color: #7f1d1d !important;
+      }
+
+      .red-theme .btn-outline {
+        border-color: #991b1b !important;
+        color: #991b1b !important;
+      }
+
+      .red-theme .btn-outline:hover {
+        background-color: rgba(153, 27, 27, 0.1) !important;
+      }
+
+      .red-theme .border-accent {
+        border-color: #991b1b !important;
+      }
+
+      .red-theme input[type="checkbox"]:checked {
+        background-color: #991b1b !important;
+        border-color: #991b1b !important;
+      }
+
+      .red-theme .form-input:focus {
+        border-color: #991b1b !important;
+        box-shadow: 0 0 0 1px #991b1b !important;
+      }
+
+      .red-theme .text-primary-text,
+      .red-theme h1,
+      .red-theme h2,
+      .red-theme h3,
+      .red-theme h4,
+      .red-theme h5,
+      .red-theme h6 {
+        color: #0f172a !important;
+      }
+
+      /* Red theme sidebar nav - unselected items have dark text */
+      .red-theme nav a span,
+      .red-theme nav button span {
+        color: #334155 !important;
+      }
+
+      /* Red theme active/selected nav - white text */
+      .red-theme nav a.bg-accent span,
+      .red-theme nav a[class*="bg-accent"] span {
+        color: #ffffff !important;
+      }
+
+      .red-theme nav a.bg-accent,
+      .red-theme nav a[class*="bg-accent"] {
+        background-color: #991B1B !important;
+      }
+
+      /* Red theme - force active nav background */
+      .red-theme nav a[class~="bg-accent"],
+      .red-theme nav button[class~="bg-accent"],
+      .red-theme .bg-accent {
+        background-color: #991B1B !important;
+      }
+
+      .red-theme .text-muted {
+        color: #64748b !important;
+      }
+
+      /* =========================================
+         AMBER THEME (Warm Gold)
+         Apply .amber-theme class to body to activate
+         ========================================= */
+
+      .amber-theme .bg-accent-light {
+        background-color: rgba(180, 83, 9, 0.1) !important;
+      }
+
+      .amber-theme .bg-accent {
+        background-color: #b45309 !important;
+      }
+
+      .amber-theme .text-accent {
+        color: #b45309 !important;
+      }
+
+      .amber-theme .text-accent-dark {
+        color: #92400e !important;
+      }
+
+      .amber-theme .btn-primary {
+        background-color: #b45309 !important;
+        border-color: #92400e !important;
+      }
+
+      .amber-theme .btn-primary:hover {
+        background-color: #92400e !important;
+      }
+
+      .amber-theme .btn-outline {
+        border-color: #b45309 !important;
+        color: #b45309 !important;
+      }
+
+      .amber-theme .btn-outline:hover {
+        background-color: rgba(180, 83, 9, 0.1) !important;
+      }
+
+      .amber-theme .border-accent {
+        border-color: #b45309 !important;
+      }
+
+      .amber-theme input[type="checkbox"]:checked {
+        background-color: #b45309 !important;
+        border-color: #b45309 !important;
+      }
+
+      .amber-theme .form-input:focus {
+        border-color: #b45309 !important;
+        box-shadow: 0 0 0 1px #b45309 !important;
+      }
+
+      .amber-theme .text-primary-text,
+      .amber-theme h1,
+      .amber-theme h2,
+      .amber-theme h3,
+      .amber-theme h4,
+      .amber-theme h5,
+      .amber-theme h6 {
+        color: #0f172a !important;
+      }
+
+      /* Amber theme sidebar nav - unselected items have dark text */
+      .amber-theme nav a span,
+      .amber-theme nav button span {
+        color: #334155 !important;
+      }
+
+      /* Amber theme active/selected nav - white text */
+      .amber-theme nav a.bg-accent span,
+      .amber-theme nav a[class*="bg-accent"] span {
+        color: #ffffff !important;
+      }
+
+      .amber-theme nav a.bg-accent,
+      .amber-theme nav a[class*="bg-accent"] {
+        background-color: #B45309 !important;
+      }
+
+      /* Amber theme - force active nav background */
+      .amber-theme nav a[class~="bg-accent"],
+      .amber-theme nav button[class~="bg-accent"],
+      .amber-theme .bg-accent {
+        background-color: #B45309 !important;
+      }
+
+      .amber-theme .text-muted {
+        color: #64748b !important;
+      }
+
       /* Mobile overrides for buttons */
       @media (max-width: 768px) {
-        /* Universal button styling - Green primary style */
+        /* Theme-specific button colors on mobile */
+        .blue-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
+        .blue-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
+          background-color: #1a3a6e !important;
+          box-shadow: 0 2px 8px rgba(26, 58, 110, 0.3) !important;
+        }
+
+        .blue-theme button:hover:not(.btn-icon),
+        .blue-theme .btn:hover:not(.btn-icon) {
+          background-color: #0f2548 !important;
+          box-shadow: 0 4px 12px rgba(26, 58, 110, 0.4) !important;
+        }
+
+        .purple-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
+        .purple-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
+          background-color: #5B21B6 !important;
+          box-shadow: 0 2px 8px rgba(91, 33, 182, 0.3) !important;
+        }
+
+        .purple-theme button:hover:not(.btn-icon),
+        .purple-theme .btn:hover:not(.btn-icon) {
+          background-color: #4C1D95 !important;
+          box-shadow: 0 4px 12px rgba(91, 33, 182, 0.4) !important;
+        }
+
+        .red-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
+        .red-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
+          background-color: #991B1B !important;
+          box-shadow: 0 2px 8px rgba(153, 27, 27, 0.3) !important;
+        }
+
+        .red-theme button:hover:not(.btn-icon),
+        .red-theme .btn:hover:not(.btn-icon) {
+          background-color: #7F1D1D !important;
+          box-shadow: 0 4px 12px rgba(153, 27, 27, 0.4) !important;
+        }
+
+        .amber-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
+        .amber-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
+          background-color: #B45309 !important;
+          box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3) !important;
+        }
+
+        .amber-theme button:hover:not(.btn-icon),
+        .amber-theme .btn:hover:not(.btn-icon) {
+          background-color: #92400E !important;
+          box-shadow: 0 4px 12px rgba(180, 83, 9, 0.4) !important;
+        }
+
+        /* Default green theme for mobile */
         button:not(nav button):not(.btn-icon):not(.btn-secondary):not(
           .google-btn
         ):not(.signin-btn):not(.btn-danger),
@@ -1333,8 +1706,8 @@
         .blue-theme .modal-content,
         .blue-theme div[role="dialog"],
         .blue-theme .fixed > div[role="dialog"] {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important; 
+          background-color: #ffffff !important;
+          border-color: #e2e8f0 !important;
         }
 
         /* Ensure Blue Theme Modal Text is Dark */
@@ -1345,25 +1718,25 @@
         .blue-theme [role="dialog"] div,
         .blue-theme .modal-content *,
         .blue-theme div[role="dialog"] * {
-             color: #0f172a !important;
+          color: #0f172a !important;
         }
 
         /* Fix Bottom Nav Text Color to allow inheritance (Blue/Gray) */
         #mobile-bottom-nav a span,
         .blue-theme #mobile-bottom-nav a span {
-             color: inherit !important;
+          color: inherit !important;
         }
 
         /* Fix Profile Attendance Card Background (Force Light) */
         .blue-theme .fo-attendance-card,
         .blue-theme [class*="attendance-card"] {
-             background-color: #f9fafb !important;
-             border: 1px solid #e5e7eb !important;
-             color: #111827 !important;
+          background-color: #f9fafb !important;
+          border: 1px solid #e5e7eb !important;
+          color: #111827 !important;
         }
-        .blue-theme .fo-attendance-card p, 
+        .blue-theme .fo-attendance-card p,
         .blue-theme .fo-attendance-card strong {
-              color: #111827 !important;
+          color: #111827 !important;
         }
 
         /* Light gray backgrounds to dark green */

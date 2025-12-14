@@ -54,9 +54,17 @@ export const ApiSettings: React.FC = () => {
         }
     };
 
+    const themeNames: Record<ColorScheme, string> = {
+        blue: 'SouthWall Blue',
+        green: 'Paradigm Green',
+        purple: 'Royal Purple',
+        red: 'Crimson Red',
+        amber: 'Amber Gold'
+    };
+
     const handleColorSchemeChange = (scheme: ColorScheme) => {
         setColorScheme(scheme);
-        setToast({ message: `Color scheme changed to ${scheme === 'green' ? 'Paradigm (Green)' : 'SouthWall (Blue)'}`, type: 'success' });
+        setToast({ message: `Color scheme changed to ${themeNames[scheme]}`, type: 'success' });
     };
 
     return (
@@ -74,24 +82,8 @@ export const ApiSettings: React.FC = () => {
                     {/* Color Scheme Selection */}
                     <SettingsCard title="Color Scheme" icon={Palette}>
                         <p className="text-sm text-muted -mt-2">Choose the application's primary color scheme.</p>
-                        <div className="flex flex-wrap gap-4 pt-4">
-                            <button
-                                type="button"
-                                onClick={() => handleColorSchemeChange('green')}
-                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                                    colorScheme === 'green' 
-                                        ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
-                                        : 'border-border hover:border-green-300'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-[#006B3F] flex items-center justify-center">
-                                    <span className="text-white font-bold text-sm">P</span>
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-semibold text-primary-text">Paradigm (Green)</p>
-                                    <p className="text-xs text-muted">Default theme</p>
-                                </div>
-                            </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
+                            {/* SouthWall Blue */}
                             <button
                                 type="button"
                                 onClick={() => handleColorSchemeChange('blue')}
@@ -101,12 +93,88 @@ export const ApiSettings: React.FC = () => {
                                         : 'border-border hover:border-blue-300'
                                 }`}
                             >
-                                <div className="w-10 h-10 rounded-full bg-[#1a3a6e] flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-full bg-[#1a3a6e] flex items-center justify-center flex-shrink-0">
                                     <span className="text-white font-bold text-sm">S</span>
                                 </div>
                                 <div className="text-left">
-                                    <p className="font-semibold text-primary-text">SouthWall (Blue)</p>
+                                    <p className="font-semibold text-primary-text">SouthWall Blue</p>
                                     <p className="text-xs text-muted">Security theme</p>
+                                </div>
+                            </button>
+                            
+                            {/* Paradigm Green */}
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('green')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'green' 
+                                        ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                                        : 'border-border hover:border-green-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#006B3F] flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm">P</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">Paradigm Green</p>
+                                    <p className="text-xs text-muted">Nature theme</p>
+                                </div>
+                            </button>
+
+                            {/* Royal Purple */}
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('purple')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'purple' 
+                                        ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200' 
+                                        : 'border-border hover:border-purple-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#5B21B6] flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm">R</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">Royal Purple</p>
+                                    <p className="text-xs text-muted">Premium theme</p>
+                                </div>
+                            </button>
+
+                            {/* Crimson Red */}
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('red')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'red' 
+                                        ? 'border-red-500 bg-red-50 ring-2 ring-red-200' 
+                                        : 'border-border hover:border-red-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#991B1B] flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm">C</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">Crimson Red</p>
+                                    <p className="text-xs text-muted">Bold theme</p>
+                                </div>
+                            </button>
+
+                            {/* Amber Gold */}
+                            <button
+                                type="button"
+                                onClick={() => handleColorSchemeChange('amber')}
+                                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                                    colorScheme === 'amber' 
+                                        ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200' 
+                                        : 'border-border hover:border-orange-300'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full bg-[#B45309] flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white font-bold text-sm">A</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-semibold text-primary-text">Amber Gold</p>
+                                    <p className="text-xs text-muted">Warm theme</p>
                                 </div>
                             </button>
                         </div>
