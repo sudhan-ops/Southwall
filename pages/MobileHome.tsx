@@ -13,20 +13,7 @@ const MobileHome: React.FC = () => {
     const { colorScheme } = useBrandingStore();
     const navigate = useNavigate();
 
-    const themeColors = colorScheme === 'blue'
-        ? {
-            bg: 'bg-slate-50',
-            cardBg: '!bg-blue-500 shadow-md',
-            iconBg: 'bg-white/10',
-            border: 'border-blue-500/10',
-            highlightBorder: 'border-white/20',
-            iconColor: '!text-white',
-            textColor: '!text-white',
-            subTextColor: '!text-white',
-            headingColor: '!text-[#0f172a]',
-            cardHeadingColor: '!text-white'
-        }
-        : {
+    const themeColors = {
             bg: 'bg-[#041b0f]',
             cardBg: 'bg-[#041b0f]',
             iconBg: 'bg-[#041b0f]',

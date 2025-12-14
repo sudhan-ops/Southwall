@@ -35,7 +35,7 @@ const UniformStatusChip: React.FC<{ status: UniformRequest['status'] }> = ({ sta
       'Issued': 'bg-green-50 text-green-700 border border-green-200',
       'Rejected': 'bg-red-50 text-red-700 border border-red-200',
     };
-    const styles = colorScheme === 'blue' ? lightStyles : darkStyles;
+    const styles = darkStyles;
     return <span className={`fo-status-badge ${styles[status]}`}>{status}</span>;
 };
 
@@ -372,15 +372,15 @@ const UniformRequests: React.FC = () => {
     }
 
     return (
-        <div className={`h-full flex flex-col ${colorScheme === 'blue' ? 'bg-slate-50 text-slate-900' : 'bg-[#041b0f] text-white'}`}>
+        <div className={`h-full flex flex-col bg-[#041b0f] text-white`}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <Modal isOpen={!!deletingRequest} onClose={() => setDeletingRequest(null)} onConfirm={handleConfirmDelete} title="Confirm Deletion">
                 Are you sure you want to delete this uniform request? This cannot be undone.
             </Modal>
 
-            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header ${colorScheme === 'blue' ? 'bg-white border-slate-200 text-slate-900 border-b' : ''}`}>
+            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header`}>
                 <h1 className="text-lg font-semibold">Uniform Requests</h1>
-                <button onClick={handleNewRequest} aria-label="New Uniform Request" className={`${colorScheme === 'blue' ? 'text-slate-700 hover:bg-slate-100 p-2 rounded-full' : ''}`}>
+                <button onClick={handleNewRequest} aria-label="New Uniform Request" className={``}>
                     <UserPlus className="h-6 w-6" />
                 </button>
             </header>
@@ -388,16 +388,16 @@ const UniformRequests: React.FC = () => {
             <main className="flex-1 overflow-y-auto p-4 space-y-3">
                 {requests.length > 0 ? (
                     requests.map(req => (
-                        <div key={req.id} className={`p-3 rounded-xl border ${colorScheme === 'blue' ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#243524] border-[#374151]'}`}>
+                        <div key={req.id} className={`p-3 rounded-xl border bg-[#243524] border-[#374151]`}>
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className={`font-semibold ${colorScheme === 'blue' ? 'text-slate-900' : 'text-white'}`}>{req.siteName}</p>
-                                    <p className={`text-xs ${colorScheme === 'blue' ? 'text-slate-500' : 'text-gray-400'}`}>{format(new Date(req.requestedDate), 'dd MMM, yyyy')}</p>
+                                    <p className={`font-semibold text-white`}>{req.siteName}</p>
+                                    <p className={`text-xs text-gray-400`}>{format(new Date(req.requestedDate), 'dd MMM, yyyy')}</p>
                                 </div>
                                 <UniformStatusChip status={req.status} />
                             </div>
                             <div className="mt-3 flex justify-between items-end">
-                                <div className={`text-sm ${colorScheme === 'blue' ? 'text-slate-600' : 'text-gray-300'}`}>
+                                <div className={`text-sm text-gray-300`}>
                                     <p>{req.gender} Uniforms</p>
                                     <p className="font-semibold">{totalItems(req.items)} Items</p>
                                 </div>
@@ -411,7 +411,7 @@ const UniformRequests: React.FC = () => {
                         </div>
                     ))
                 ) : (
-                    <div className={`text-center pt-16 ${colorScheme === 'blue' ? 'text-slate-400' : 'text-muted'}`}>
+                    <div className={`text-center pt-16 text-muted`}>
                         <Shirt className="h-12 w-12 mx-auto mb-4" />
                         <p>No uniform requests found.</p>
                         <Button onClick={handleNewRequest} className="mt-4">

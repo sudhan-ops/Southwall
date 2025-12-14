@@ -57,6 +57,28 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
     const { user } = useAuthStore();
     const { permissions } = usePermissionsStore();
     const { colorScheme } = useBrandingStore();
+    const location = useLocation();
+
+    useEffect(() => {
+        // Force text color for active items to overcome stubborn global styles
+        const applyForceColor = () => {
+             const activeElements = document.querySelectorAll('.nav-active-white span, .nav-active-white svg');
+             activeElements.forEach((el) => {
+                 (el as HTMLElement).style.setProperty('color', '#ffffff', 'important');
+                 if (el.tagName === 'svg') {
+                     (el as HTMLElement).style.setProperty('fill', '#ffffff', 'important');
+                 }
+             });
+        };
+        
+        // Apply immediately and after short delays to handle transitions
+        applyForceColor();
+        const t1 = setTimeout(applyForceColor, 50);
+        const t2 = setTimeout(applyForceColor, 150);
+        
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+    }, [location.pathname, mode]);
+
     const availableNavLinks = user ? allNavLinks
         .filter(link => permissions[user.role]?.includes(link.permission))
         .sort((a, b) => a.label.localeCompare(b.label))
@@ -65,7 +87,7 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
     // Dynamic accent colors based on branding
     const accentColors = (() => {
         switch (colorScheme) {
-            case 'blue': return { bg: '#1a3a6e', border: '#0f2548' };
+
             case 'purple': return { bg: '#5B21B6', border: '#4C1D95' };
             case 'red': return { bg: '#991B1B', border: '#7F1D1D' };
             case 'amber': return { bg: '#B45309', border: '#92400E' };
@@ -92,8 +114,8 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
             {hideHeader && isCollapsed && (
                 <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
                     style={{
-                        borderColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
-                        backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                        borderColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
+                        backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
                     }}>
                     <button onClick={() => window.location.href = '/#/profile'} className={`btn-icon inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/10 focus:outline-none`} aria-label="Go to profile page">
                         <span className="sr-only">Go to profile</span>
@@ -104,8 +126,8 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
             {hideHeader && !isCollapsed && (
                 <div className={`p-4 border-b flex justify-center h-16 items-center transition-all duration-300 flex-shrink-0`}
                     style={{
-                        borderColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
-                        backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
+                        borderColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b',
+                        backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f'
                     }}>
                     {/* Empty header - just background color */}
                 </div>
@@ -135,12 +157,12 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                 : isActive
                                     ? `${colorScheme === 'purple' ? 'bg-[#5B21B6]' : colorScheme === 'red' ? 'bg-[#991B1B]' : colorScheme === 'amber' ? 'bg-[#B45309]' : 'bg-[#1c3a23]'} !text-white shadow-sm border border-white/5`
                                     : 'text-white hover:bg-white/10 hover:text-white'
-                            }`
+                            } ${isActive && mode === 'light' ? 'nav-active-white' : ''}`
                         }
                         style={({ isActive }) => {
                             if (!isActive) return {};
                             return mode === 'light'
-                                ? { backgroundColor: accentColors.bg, borderColor: accentColors.border }
+                                ? { backgroundColor: accentColors.bg, borderColor: accentColors.border, color: '#ffffff' }
                                 : {}; // Dark mode bg is handled by class
                         }}
                         title={link.label}
@@ -153,12 +175,29 @@ const SidebarContent: React.FC<{ isCollapsed: boolean, onLinkClick?: () => void,
                                         : isActive ? 'text-white' : 'text-white group-hover:text-white'
                                         } ${isCollapsed ? '' : 'mr-3'}`}
                                 />
-                                {!isCollapsed && <span className={isActive && mode === 'light' ? 'text-white' : ''}>{link.label}</span>}
+                                {!isCollapsed && (
+                                    <span
+                                        className={isActive && mode === 'light' ? '!text-white' : ''}
+                                        style={isActive && mode === 'light' ? { color: '#ffffff' } : {}}
+                                    >
+                                        {link.label}
+                                    </span>
+                                )}
                             </>
                         )}
                     </NavLink>
                 ))}
             </nav>
+
+            {/* Force override for active menu items in light mode using high specificity */}
+            <style dangerouslySetInnerHTML={{__html: `
+                .nav-active-white span, 
+                .nav-active-white svg,
+                a.nav-active-white > span {
+                    color: #ffffff !important;
+                    fill: #ffffff !important;
+                }
+            `}} />
         </div>
     );
 };
@@ -243,7 +282,7 @@ const MainLayout: React.FC = () => {
 
     return (
         // ensures the container grows as needed instead of forcing a fixed height.
-        <div className={`flex min-h-screen ${isMobile ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : 'bg-page'} ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}>
+        <div className={`flex min-h-screen ${isMobile ? 'bg-[#041b0f]' : 'bg-page'} ${!isMobile ? 'p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8' : ''}`}>
 
             {/* Backdrop for mobile when sidebar is expanded */}
             {isMobile && !isSidebarCollapsed && (
@@ -256,20 +295,20 @@ const MainLayout: React.FC = () => {
             {/* Sidebar - Overlay on mobile, fixed on desktop */}
             <aside className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out ${isMobile ? (isSidebarCollapsed ? 'w-16' : 'w-64') : (isSidebarCollapsed ? 'w-20' : 'w-72')} ${isMobile ? 'border-r' : 'bg-white border-r border-gray-200/60'} ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : ''}`}
                 style={isMobile ? {
-                    backgroundColor: colorScheme === 'blue' ? '#0f172a' : colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f',
-                    borderRightColor: colorScheme === 'blue' ? '#1e293b' : colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b'
+                    backgroundColor: colorScheme === 'purple' ? '#3B0764' : colorScheme === 'red' ? '#450A0A' : colorScheme === 'amber' ? '#451A03' : '#041b0f',
+                    borderRightColor: colorScheme === 'purple' ? '#4C1D95' : colorScheme === 'red' ? '#7F1D1D' : colorScheme === 'amber' ? '#92400E' : '#1f3d2b'
                 } : undefined}>
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                     <SidebarContent
                         isCollapsed={isSidebarCollapsed}
-                        mode={isMobile ? "dark" : (colorScheme === 'blue' ? 'dark' : 'light')} 
+                        mode={isMobile ? "dark" : 'light'} 
                         onLinkClick={isMobile ? () => setIsSidebarCollapsed(true) : undefined}
                         onExpand={() => setIsSidebarCollapsed(false)}
                         hideHeader={isMobile}
                         isMobile={isMobile}
                     />
                 </div>
-                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? (colorScheme === 'blue' ? 'border-t border-[#1e293b]' : 'border-t border-[#1f3d2b]') : (colorScheme === 'blue' ? 'border-t border-[#1e293b]' : 'border-t border-border')}`}>
+                <div className={`flex-shrink-0 px-2 pt-2 mt-auto flex items-center ${isMobile ? 'border-t border-[#1f3d2b]' : 'border-t border-border'}`}>
                     <button
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         className={`flex-1 flex items-center justify-center p-2 rounded-lg transition-colors ${isMobile ? 'text-white/70 hover:bg-white/10' : 'text-muted hover:bg-page'}`}
@@ -280,11 +319,11 @@ const MainLayout: React.FC = () => {
                 </div>
             </aside>
 
-            <div className={`flex-1 flex flex-col ${isMobile ? (colorScheme === 'blue' ? 'bg-white' : 'bg-[#041b0f]') : 'bg-gray-50/50'} ${isMobile && isSidebarCollapsed ? 'ml-16' : ''}`}>
+            <div className={`flex-1 flex flex-col ${isMobile ? 'bg-[#041b0f]' : 'bg-gray-50/50'} ${isMobile && isSidebarCollapsed ? 'ml-16' : ''}`}>
                 <Header />
 
                 {/* Main Content */}
-                <main ref={mainContentRef} className={`flex-1 overflow-y-auto ${isMobile ? (colorScheme === 'blue' ? 'bg-[#1a3a6e]' : 'bg-[#041b0f]') : 'bg-page'}`}>
+                <main ref={mainContentRef} className={`flex-1 overflow-y-auto ${isMobile ? 'bg-[#041b0f]' : 'bg-page'}`}>
                     <div className="p-4">
                         {/* Bordered Card Container removed to fix white screen issue */}
                         <Outlet />

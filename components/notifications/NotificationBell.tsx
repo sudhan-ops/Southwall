@@ -33,7 +33,7 @@ const NotificationIcon: React.FC<{ type: NotificationType }> = ({ type }) => {
 const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) => {
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
     const { colorScheme } = useBrandingStore();
-    const isBlue = colorScheme !== 'green';
+    const isBlue = false;
     const isMobile = useMediaQuery('(max-width: 767px)');
     const [isOpen, setIsOpen] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ const NotificationBell: React.FC<{ className?: string }> = ({ className = '' }) 
             <button
                 ref={triggerRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`btn-icon relative p-2 rounded-full hover:bg-page ${isMobile && colorScheme === 'blue' ? 'text-white hover:text-gray-200' : 'text-muted'}`}
+                className={`btn-icon relative p-2 rounded-full hover:bg-page text-muted`}
                 aria-label={`Notifications (${unreadCount} unread)`}
             >
                 <Bell className="h-5 w-5" />

@@ -24,15 +24,15 @@ const Button: React.FC<ButtonProps> = ({
   const getDynamicStyles = () => {
     if (variant === 'primary') {
       return {
-        backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F',
-        borderColor: colorScheme === 'blue' ? '#0f2548' : '#005632',
+        backgroundColor: '#006B3F',
+        borderColor: '#005632',
         color: '#FFFFFF'
       };
     }
     if (variant === 'outline') {
       return {
-        borderColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F',
-        color: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F'
+        borderColor: '#006B3F',
+        color: '#006B3F'
       };
     }
     return {};

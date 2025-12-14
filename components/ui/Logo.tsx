@@ -12,7 +12,7 @@ const Logo: React.FC<LogoProps> = ({ className = '' }) => {
   // Theme-specific colors for logo text
   const textColor = (() => {
     switch (colorScheme) {
-      case 'blue': return '#1a3a6e';
+
       case 'purple': return '#5B21B6';
       case 'red': return '#991B1B';
       case 'amber': return '#B45309';
