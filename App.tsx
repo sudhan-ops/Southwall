@@ -108,6 +108,9 @@ import Review from './pages/onboarding/Review';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { IdleTimeoutManager } from './components/auth/IdleTimeoutManager';
 import ScrollToTop from './components/ScrollToTop';
+import PatrolDashboard from './pages/patrol/PatrolDashboard';
+import { PatrolScanner } from './components/patrol/PatrolScanner';
+import { PatrolQRGenerator } from './components/patrol/PatrolQRGenerator';
 
 // Theme Manager
 const ThemeManager: React.FC = () => {
@@ -573,11 +576,14 @@ const App: React.FC = () => {
           <Route element={<ProtectedRoute requiredPermission="manage_approval_workflow" />}>
             <Route path="admin/approval-workflow" element={<ApprovalWorkflow />} />
             <Route path="admin/approval-workflow/chart" element={<WorkflowChartFullScreen />} />
+            <Route path="admin/patrol/dashboard" element={<PatrolDashboard />} />
+            <Route path="admin/patrol/qr-codes" element={<PatrolQRGenerator />} />
           </Route>
 
           {/* Developer */}
           <Route element={<ProtectedRoute requiredPermission="view_developer_settings" />}>
             <Route path="developer/api" element={<ApiSettings />} />
+            <Route path="patrol/scan" element={<PatrolScanner />} />
           </Route>
 
           {/* Operations & Site */}

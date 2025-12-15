@@ -27,6 +27,9 @@ import type {
   OnboardingData,
   Organization,
   OrganizationGroup,
+  PatrolDailyScore,
+  PatrolLog,
+  PatrolQRCode,
   PerfiosVerificationData,
   Policy,
   RecurringHolidayRule,
@@ -2379,5 +2382,111 @@ export const api = {
       type: "info",
       link: `/user-management`,
     });
+  },
+
+  // --- Security Patrolling ---
+  getPatrolQrCodes: async (siteId?: string): Promise<PatrolQRCode[]> => {
+    let query = supabase.from("patrol_qr_codes").select("*");
+    if (siteId) query = query.eq("site_id", siteId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data || []).map(toCamelCase);
+  },
+
+  createPatrolQrCode: async (
+    data: Partial<PatrolQRCode>,
+  ): Promise<PatrolQRCode> => {
+    const { data: created, error } = await supabase.from("patrol_qr_codes")
+      .insert(
+        toSnakeCase(data),
+      ).select().single();
+    if (error) throw error;
+    return toCamelCase(created);
+  },
+
+  updatePatrolQrCode: async (
+    id: string,
+    updates: Partial<PatrolQRCode>,
+  ): Promise<void> => {
+    const { error } = await supabase.from("patrol_qr_codes").update(
+      toSnakeCase(updates),
+    ).eq("id", id);
+    if (error) throw error;
+  },
+
+  deletePatrolQrCode: async (id: string): Promise<void> => {
+    const { error } = await supabase.from("patrol_qr_codes").delete().eq(
+      "id",
+      id,
+    );
+    if (error) throw error;
+  },
+
+  submitPatrolLog: async (log: Omit<PatrolLog, "id">): Promise<void> => {
+    // If photo is provided as data URL, upload it first
+    let photoUrl = log.photoUrl;
+    if (photoUrl && photoUrl.startsWith("data:")) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error("User not authenticated");
+
+      const blob = await dataUrlToBlob(photoUrl);
+      const fileExt = "jpg";
+      const filePath = `${session.user.id}/patrols/${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from(
+        "task-attachments",
+      ).upload(filePath, blob);
+
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("task-attachments")
+        .getPublicUrl(filePath);
+      photoUrl = publicUrl;
+    }
+
+    const dbLog = {
+      ...toSnakeCase(log),
+      photo_url: photoUrl,
+    };
+
+    const { error } = await supabase.from("patrol_logs").insert(dbLog);
+    if (error) throw error;
+  },
+
+  getPatrolLogs: async (
+    date: string,
+    siteId?: string,
+  ): Promise<PatrolLog[]> => {
+    // filtering by siteId would require a join, use explicit join syntax or multiple queries
+    // For simplicity, we assume we might need a custom RPC or just fetch all for now if site filtering is complex via JS SDK without foreign key definitions in generated types
+    let query = supabase.from("patrol_logs").select(
+      "*, patrol_qr_codes!inner(site_id)",
+    )
+      .gte("scan_time", `${date}T00:00:00`)
+      .lte("scan_time", `${date}T23:59:59`)
+      .order("scan_time", { ascending: false });
+
+    if (siteId) {
+      query = query.eq("patrol_qr_codes.site_id", siteId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    // map the inner joined data if needed, or just return flattened
+    // The toCamelCase helper might need adjustment if nested objects return
+    return (data || []).map(toCamelCase);
+  },
+
+  getPatrolDailyScores: async (date: string): Promise<PatrolDailyScore[]> => {
+    const { data, error } = await supabase.from("patrol_daily_scores")
+      .select("*")
+      .eq("date", date);
+    if (error) throw error;
+    return (data || []).map(toCamelCase);
+  },
+
+  getCheckpoints: async (siteId: string): Promise<PatrolQRCode[]> => {
+    const { data, error } = await supabase.from("patrol_qr_codes").select("*")
+      .eq("site_id", siteId).eq("status", "active");
+    if (error) throw error;
+    return (data || []).map(toCamelCase);
   },
 };

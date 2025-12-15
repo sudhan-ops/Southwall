@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType } from "react";
 
 export type UserRole = string;
 
@@ -8,32 +8,32 @@ export interface Role {
 }
 
 export type Permission =
-  | 'view_all_submissions'
-  | 'manage_users'
-  | 'manage_sites'
-  | 'view_entity_management'
-  | 'view_developer_settings'
-  | 'view_operations_dashboard'
-  | 'view_site_dashboard'
-  | 'create_enrollment'
-  | 'manage_roles_and_permissions'
-  | 'manage_attendance_rules'
-  | 'view_own_attendance'
-  | 'view_all_attendance'
-  | 'apply_for_leave'
-  | 'manage_leave_requests'
-  | 'manage_approval_workflow'
-  | 'download_attendance_report'
-  | 'manage_tasks'
-  | 'manage_policies'
-  | 'manage_insurance'
-  | 'manage_enrollment_rules'
-  | 'manage_uniforms'
-  | 'view_invoice_summary'
-  | 'view_verification_costing'
-  | 'view_field_officer_tracking'
-  | 'manage_modules'
-  | 'access_support_desk';
+  | "view_all_submissions"
+  | "manage_users"
+  | "manage_sites"
+  | "view_entity_management"
+  | "view_developer_settings"
+  | "view_operations_dashboard"
+  | "view_site_dashboard"
+  | "create_enrollment"
+  | "manage_roles_and_permissions"
+  | "manage_attendance_rules"
+  | "view_own_attendance"
+  | "view_all_attendance"
+  | "apply_for_leave"
+  | "manage_leave_requests"
+  | "manage_approval_workflow"
+  | "download_attendance_report"
+  | "manage_tasks"
+  | "manage_policies"
+  | "manage_insurance"
+  | "manage_enrollment_rules"
+  | "manage_uniforms"
+  | "view_invoice_summary"
+  | "view_verification_costing"
+  | "view_field_officer_tracking"
+  | "manage_modules"
+  | "access_support_desk";
 
 export interface AppModule {
   id: string;
@@ -93,20 +93,27 @@ export interface PersonalDetails {
   lastName: string;
   preferredName?: string;
   dob: string;
-  gender: 'Male' | 'Female' | 'Other' | '';
-  maritalStatus: 'Single' | 'Married' | 'Divorced' | 'Widowed' | '';
-  bloodGroup: '' | 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  gender: "Male" | "Female" | "Other" | "";
+  maritalStatus: "Single" | "Married" | "Divorced" | "Widowed" | "";
+  bloodGroup: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   mobile: string;
   alternateMobile?: string;
   email: string;
-  idProofType?: 'Aadhaar' | 'PAN' | 'Voter ID' | '';
+  idProofType?: "Aadhaar" | "PAN" | "Voter ID" | "";
   idProofNumber?: string;
   photo?: UploadedFile | null;
   idProofFront?: UploadedFile | null;
   idProofBack?: UploadedFile | null;
   emergencyContactName: string;
   emergencyContactNumber: string;
-  relationship: 'Spouse' | 'Child' | 'Father' | 'Mother' | 'Sibling' | 'Other' | '';
+  relationship:
+    | "Spouse"
+    | "Child"
+    | "Father"
+    | "Mother"
+    | "Sibling"
+    | "Other"
+    | "";
   salary: number | null;
   verifiedStatus?: {
     name?: boolean | null;
@@ -139,10 +146,10 @@ export interface AddressDetails {
 
 export interface FamilyMember {
   id: string;
-  relation: 'Spouse' | 'Child' | 'Father' | 'Mother' | '';
+  relation: "Spouse" | "Child" | "Father" | "Mother" | "";
   name: string;
   dob: string;
-  gender: 'Male' | 'Female' | 'Other' | '';
+  gender: "Male" | "Female" | "Other" | "";
   occupation?: string;
   dependent: boolean;
   idProof: UploadedFile | null;
@@ -199,9 +206,9 @@ export interface EsiDetails {
 
 export interface GmcDetails {
   isOptedIn: boolean | null;
-  policyAmount?: '1L' | '2L' | '';
+  policyAmount?: "1L" | "2L" | "";
   nomineeName?: string;
-  nomineeRelation?: 'Spouse' | 'Child' | 'Father' | 'Mother' | '';
+  nomineeRelation?: "Spouse" | "Child" | "Father" | "Mother" | "";
   wantsToAddDependents?: boolean;
   selectedSpouseId?: string;
   selectedChildIds?: string[];
@@ -221,7 +228,7 @@ export interface OrganizationDetails {
   organizationId: string;
   organizationName: string;
   joiningDate: string;
-  workType: 'Full-time' | 'Part-time' | 'Contract' | '';
+  workType: "Full-time" | "Part-time" | "Contract" | "";
   site?: string;
   defaultSalary?: number | null;
 }
@@ -245,7 +252,7 @@ export interface SalaryChangeRequest {
   requestedAt: string; // ISO string
   originalAmount: number;
   requestedAmount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  status: "pending" | "approved" | "rejected" | "expired";
   approvedBy?: string; // userId
   approvedAt?: string;
   rejectionReason?: string;
@@ -271,8 +278,8 @@ export interface BiometricsData {
 
 export interface OnboardingData {
   id?: string;
-  status: 'draft' | 'pending' | 'verified' | 'rejected';
-  portalSyncStatus?: 'pending_sync' | 'synced' | 'failed';
+  status: "draft" | "pending" | "verified" | "rejected";
+  portalSyncStatus?: "pending_sync" | "synced" | "failed";
   organizationId?: string;
   organizationName?: string;
   enrollmentDate: string;
@@ -293,7 +300,20 @@ export interface OnboardingData {
   verificationUsage?: VerificationUsageItem[];
 }
 
-export type OnboardingStep = 'personal' | 'address' | 'organization' | 'family' | 'education' | 'bank' | 'uan' | 'esi' | 'gmc' | 'uniform' | 'biometrics' | 'documents' | 'review';
+export type OnboardingStep =
+  | "personal"
+  | "address"
+  | "organization"
+  | "family"
+  | "education"
+  | "bank"
+  | "uan"
+  | "esi"
+  | "gmc"
+  | "uniform"
+  | "biometrics"
+  | "documents"
+  | "review";
 
 export interface EmailSettings {
   // SMTP settings are now managed on the backend for security.
@@ -308,7 +328,10 @@ export interface AddressSettings {
 }
 
 export interface GmcPolicySettings {
-  applicability: 'Mandatory' | 'Optional - Opt-in Default' | 'Optional - Opt-out Default';
+  applicability:
+    | "Mandatory"
+    | "Optional - Opt-in Default"
+    | "Optional - Opt-out Default";
   optInDisclaimer: string;
   coverageDetails: string;
   optOutDisclaimer: string;
@@ -337,11 +360,11 @@ export interface VerificationRules {
 export interface EnrollmentRules {
   esiCtcThreshold: number;
   enforceManpowerLimit: boolean;
-  manpowerLimitRule: 'warn' | 'block';
+  manpowerLimitRule: "warn" | "block";
   allowSalaryEdit?: boolean;
   salaryThreshold: number;
-  defaultPolicySingle: '1L' | '2L';
-  defaultPolicyMarried: '1L' | '2L';
+  defaultPolicySingle: "1L" | "2L";
+  defaultPolicyMarried: "1L" | "2L";
   enableEsiRule: boolean;
   enableGmcRule: boolean;
   enforceFamilyValidation?: boolean;
@@ -364,7 +387,7 @@ export interface NotificationSettings {
 }
 
 // Types for Entity Management
-export type RegistrationType = 'CIN' | 'ROC' | 'ROF' | 'Society' | 'Trust' | '';
+export type RegistrationType = "CIN" | "ROC" | "ROF" | "Society" | "Trust" | "";
 
 export interface Entity {
   id: string;
@@ -406,7 +429,7 @@ export interface Policy {
   description?: string;
 }
 
-export type InsuranceType = 'GMC' | 'GPA' | 'WCA' | 'Other';
+export type InsuranceType = "GMC" | "GPA" | "WCA" | "Other";
 export interface Insurance {
   id: string;
   type: InsuranceType;
@@ -446,7 +469,7 @@ export interface IssuedEquipment {
   modelNumber: string;
   serialNumber: string;
   accessories: string;
-  condition: 'New' | 'Old' | '';
+  condition: "New" | "Old" | "";
   issueDate: string;
   picture?: UploadedFile | null;
 }
@@ -495,7 +518,17 @@ export interface SiteConfiguration {
   shopAndEstablishmentCode?: string | null;
   keyAccountManager?: string | null;
   siteAreaSqFt?: number | null;
-  projectType?: 'Apartment' | 'Villa' | 'Vilament' | 'Rowhouse' | 'Combined' | 'Commercial Office' | 'Commercial Retail' | 'Commercial' | 'Public' | '';
+  projectType?:
+    | "Apartment"
+    | "Villa"
+    | "Vilament"
+    | "Rowhouse"
+    | "Combined"
+    | "Commercial Office"
+    | "Commercial Retail"
+    | "Commercial"
+    | "Public"
+    | "";
   apartmentCount?: number | null;
   agreementDetails?: {
     fromDate?: string | null;
@@ -523,8 +556,8 @@ export interface SiteConfiguration {
     holidays?: {
       numberOfDays?: number | null;
       list?: HolidayListItem[];
-      salaryPayment?: 'Full Payment' | 'Duty Payment' | 'Nil Payment' | '';
-      billing?: 'Full Payment' | 'Duty Payment' | 'Nil Payment' | '';
+      salaryPayment?: "Full Payment" | "Duty Payment" | "Nil Payment" | "";
+      billing?: "Full Payment" | "Duty Payment" | "Nil Payment" | "";
     };
 
     costingSheetLink?: string | null;
@@ -543,8 +576,14 @@ export interface SiteConfiguration {
     equipment?: {
       issued?: IssuedEquipment[];
       intermittent?: {
-        billing: 'To Be Billed' | 'Not to be Billed' | '';
-        frequency: 'Monthly' | 'Bi-Monthly' | 'Quarterly' | 'Half Yearly' | 'Yearly' | '';
+        billing: "To Be Billed" | "Not to be Billed" | "";
+        frequency:
+          | "Monthly"
+          | "Bi-Monthly"
+          | "Quarterly"
+          | "Half Yearly"
+          | "Yearly"
+          | "";
         taskCreation?: boolean;
         durationDays?: number | null;
       };
@@ -571,9 +610,8 @@ export interface Agreement {
   addendum2Date?: string;
 }
 
-
 // Types for Attendance
-export type AttendanceEventType = 'check-in' | 'check-out';
+export type AttendanceEventType = "check-in" | "check-out";
 
 export interface AttendanceEvent {
   id: string;
@@ -621,8 +659,15 @@ export interface Location {
 
 export interface RecurringHolidayRule {
   id?: string; // Optional for new rules before saving
-  type?: 'office' | 'field'; // Optional as it might be inferred
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  type?: "office" | "field"; // Optional as it might be inferred
+  day:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
   n: number; // 1 for 1st, 2 for 2nd, 3 for 3rd, 4 for 4th, 5 for 5th
 }
 
@@ -647,10 +692,18 @@ export interface Holiday {
   id: string;
   date: string; // YYYY-MM-DD
   name: string;
-  type: 'office' | 'field';
+  type: "office" | "field";
 }
 
-export type DailyAttendanceStatus = 'Present' | 'Half Day' | 'Absent' | 'Holiday' | 'Weekend' | 'Incomplete' | 'On Leave (Full)' | 'On Leave (Half)';
+export type DailyAttendanceStatus =
+  | "Present"
+  | "Half Day"
+  | "Absent"
+  | "Holiday"
+  | "Weekend"
+  | "Incomplete"
+  | "On Leave (Full)"
+  | "On Leave (Half)";
 
 export interface DailyAttendanceRecord {
   date: string; // YYYY-MM-DD
@@ -662,13 +715,17 @@ export interface DailyAttendanceRecord {
 }
 
 // Types for Leave Management
-export type LeaveType = 'Earned' | 'Sick' | 'Floating' | 'Comp Off';
-export type LeaveRequestStatus = 'pending_manager_approval' | 'pending_hr_confirmation' | 'approved' | 'rejected';
+export type LeaveType = "Earned" | "Sick" | "Floating" | "Comp Off";
+export type LeaveRequestStatus =
+  | "pending_manager_approval"
+  | "pending_hr_confirmation"
+  | "approved"
+  | "rejected";
 
 export interface ApprovalRecord {
   approverId: string;
   approverName: string;
-  status: 'approved' | 'rejected';
+  status: "approved" | "rejected";
   timestamp: string;
   comments?: string;
 }
@@ -679,7 +736,7 @@ export interface CompOffLog {
   userName?: string;
   dateEarned: string; // YYYY-MM-DD
   reason: string;
-  status: 'earned' | 'used' | 'expired';
+  status: "earned" | "used" | "expired";
   leaveRequestId?: string | null;
   grantedById?: string;
   grantedByName?: string;
@@ -708,7 +765,7 @@ export interface LeaveRequest {
   endDate: string; // YYYY-MM-DD
   reason: string;
   status: LeaveRequestStatus;
-  dayOption?: 'full' | 'half'; // only for single-day earned leave
+  dayOption?: "full" | "half"; // only for single-day earned leave
   currentApproverId: string | null;
   approvalHistory: ApprovalRecord[];
   doctorCertificate?: UploadedFile | null;
@@ -719,11 +776,11 @@ export interface ExtraWorkLog {
   userId: string;
   userName: string;
   workDate: string; // YYYY-MM-DD
-  workType: 'Holiday' | 'Week Off' | 'Night Shift';
-  claimType: 'OT' | 'Comp Off';
+  workType: "Holiday" | "Week Off" | "Night Shift";
+  claimType: "OT" | "Comp Off";
   hoursWorked?: number | null;
   reason: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: "Pending" | "Approved" | "Rejected";
   approverId?: string | null;
   approverName?: string | null;
   approvedAt?: string | null;
@@ -732,9 +789,9 @@ export interface ExtraWorkLog {
 }
 
 // Types for Task Management
-export type TaskPriority = 'Low' | 'Medium' | 'High';
-export type TaskStatus = 'To Do' | 'In Progress' | 'Done';
-export type EscalationStatus = 'None' | 'Level 1' | 'Level 2' | 'Email Sent';
+export type TaskPriority = "Low" | "Medium" | "High";
+export type TaskStatus = "To Do" | "In Progress" | "Done";
+export type EscalationStatus = "None" | "Level 1" | "Level 2" | "Email Sent";
 
 export interface Task {
   id: string;
@@ -763,12 +820,12 @@ export interface Task {
 // compatibility.  Notifications of type 'greeting' are used when users
 // first log in or out to send friendly welcome/goodbye messages.
 export type NotificationType =
-  | 'task_assigned'
-  | 'task_escalated'
-  | 'provisional_site_reminder'
-  | 'security'
-  | 'info'
-  | 'greeting';
+  | "task_assigned"
+  | "task_escalated"
+  | "provisional_site_reminder"
+  | "security"
+  | "info"
+  | "greeting";
 
 export interface Notification {
   id: string;
@@ -816,15 +873,15 @@ export interface SiteStaff {
 }
 
 // Asset Management Types
-export type AssetCondition = 'New' | 'Used' | '';
-export type DamageStatus = 'With Damages' | 'Without Damages' | '';
+export type AssetCondition = "New" | "Used" | "";
+export type DamageStatus = "With Damages" | "Without Damages" | "";
 
 export interface PhoneAsset {
   id: string;
-  type: 'Phone';
+  type: "Phone";
   brand: string | null;
   condition: AssetCondition | null;
-  chargerStatus: 'With Charger' | 'Without Charger' | '' | null;
+  chargerStatus: "With Charger" | "Without Charger" | "" | null;
   displayStatus: DamageStatus | null;
   bodyStatus: DamageStatus | null;
   imei: string | null;
@@ -834,44 +891,50 @@ export interface PhoneAsset {
 
 export interface SimAsset {
   id: string;
-  type: 'Sim';
+  type: "Sim";
   number: string | null;
 }
 
 export interface ComputerAsset {
   id: string;
-  type: 'Computer';
-  computerType: 'Laptop' | 'Desktop' | 'Tab' | '' | null;
+  type: "Computer";
+  computerType: "Laptop" | "Desktop" | "Tab" | "" | null;
   brand: string | null;
   condition: AssetCondition | null;
-  bagStatus: 'With Bag' | 'Without Bag' | '' | null;
-  mouseStatus: 'With Mouse' | 'Without Mouse' | '' | null;
-  chargerStatus: 'With Charger' | 'Without Charger' | '' | null;
+  bagStatus: "With Bag" | "Without Bag" | "" | null;
+  mouseStatus: "With Mouse" | "Without Mouse" | "" | null;
+  chargerStatus: "With Charger" | "Without Charger" | "" | null;
   displayStatus: DamageStatus | null;
   bodyStatus: DamageStatus | null;
   serialNumber: string | null;
   windowsKey: string | null;
-  officeStatus: 'With Office' | 'Without Office' | '' | null;
-  antivirusStatus: 'With Antivirus' | 'Without Antivirus' | '' | null;
+  officeStatus: "With Office" | "Without Office" | "" | null;
+  antivirusStatus: "With Antivirus" | "Without Antivirus" | "" | null;
   picture?: UploadedFile | null;
 }
 
 export interface IdCardAsset {
   id: string;
-  type: 'IdCard';
+  type: "IdCard";
   issueDate: string | null;
 }
 
 export interface PetrocardAsset {
   id: string;
-  type: 'Petrocard';
+  type: "Petrocard";
   number: string | null;
 }
 
 export interface VehicleAsset {
   id: string;
-  type: 'Vehicle';
-  vehicleType: 'Bicycle' | 'Two Wheeler' | 'Three Wheeler' | 'Four Wheeler' | '' | null;
+  type: "Vehicle";
+  vehicleType:
+    | "Bicycle"
+    | "Two Wheeler"
+    | "Three Wheeler"
+    | "Four Wheeler"
+    | ""
+    | null;
   brand: string | null;
   dlNumber: string | null;
   dlFrontPic?: UploadedFile | null;
@@ -882,7 +945,7 @@ export interface VehicleAsset {
   chassisNumber: string | null;
   insuranceValidity: string | null;
   pollutionCertValidity: string | null;
-  finesStatus: 'Existing' | 'Nil' | '' | null;
+  finesStatus: "Existing" | "Nil" | "" | null;
   picture?: UploadedFile | null;
 }
 
@@ -895,14 +958,14 @@ export interface ToolAssetItem {
 
 export interface ToolsAsset {
   id: string;
-  type: 'Tools';
+  type: "Tools";
   toolList: ToolAssetItem[] | null;
   picture?: UploadedFile | null;
 }
 
 export interface OtherAsset {
   id: string;
-  type: 'Other';
+  type: "Other";
   name: string | null;
   brand: string | null;
   model: string | null;
@@ -913,7 +976,15 @@ export interface OtherAsset {
   picture?: UploadedFile | null;
 }
 
-export type Asset = PhoneAsset | SimAsset | ComputerAsset | IdCardAsset | PetrocardAsset | VehicleAsset | ToolsAsset | OtherAsset;
+export type Asset =
+  | PhoneAsset
+  | SimAsset
+  | ComputerAsset
+  | IdCardAsset
+  | PetrocardAsset
+  | VehicleAsset
+  | ToolsAsset
+  | OtherAsset;
 
 // Types for Master Tools List
 export interface MasterTool {
@@ -934,7 +1005,7 @@ export interface GentsPantsSize {
   hip: number;
   tilesLoose: number;
   bottomWaist: number;
-  fit: 'Slim Fit' | 'Regular Fit' | 'Plump Fit';
+  fit: "Slim Fit" | "Regular Fit" | "Plump Fit";
 }
 
 export interface GentsShirtSize {
@@ -947,7 +1018,7 @@ export interface GentsShirtSize {
   halfChestLoose: number;
   shoulder: number;
   collar: number;
-  fit: 'Slim Fit' | 'Regular Fit' | 'Plump Fit';
+  fit: "Slim Fit" | "Regular Fit" | "Plump Fit";
 }
 
 export interface MasterGentsUniforms {
@@ -980,7 +1051,7 @@ export interface LadiesPantsSize {
   length: number;
   waist: number;
   hip: number;
-  fit: 'Slim Fit' | 'Regular Fit' | 'Comfort Fit';
+  fit: "Slim Fit" | "Regular Fit" | "Comfort Fit";
 }
 
 export interface LadiesShirtSize {
@@ -990,7 +1061,7 @@ export interface LadiesShirtSize {
   sleeves: number;
   bust: number;
   shoulder: number;
-  fit: 'Slim Fit' | 'Regular Fit' | 'Comfort Fit';
+  fit: "Slim Fit" | "Regular Fit" | "Comfort Fit";
 }
 
 export interface MasterLadiesUniforms {
@@ -1062,7 +1133,7 @@ export interface BillingRates {
   [designation: string]: {
     ratePerDay: number;
     ratePerMonth: number;
-  }
+  };
 }
 
 export interface PerfiosApiSettings {
@@ -1110,7 +1181,7 @@ export interface UniformRequestItem {
   sizeId: string;
   sizeLabel: string;
   fit: string;
-  category: 'Pants' | 'Shirts';
+  category: "Pants" | "Shirts";
   quantity: number;
 }
 
@@ -1118,11 +1189,11 @@ export interface UniformRequest {
   id: string;
   siteId: string;
   siteName: string;
-  gender: 'Gents' | 'Ladies';
+  gender: "Gents" | "Ladies";
   requestedDate: string;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Issued';
+  status: "Pending" | "Approved" | "Rejected" | "Issued";
   items: UniformRequestItem[];
-  source?: 'Bulk' | 'Enrollment' | 'Individual';
+  source?: "Bulk" | "Enrollment" | "Individual";
   requestedById?: string;
   requestedByName?: string;
   employeeDetails?: {
@@ -1136,7 +1207,6 @@ export interface UniformRequest {
     }[];
   }[];
 }
-
 
 // Types for Verification Costing
 export interface VerificationCostSetting {
@@ -1189,9 +1259,14 @@ export interface SupportTicket {
   ticketNumber: string;
   title: string;
   description: string;
-  category: 'Software Developer' | 'Admin' | 'Operational' | 'HR Query' | 'Other';
-  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
-  status: 'Open' | 'In Progress' | 'Pending Requester' | 'Resolved' | 'Closed';
+  category:
+    | "Software Developer"
+    | "Admin"
+    | "Operational"
+    | "HR Query"
+    | "Other";
+  priority: "Low" | "Medium" | "High" | "Urgent";
+  status: "Open" | "In Progress" | "Pending Requester" | "Resolved" | "Closed";
   raisedById: string;
   raisedByName: string;
   raisedAt: string; // ISO String
@@ -1203,4 +1278,48 @@ export interface SupportTicket {
   feedback: string | null;
   attachmentUrl?: string | null;
   posts: TicketPost[];
+}
+
+// Security Patrolling Types
+export interface PatrolQRCode {
+  id: string;
+  siteId: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  activeFrom?: string | null;
+  activeTo?: string | null;
+  assignedRoleId?: string | null;
+  questions: string[]; // Array of questions
+  requirePhotoOnNo: boolean;
+  status: "active" | "inactive";
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PatrolLog {
+  id: string;
+  qrId: string;
+  userId: string;
+  scanTime: string;
+  latitude: number;
+  longitude: number;
+  isWithinRadius: boolean;
+  answers: { question: string; answer: "YES" | "NO" }[];
+  photoUrl?: string | null;
+  reason?: string | null;
+  status: "Completed" | "Failed" | "Exception";
+  scoreAwarded: number;
+  createdAt?: string;
+}
+
+export interface PatrolDailyScore {
+  id: string;
+  userId: string;
+  date: string;
+  totalScore: number;
+  scoreStatus: "OK" | "Concern";
+  updatedAt?: string;
 }

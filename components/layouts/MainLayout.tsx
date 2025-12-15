@@ -46,11 +46,13 @@ export const allNavLinks: NavLinkConfig[] = [
     { to: '/tasks', label: 'Task Management', icon: ListTodo, permission: 'manage_tasks' },
     { to: '/uniforms', label: 'Uniform Management', icon: Shirt, permission: 'manage_uniforms' },
     { to: '/admin/users', label: 'User Management', icon: Users, permission: 'manage_users' },
+    { to: '/admin/patrol/dashboard', label: 'Patrol Dashboard', icon: ClipboardList, permission: 'manage_approval_workflow' },
     { to: '/hr/field-officer-tracking', label: 'User Activity Tracking', icon: MapIcon, permission: 'view_field_officer_tracking' },
     // Manage geofenced locations for attendance
     { to: '/hr/locations', label: 'Geo Locations', icon: MapPin, permission: 'manage_attendance_rules' },
     // User‑specific geofencing management
     { to: '/attendance/locations', label: 'My Locations', icon: Navigation, permission: 'view_own_attendance' },
+    { to: '/patrol/scan', label: 'Patrol Scanner', icon: ShieldCheck, permission: 'view_developer_settings' },
 ];
 
 
