@@ -2458,11 +2458,9 @@ export const api = {
     // filtering by siteId would require a join, use explicit join syntax or multiple queries
     // For simplicity, we assume we might need a custom RPC or just fetch all for now if site filtering is complex via JS SDK without foreign key definitions in generated types
     // Convert local date string (YYYY-MM-DD) to start/end of day in UTC
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Appending T00:00:00 ensures it is treated as local time by Date constructor
+    const startOfDay = new Date(`${date}T00:00:00`);
+    const endOfDay = new Date(`${date}T23:59:59.999`);
 
     let query = supabase.from("patrol_logs").select(
       "*, patrol_qr_codes!inner(site_id)",
