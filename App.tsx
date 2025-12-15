@@ -403,11 +403,26 @@ const App: React.FC = () => {
           });
         }
         if (settings.apiSettings?.colorScheme) {
-          initBranding(settings.apiSettings.colorScheme, settings.apiSettings.appTitle);
+          const { userHasSetPreference, setAppTitle } = useBrandingStore.getState();
+          if (!userHasSetPreference) {
+            initBranding(settings.apiSettings.colorScheme, settings.apiSettings.appTitle);
+          } else if (settings.apiSettings.appTitle) {
+            setAppTitle(settings.apiSettings.appTitle);
+          }
         }
-        // Hydrate global logo if available
+        // Hydrate global logo if available but respect user local choice
         if (settings.apiSettings?.globalLogo) {
-             useLogoStore.getState().setCurrentLogo(settings.apiSettings.globalLogo);
+             const logoState = useLogoStore.getState();
+             if (logoState.setDefaultLogoValue) {
+                 logoState.setDefaultLogoValue(settings.apiSettings.globalLogo);
+             }
+             
+             if (!logoState.userHasSetLogo && logoState.initLogo) {
+                logoState.initLogo(settings.apiSettings.globalLogo);
+             } else if (!logoState.userHasSetLogo) {
+                // Fallback if initLogo not available (should be)
+                logoState.setCurrentLogo(settings.apiSettings.globalLogo);
+             }
         }
       } catch (error) {
         console.error('Failed to load initial application data:', error);

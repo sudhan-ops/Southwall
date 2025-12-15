@@ -20,6 +20,7 @@ export type ColorScheme =
 interface BrandingState {
     colorScheme: ColorScheme;
     appTitle: string;
+    userHasSetPreference: boolean;
     setColorScheme: (scheme: ColorScheme) => void;
     setAppTitle: (title: string) => void;
     initBranding: (scheme: ColorScheme, title?: string) => void;
@@ -30,7 +31,9 @@ export const useBrandingStore = create<BrandingState>()(
         (set) => ({
             colorScheme: "green", // Default to green (Paradigm)
             appTitle: "Paradigm Employee Onboarding",
-            setColorScheme: (scheme) => set({ colorScheme: scheme }),
+            userHasSetPreference: false,
+            setColorScheme: (scheme) =>
+                set({ colorScheme: scheme, userHasSetPreference: true }),
             setAppTitle: (title) => set({ appTitle: title }),
             initBranding: (scheme, title) =>
                 set((state) => ({

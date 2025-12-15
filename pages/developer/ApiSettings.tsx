@@ -89,10 +89,13 @@ export const ApiSettings: React.FC = () => {
         'black-gold': 'Management / Exec',
     };
 
-    const handleColorSchemeChange = async (scheme: ColorScheme) => {
+    const handleColorSchemeChange = async (scheme: ColorScheme, forceGlobal?: boolean) => {
         setColorScheme(scheme);
         
-        if (updateGlobal) {
+        // Use the explicit forceGlobal param if provided, otherwise fall back to state
+        const shouldUpdateGlobal = forceGlobal !== undefined ? forceGlobal : updateGlobal;
+        
+        if (shouldUpdateGlobal) {
             try {
                 const { settings } = await api.getInitialAppData();
                 const currentApiSettings = settings.apiSettings || {};
@@ -174,7 +177,14 @@ export const ApiSettings: React.FC = () => {
                                     label="Set as Global Default" 
                                     description="If checked, the selected color scheme will be applied to all users who haven't set a preference."
                                     checked={updateGlobal}
-                                    onChange={(e) => setUpdateGlobal(e.target.checked)}
+                                    onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        setUpdateGlobal(isChecked);
+                                        // If checking the box, immediately update the current scheme globally
+                                        if (isChecked) {
+                                            handleColorSchemeChange(colorScheme, true);
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>
