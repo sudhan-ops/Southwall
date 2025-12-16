@@ -29,8 +29,8 @@ interface BrandingState {
 export const useBrandingStore = create<BrandingState>()(
     persist(
         (set) => ({
-            colorScheme: "green", // Default to green (Paradigm)
-            appTitle: "Paradigm Employee Onboarding",
+            colorScheme: "professional-blue",
+            appTitle: "Southwall Employee Onboarding",
             userHasSetPreference: false,
             setColorScheme: (scheme) =>
                 set({ colorScheme: scheme, userHasSetPreference: true }),

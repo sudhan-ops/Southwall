@@ -9,12 +9,12 @@
     />
 
     <!-- PWA Meta Tags -->
-    <meta name="application-name" content="Paradigm Services">
+    <meta name="application-name" content="Southwall Security">
     <meta
       name="description"
-      content="Comprehensive employee onboarding and management system for Paradigm Services"
+      content="Comprehensive employee onboarding and management system for Southwall Security"
     >
-    <meta name="theme-color" content="#041b0f">
+    <meta name="theme-color" content="#1e293b">
     <link rel="manifest" href="/manifest.json">
 
     <!-- Apple iOS PWA Support -->
@@ -23,7 +23,6 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     >
-    <meta name="apple-mobile-web-app-title" content="Paradigm">
     <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png">
     <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png">
@@ -106,7 +105,7 @@
     >
     <link rel="shortcut icon" href="/favicon.ico">
 
-    <title>Paradigm Employee Onboarding</title>
+    <title>Southwall Employee Onboarding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -172,10 +171,12 @@
       body .auth-card-container span,
       body .auth-card-container .text-primary-text,
       body .auth-card-container .text-muted,
-      body .auth-card-container div:not(input):not(.google-btn):not(.form-input) {
+      body
+        .auth-card-container
+        div:not(input):not(.google-btn):not(.form-input) {
         color: #ffffff !important;
       }
-      
+
       /* Ensure links in the auth card are white */
       body .auth-card-container a,
       body .auth-card-container a:hover {
@@ -821,13 +822,13 @@
 
       .green-theme nav a.bg-accent,
       .green-theme nav a[class*="bg-accent"] {
-        background-color: #006B3F !important;
+        background-color: #006b3f !important;
       }
 
       /* Green theme - force active nav background */
       .green-theme nav a[class~="bg-accent"],
       .green-theme nav button[class~="bg-accent"] {
-        background-color: #006B3F !important;
+        background-color: #006b3f !important;
       }
 
       .green-theme .text-muted {
@@ -1237,14 +1238,14 @@
 
       .purple-theme nav a.bg-accent,
       .purple-theme nav a[class*="bg-accent"] {
-        background-color: #5B21B6 !important;
+        background-color: #5b21b6 !important;
       }
 
       /* Purple theme - force active nav background */
       .purple-theme nav a[class~="bg-accent"],
       .purple-theme nav button[class~="bg-accent"],
       .purple-theme .bg-accent {
-        background-color: #5B21B6 !important;
+        background-color: #5b21b6 !important;
       }
 
       .purple-theme .text-muted {
@@ -1334,14 +1335,14 @@
 
       .red-theme nav a.bg-accent,
       .red-theme nav a[class*="bg-accent"] {
-        background-color: #991B1B !important;
+        background-color: #991b1b !important;
       }
 
       /* Red theme - force active nav background */
       .red-theme nav a[class~="bg-accent"],
       .red-theme nav button[class~="bg-accent"],
       .red-theme .bg-accent {
-        background-color: #991B1B !important;
+        background-color: #991b1b !important;
       }
 
       .red-theme .text-muted {
@@ -1431,14 +1432,14 @@
 
       .amber-theme nav a.bg-accent,
       .amber-theme nav a[class*="bg-accent"] {
-        background-color: #B45309 !important;
+        background-color: #b45309 !important;
       }
 
       /* Amber theme - force active nav background */
       .amber-theme nav a[class~="bg-accent"],
       .amber-theme nav button[class~="bg-accent"],
       .amber-theme .bg-accent {
-        background-color: #B45309 !important;
+        background-color: #b45309 !important;
       }
 
       .amber-theme .text-muted {
@@ -1448,8 +1449,14 @@
       /* Mobile overrides for buttons */
       @media (max-width: 768px) {
         /* Theme-specific button colors on mobile */
-        .blue-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
-        .blue-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
+        .blue-theme
+          button:not(nav button):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger),
+        .blue-theme
+          .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger) {
           background-color: #1a3a6e !important;
           box-shadow: 0 2px 8px rgba(26, 58, 110, 0.3) !important;
         }
@@ -1460,39 +1467,57 @@
           box-shadow: 0 4px 12px rgba(26, 58, 110, 0.4) !important;
         }
 
-        .purple-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
-        .purple-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
-          background-color: #5B21B6 !important;
+        .purple-theme
+          button:not(nav button):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger),
+        .purple-theme
+          .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger) {
+          background-color: #5b21b6 !important;
           box-shadow: 0 2px 8px rgba(91, 33, 182, 0.3) !important;
         }
 
         .purple-theme button:hover:not(.btn-icon),
         .purple-theme .btn:hover:not(.btn-icon) {
-          background-color: #4C1D95 !important;
+          background-color: #4c1d95 !important;
           box-shadow: 0 4px 12px rgba(91, 33, 182, 0.4) !important;
         }
 
-        .red-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
-        .red-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
-          background-color: #991B1B !important;
+        .red-theme
+          button:not(nav button):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger),
+        .red-theme
+          .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger) {
+          background-color: #991b1b !important;
           box-shadow: 0 2px 8px rgba(153, 27, 27, 0.3) !important;
         }
 
         .red-theme button:hover:not(.btn-icon),
         .red-theme .btn:hover:not(.btn-icon) {
-          background-color: #7F1D1D !important;
+          background-color: #7f1d1d !important;
           box-shadow: 0 4px 12px rgba(153, 27, 27, 0.4) !important;
         }
 
-        .amber-theme button:not(nav button):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger),
-        .amber-theme .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(.google-btn):not(.signin-btn):not(.btn-danger) {
-          background-color: #B45309 !important;
+        .amber-theme
+          button:not(nav button):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger),
+        .amber-theme
+          .btn:not(nav .btn):not(.btn-icon):not(.btn-secondary):not(
+            .google-btn
+          ):not(.signin-btn):not(.btn-danger) {
+          background-color: #b45309 !important;
           box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3) !important;
         }
 
         .amber-theme button:hover:not(.btn-icon),
         .amber-theme .btn:hover:not(.btn-icon) {
-          background-color: #92400E !important;
+          background-color: #92400e !important;
           box-shadow: 0 4px 12px rgba(180, 83, 9, 0.4) !important;
         }
 

@@ -68,12 +68,12 @@ const AuthLayout: React.FC = () => {
                                 Welcome to the Future of Onboarding.
                             </h1>
                             <p className="!text-white mt-4 max-w-md drop-shadow-lg text-xs lg:text-sm xl:text-base relative z-10" style={{ color: '#ffffff', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                                Streamlining the journey for every new member of the Paradigm family.
+                                Streamlining the journey for every new member of the Southwall family.
                             </p>
                         </div>
 
                         <div>
-                            <p className="!text-white text-[10px] lg:text-xs mt-4" style={{ color: '#ffffff' }}>© {new Date().getFullYear()} Paradigm Services. All rights reserved.</p>
+                            <p className="!text-white text-[10px] lg:text-xs mt-4" style={{ color: '#ffffff' }}>© {new Date().getFullYear()} Southwall Security. All rights reserved.</p>
                         </div>
                     </div>
 

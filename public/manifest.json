@@ -1,7 +1,7 @@
 {
-    "name": "Paradigm Office",
-    "short_name": "Paradigm Office",
-    "description": "Comprehensive employee onboarding and management system",
+    "name": "Southwall Security",
+    "short_name": "Southwall",
+    "description": "Comprehensive employee onboarding and management system for Southwall Security",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f1f0f",
