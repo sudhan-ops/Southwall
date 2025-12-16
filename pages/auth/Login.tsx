@@ -168,7 +168,7 @@ const Login: React.FC = () => {
                                 labelClassName="!text-white font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
-                                inputClassName={`text-[#22c55e] focus:ring-[#22c55e] border-white/20 rounded bg-black/40`}
+                                inputClassName={`text-blue-600 focus:ring-blue-600 border-white/20 rounded bg-black/40`}
                             />
                             <style dangerouslySetInnerHTML={{__html: `
                                 .login-checkbox-container label {

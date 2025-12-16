@@ -9,6 +9,7 @@ import { useSettingsStore } from './store/settingsStore';
 import { useBrandingStore } from './store/brandingStore';
 import { useLogoStore } from './store/logoStore';
 import { useMediaQuery } from './hooks/useMediaQuery';
+import { useLocationTracker } from './hooks/useLocationTracker';
 import { supabase } from './services/supabase';
 import { authService } from './services/authService';
 // Import the API client under an alias to avoid name collisions.  Renaming
@@ -98,6 +99,10 @@ import EducationDetails from './pages/onboarding/EducationDetails';
 import BankDetails from './pages/onboarding/BankDetails';
 import UanDetails from './pages/onboarding/UanDetails';
 import EsiDetails from './pages/onboarding/EsiDetails';
+
+// My Team Module
+import MyTeamList from './pages/my-team/MyTeamList';
+import TeamMemberProfile from './pages/my-team/TeamMemberProfile';
 import GmcDetails from './pages/onboarding/GmcDetails';
 import UniformDetails from './pages/onboarding/UniformDetails';
 import Documents from './pages/onboarding/Documents';
@@ -191,6 +196,9 @@ const MainLayoutWrapper: React.FC = () => {
   const location = useLocation();
   // IMPORTANT: All hooks must be called before any conditional returns
   const isMobile = useMediaQuery('(max-width: 767px)');
+
+  // Activate background location tracking for authenticated users
+  useLocationTracker();
 
   if (!isInitialized) {
     // Wait for the session check to complete.
@@ -590,6 +598,13 @@ const App: React.FC = () => {
           <Route element={<ProtectedRoute requiredPermission="view_operations_dashboard" />}>
             <Route path="operations/dashboard" element={<OperationsDashboard />} />
             <Route path="operations/team-activity" element={<TeamActivity />} />
+          </Route>
+
+          {/* My Team & Tracking */}
+          <Route element={<ProtectedRoute requiredPermission="view_field_officer_tracking" />}>
+             <Route path="my-team" element={<MyTeamList />} />
+             <Route path="my-team/:userId" element={<TeamMemberProfile />} />
+             <Route path="hr/tracking" element={<FieldOfficerTracking />} />
           </Route>
           <Route element={<ProtectedRoute requiredPermission="view_site_dashboard" />}>
             <Route path="site/dashboard" element={<SiteDashboard />} />

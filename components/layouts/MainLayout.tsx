@@ -41,6 +41,7 @@ export const allNavLinks: NavLinkConfig[] = [
     { to: '/operations/dashboard', label: 'Operations', icon: BriefcaseBusiness, permission: 'view_operations_dashboard' },
     { to: '/profile', label: 'Profile', icon: User, permission: 'view_own_attendance' },
     { to: '/admin/roles', label: 'Role Management', icon: ShieldCheck, permission: 'manage_roles_and_permissions' },
+    { to: '/my-team', label: 'My Team', icon: Users, permission: 'view_field_officer_tracking' },
     { to: '/site/dashboard', label: 'Site Dashboard', icon: Home, permission: 'view_site_dashboard' },
     { to: '/admin/sites', label: 'Site Management', icon: Building, permission: 'manage_sites' },
     { to: '/tasks', label: 'Task Management', icon: ListTodo, permission: 'manage_tasks' },

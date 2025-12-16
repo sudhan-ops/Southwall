@@ -629,6 +629,18 @@ export interface AttendanceEvent {
   locationId?: string | null;
 }
 
+export interface LocationLog {
+  id: string;
+  userId: string;
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  speed?: number;
+  batteryLevel?: number;
+  activityType?: string;
+  timestamp: string;
+}
+
 // -----------------------------------------------------------------------------
 // Geofencing Types
 //

@@ -27,10 +27,30 @@ export const PatrolQRGenerator: React.FC = () => {
 
     const loadSites = async () => {
         try {
-            const orgs = await api.getOrganizations();
-            setSites(orgs);
-            setSites(orgs);
-            if (orgs.length > 0 && !isManualSite) setSelectedSiteId(orgs[0].id);
+            const [orgs, allQrs] = await Promise.all([
+                api.getOrganizations(),
+                api.getPatrolQrCodes()
+            ]);
+
+            // Extract unique siteIds from existing QRs to find manual entries
+            const existingQrSiteIds = Array.from(new Set(allQrs.map(q => q.siteId)));
+            const orgIds = new Set(orgs.map(o => o.id));
+            
+            const manualSites = existingQrSiteIds
+                .filter(id => !orgIds.has(id) && id) // Filter out known orgs and empty strings
+                .map(id => ({
+                    id: id,
+                    fullName: `${id} (Manual)`, // Distinguish manual sites
+                    shortName: id,
+                } as Organization));
+
+            const combinedSites = [...orgs, ...manualSites];
+            setSites(combinedSites);
+            
+            // Only set default if nothing selected yet
+            if (combinedSites.length > 0 && !selectedSiteId && !isManualSite) {
+                 setSelectedSiteId(combinedSites[0].id);
+            }
         } catch (err) {
             console.error(err);
         }
@@ -91,6 +111,7 @@ export const PatrolQRGenerator: React.FC = () => {
             
             // Refresh list
             loadRefreshedQRs();
+            loadSites(); // Refresh sites list to include any new manual site
             resetForm();
         } catch (err: any) {
             alert(err.message);
@@ -116,7 +137,7 @@ export const PatrolQRGenerator: React.FC = () => {
         setQuestions(qr.questions || ['Is the area secure?']);
         setCurrentLocation({ lat: qr.latitude, lng: qr.longitude });
         setSelectedSiteId(qr.siteId);
-        // If site is not in list (manual?), handle manual toggle if needed, or just set ID.
+        setIsManualSite(false); // Since we now load manual sites into the dropdown, we can show it there
         // Assuming site list loaded or manual input works.
     };
 

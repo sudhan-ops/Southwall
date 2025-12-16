@@ -18,6 +18,7 @@ import type {
   LeaveBalance,
   LeaveRequest,
   Location,
+  LocationLog,
   ManpowerDetail,
   MasterGentsUniforms,
   MasterLadiesUniforms,
@@ -2420,6 +2421,57 @@ export const api = {
       id,
     );
     if (error) throw error;
+  },
+
+  // --- My Team / Location Tracking ---
+
+  /**
+   * Log user's current location (background or foreground).
+   */
+  logLocation: async (data: Partial<LocationLog>): Promise<void> => {
+    const { error } = await supabase.from("user_location_logs").insert(
+      toSnakeCase(data),
+    );
+    if (error) throw error;
+  },
+
+  /**
+   * Fetch team members (users reporting to current user).
+   * For admins, this could be adjusted to return all users or filter by team.
+   * Currently, it fetches users where reporting_manager_id matches the param.
+   */
+  getTeamMembers: async (managerId: string): Promise<User[]> => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("reporting_manager_id", managerId);
+
+    if (error) throw error;
+    return (data || []).map(toCamelCase);
+  },
+
+  /**
+   * Fetch location history for a user on a specific date.
+   */
+  getLocationHistory: async (
+    userId: string,
+    date: string,
+  ): Promise<LocationLog[]> => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const { data, error } = await supabase
+      .from("user_location_logs")
+      .select("*")
+      .eq("user_id", userId)
+      .gte("timestamp", start.toISOString())
+      .lte("timestamp", end.toISOString())
+      .order("timestamp", { ascending: true }); // Ordered for route plotting
+
+    if (error) throw error;
+    return (data || []).map(toCamelCase);
   },
 
   submitPatrolLog: async (log: Omit<PatrolLog, "id">): Promise<void> => {
