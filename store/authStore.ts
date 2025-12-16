@@ -1,49 +1,54 @@
-
-
-import { create } from 'zustand';
-import { authService } from '../services/authService';
-import type { User } from '../types';
-import { supabase } from '../services/supabase';
-import type { RealtimeChannel, Subscription } from '@supabase/supabase-js';
+import { create } from "zustand";
+import { authService } from "../services/authService";
+import type { User } from "../types";
+import { supabase } from "../services/supabase";
+import type { RealtimeChannel, Subscription } from "@supabase/supabase-js";
 // FIX: Import the 'api' object to resolve 'Cannot find name' errors.
-import { api } from '../services/api';
-import { withTimeout } from '../utils/async';
+import { api } from "../services/api";
+import { withTimeout } from "../utils/async";
 // Utilities for geofencing
-import { calculateDistanceMeters, reverseGeocode, getPrecisePosition } from '../utils/locationUtils';
+import {
+    calculateDistanceMeters,
+    getPrecisePosition,
+    reverseGeocode,
+} from "../utils/locationUtils";
 
 // Centralized friendly error message handler for Supabase
 // Centralized friendly error message handler for Supabase
 const getFriendlyAuthError = (errorMessage: string): string => {
     const msg = errorMessage.toLowerCase();
 
-    if (msg.includes('timed out')) {
-        return 'The request took too long. Please check your internet connection and try again.';
+    if (msg.includes("timed out")) {
+        return "The request took too long. Please check your internet connection and try again.";
     }
-    if (msg.includes('invalid api key') || msg.includes('configuration')) {
-        return 'System configuration error. Please contact support.';
+    if (msg.includes("invalid api key") || msg.includes("configuration")) {
+        return "System configuration error. Please contact support.";
     }
-    if (msg.includes('failed to fetch') || msg.includes('network')) {
-        return 'Unable to connect. Please check your internet connection.';
+    if (msg.includes("failed to fetch") || msg.includes("network")) {
+        return "Unable to connect. Please check your internet connection.";
     }
-    if (msg.includes('invalid login credentials')) {
+    if (msg.includes("invalid login credentials")) {
         return 'Incorrect email or password. If you use Google Sign-In, please click "Sign in with Google".';
     }
-    if (msg.includes('user already registered') || msg.includes('already exists')) {
-        return 'This email is already registered. Please sign in.';
+    if (
+        msg.includes("user already registered") ||
+        msg.includes("already exists")
+    ) {
+        return "This email is already registered. Please sign in.";
     }
-    if (msg.includes('email not confirmed')) {
-        return 'Please verify your email address. Check your inbox for the confirmation link.';
+    if (msg.includes("email not confirmed")) {
+        return "Please verify your email address. Check your inbox for the confirmation link.";
     }
-    if (msg.includes('too many requests') || msg.includes('rate limit')) {
-        return 'Too many attempts. Please wait a few minutes before trying again.';
+    if (msg.includes("too many requests") || msg.includes("rate limit")) {
+        return "Too many attempts. Please wait a few minutes before trying again.";
     }
-    if (msg.includes('weak password')) {
-        return 'Password is too weak. Please use a stronger password.';
+    if (msg.includes("weak password")) {
+        return "Password is too weak. Please use a stronger password.";
     }
 
     // Log the actual error for debugging but show a friendly message to the user
     console.error("Unhandled auth error:", errorMessage);
-    return 'Something went wrong. Please try again or contact support.';
+    return "Something went wrong. Please try again or contact support.";
 };
 
 interface AuthState {
@@ -52,10 +57,20 @@ interface AuthState {
     isAttendanceLoading: boolean;
     lastCheckInTime: string | null;
     lastCheckOutTime: string | null;
-    loginWithEmail: (email: string, password: string, rememberMe: boolean) => Promise<{ error: { message: string } | null }>;
-    signUp: (name: string, email: string, password: string) => Promise<{ error: { message: string } | null }>;
-    loginWithGoogle: () => Promise<{ error: { message: string } | null; }>;
-    sendPasswordReset: (email: string) => Promise<{ error: { message: string } | null }>;
+    loginWithEmail: (
+        email: string,
+        password: string,
+        rememberMe: boolean,
+    ) => Promise<{ error: { message: string } | null }>;
+    signUp: (
+        name: string,
+        email: string,
+        password: string,
+    ) => Promise<{ error: { message: string } | null }>;
+    loginWithGoogle: () => Promise<{ error: { message: string } | null }>;
+    sendPasswordReset: (
+        email: string,
+    ) => Promise<{ error: { message: string } | null }>;
     logout: () => Promise<void>;
     isInitialized: boolean;
     setUser: (user: User | null) => void;
@@ -75,9 +90,9 @@ interface AuthState {
 // Helper for time-based greetings
 const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -92,18 +107,20 @@ export const useAuthStore = create<AuthState>()(
         loading: false,
 
         isLoginAnimationPending: false,
-        setLoginAnimationPending: (pending) => set({ isLoginAnimationPending: pending }),
+        setLoginAnimationPending: (pending) =>
+            set({ isLoginAnimationPending: pending }),
 
         setUser: (user) => set({ user, error: null, loading: false }),
         setInitialized: (initialized) => set({ isInitialized: initialized }),
         setLoading: (loading) => set({ loading }),
-        resetAttendance: () => set({
-            isCheckedIn: false,
-            isAttendanceLoading: false,
-            lastCheckInTime: null,
-            lastCheckOutTime: null,
-            isLoginAnimationPending: false,
-        }),
+        resetAttendance: () =>
+            set({
+                isCheckedIn: false,
+                isAttendanceLoading: false,
+                lastCheckInTime: null,
+                lastCheckOutTime: null,
+                isLoginAnimationPending: false,
+            }),
         setError: (error) => set({ error }),
 
         loginWithEmail: async (email, password, rememberMe) => {
@@ -121,15 +138,20 @@ export const useAuthStore = create<AuthState>()(
                 const { data, error } = await withTimeout(
                     authService.signInWithPassword(email, password),
                     20000, // 20 second timeout for login
-                    'Login attempt timed out. Please check your network connection.'
-                ).catch(e => {
+                    "Login attempt timed out. Please check your network connection.",
+                ).catch((e) => {
                     // Handle timeout error as a login failure
-                    return { data: { user: null, session: null }, error: { message: e.message } };
+                    return {
+                        data: { user: null, session: null },
+                        error: { message: e.message },
+                    };
                 });
 
                 // Handle sign-in errors
                 if (error || !data.user || !data.session) {
-                    const friendlyError = getFriendlyAuthError(error?.message || 'Invalid login credentials');
+                    const friendlyError = getFriendlyAuthError(
+                        error?.message || "Invalid login credentials",
+                    );
                     set({ error: friendlyError, loading: false });
                     return { error: { message: friendlyError } };
                 }
@@ -138,11 +160,14 @@ export const useAuthStore = create<AuthState>()(
                 // 1. Save the email to localStorage for pre-filling
                 // 2. Manually save the refresh token to localStorage for custom session restoration (used in App.tsx)
                 if (rememberMe) {
-                    localStorage.setItem('rememberedEmail', email);
-                    localStorage.setItem('supabase.auth.rememberMe', data.session.refresh_token);
+                    localStorage.setItem("rememberedEmail", email);
+                    localStorage.setItem(
+                        "supabase.auth.rememberMe",
+                        data.session.refresh_token,
+                    );
                 } else {
-                    localStorage.removeItem('rememberedEmail');
-                    localStorage.removeItem('supabase.auth.rememberMe');
+                    localStorage.removeItem("rememberedEmail");
+                    localStorage.removeItem("supabase.auth.rememberMe");
                 }
 
                 // If sign-in is successful, we take full control.
@@ -159,25 +184,33 @@ export const useAuthStore = create<AuthState>()(
                         const greeting = getTimeBasedGreeting();
                         await api.createNotification({
                             userId: appUser.id,
-                            message: `${greeting}, ${appUser.name || 'there'}! Welcome back to Paradigm Services.`,
-                            type: 'greeting',
+                            message: `${greeting}, ${
+                                appUser.name || "there"
+                            }! Welcome back to Paradigm Services.`,
+                            type: "greeting",
                         });
                     } catch (e) {
-                        console.error('Failed to send login greeting notification', e);
+                        console.error(
+                            "Failed to send login greeting notification",
+                            e,
+                        );
                     }
                     return { error: null };
                 } else {
                     // Critical failure: sign-in worked, but profile fetch failed.
                     // Sign the user out to prevent an inconsistent state.
                     await authService.signOut();
-                    const friendlyError = 'Login successful, but failed to retrieve user profile. Please try again.';
+                    const friendlyError =
+                        "Login successful, but failed to retrieve user profile. Please try again.";
                     set({ user: null, error: friendlyError, loading: false });
                     return { error: { message: friendlyError } };
                 }
             } catch (e) {
                 // Catch exceptions from getAppUserProfile or other unexpected errors
-                console.error('Unexpected error during login flow:', e);
-                const friendlyError = getFriendlyAuthError('Unexpected error during login flow');
+                console.error("Unexpected error during login flow:", e);
+                const friendlyError = getFriendlyAuthError(
+                    "Unexpected error during login flow",
+                );
                 set({ user: null, error: friendlyError, loading: false });
                 return { error: { message: friendlyError } };
             }
@@ -188,7 +221,7 @@ export const useAuthStore = create<AuthState>()(
             const { error } = await authService.signUpWithPassword({
                 email,
                 password,
-                options: { data: { name } }
+                options: { data: { name } },
             });
 
             if (error) {
@@ -231,26 +264,34 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const greeting = getTimeBasedGreeting();
                     // If it's late (after 8 PM), say Good Night, otherwise use the time-based greeting
-                    const farewell = new Date().getHours() >= 20 ? 'Good Night' : greeting;
+                    const farewell = new Date().getHours() >= 20
+                        ? "Good Night"
+                        : greeting;
 
                     await api.createNotification({
                         userId: currentUser.id,
-                        message: `${farewell}, ${currentUser.name || 'there'}! Thanks for your hard work today.`,
-                        type: 'greeting',
+                        message: `${farewell}, ${
+                            currentUser.name || "there"
+                        }! Thanks for your hard work today.`,
+                        type: "greeting",
                     });
                 } catch (e) {
-                    console.error('Failed to send logout farewell notification', e);
+                    console.error(
+                        "Failed to send logout farewell notification",
+                        e,
+                    );
                 }
             }
             // Clear the long-term token on logout
-            localStorage.removeItem('supabase.auth.rememberMe');
+            localStorage.removeItem("supabase.auth.rememberMe");
             // The onAuthStateChange listener in App.tsx will call setUser(null).
             await authService.signOut();
         },
 
-        updateUserProfile: (updates) => set((state) => ({
-            user: state.user ? { ...state.user, ...updates } : null
-        })),
+        updateUserProfile: (updates) =>
+            set((state) => ({
+                user: state.user ? { ...state.user, ...updates } : null,
+            })),
 
         checkAttendanceStatus: async () => {
             const { user } = get();
@@ -261,33 +302,62 @@ export const useAuthStore = create<AuthState>()(
             set({ isAttendanceLoading: true });
             try {
                 const today = new Date();
-                const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0).toISOString();
-                const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999).toISOString();
+                const startOfDay = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate(),
+                    0,
+                    0,
+                    0,
+                    0,
+                ).toISOString();
+                const endOfDay = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate(),
+                    23,
+                    59,
+                    59,
+                    999,
+                ).toISOString();
 
-                const events = await api.getAttendanceEvents(user.id, startOfDay, endOfDay);
+                const events = await api.getAttendanceEvents(
+                    user.id,
+                    startOfDay,
+                    endOfDay,
+                );
 
                 if (events.length === 0) {
                     set({
                         isCheckedIn: false,
                         lastCheckInTime: null,
                         lastCheckOutTime: null,
-                        isAttendanceLoading: false
+                        isAttendanceLoading: false,
                     });
                     return;
                 }
 
                 // Sort events chronologically (oldest first) to easily find first/last
-                events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+                events.sort((a, b) =>
+                    new Date(a.timestamp).getTime() -
+                    new Date(b.timestamp).getTime()
+                );
 
-                const firstCheckIn = events.find(e => e.type === 'check-in');
-                const lastCheckOut = [...events].reverse().find(e => e.type === 'check-out');
+                const firstCheckIn = events.find((e) => e.type === "check-in");
+                const lastCheckOut = [...events].reverse().find((e) =>
+                    e.type === "check-out"
+                );
                 const lastEvent = events[events.length - 1];
 
                 set({
-                    isCheckedIn: lastEvent?.type === 'check-in',
-                    lastCheckInTime: firstCheckIn ? firstCheckIn.timestamp : null,
-                    lastCheckOutTime: lastCheckOut ? lastCheckOut.timestamp : null,
-                    isAttendanceLoading: false
+                    isCheckedIn: lastEvent?.type === "check-in",
+                    lastCheckInTime: firstCheckIn
+                        ? firstCheckIn.timestamp
+                        : null,
+                    lastCheckOutTime: lastCheckOut
+                        ? lastCheckOut.timestamp
+                        : null,
+                    isAttendanceLoading: false,
                 });
             } catch (error) {
                 console.error("Failed to check attendance status:", error);
@@ -297,8 +367,8 @@ export const useAuthStore = create<AuthState>()(
 
         toggleCheckInStatus: async () => {
             const { user, isCheckedIn } = get();
-            if (!user) return { success: false, message: 'User not found' };
-            const newType = isCheckedIn ? 'check-out' : 'check-in';
+            if (!user) return { success: false, message: "User not found" };
+            const newType = isCheckedIn ? "check-out" : "check-in";
             try {
                 // Attempt to obtain a high‑accuracy position.  If this fails, we fall back to a single geolocation call.
                 let position: GeolocationPosition | null = null;
@@ -308,18 +378,34 @@ export const useAuthStore = create<AuthState>()(
                     // ignore and fall back
                 }
                 if (!position || !position.coords) {
-                    // Fallback: one‑shot geolocation.  Use a Promise to wrap the callback‑based API.
-                    position = await new Promise<GeolocationPosition | null>((resolve) => {
-                        navigator.geolocation.getCurrentPosition(
-                            (p) => resolve(p),
-                            () => resolve(null),
-                            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                        );
-                    });
+                    // Fallback: one‑shot geolocation with relaxed constraints (Low Accuracy, Cached ok)
+                    position = await new Promise<GeolocationPosition | null>(
+                        (resolve) => {
+                            navigator.geolocation.getCurrentPosition(
+                                (p) => resolve(p),
+                                (err) => {
+                                    console.warn(
+                                        "Fallback geolocation failed:",
+                                        err.message,
+                                    );
+                                    resolve(null);
+                                },
+                                {
+                                    enableHighAccuracy: false, // Fallback to Wi-Fi/Cell for speed/reliability
+                                    timeout: 15000,
+                                    maximumAge: 60000, // Accept location up to 1 minute old
+                                },
+                            );
+                        },
+                    );
                 }
 
                 // Helper to finalize attendance
-                const finalizeAttendance = async (lat?: number, lng?: number, locId?: string | null) => {
+                const finalizeAttendance = async (
+                    lat?: number,
+                    lng?: number,
+                    locId?: string | null,
+                ) => {
                     await api.addAttendanceEvent({
                         userId: user.id,
                         timestamp: new Date().toISOString(),
@@ -333,49 +419,93 @@ export const useAuthStore = create<AuthState>()(
                     // Send notification to the USER themselves
                     try {
                         const greeting = getTimeBasedGreeting();
-                        const actionText = newType === 'check-in' ? 'checking in' : 'checking out';
+                        const actionText = newType === "check-in"
+                            ? "checking in"
+                            : "checking out";
                         await api.createNotification({
                             userId: user.id,
-                            message: `${greeting}, ${user.name || 'there'}! Thanks for ${actionText}.`,
-                            type: 'greeting',
+                            message: `${greeting}, ${
+                                user.name || "there"
+                            }! Thanks for ${actionText}.`,
+                            type: "greeting",
                         });
                     } catch (e) {
-                        console.warn('Failed to send user attendance notification', e);
+                        console.warn(
+                            "Failed to send user attendance notification",
+                            e,
+                        );
                     }
 
                     // Send notifications to managers if enabled
                     try {
                         const settings = await api.getAttendanceSettings();
-                        const isOfficeUser = ['admin', 'hr', 'finance', 'developer'].includes(user.role);
-                        const rules = isOfficeUser ? settings?.office : settings?.field;
+                        const isOfficeUser = [
+                            "admin",
+                            "hr",
+                            "finance",
+                            "developer",
+                        ].includes(user.role);
+                        const rules = isOfficeUser
+                            ? settings?.office
+                            : settings?.field;
 
                         if (rules?.enableAttendanceNotifications) {
                             const recipients: { id: string }[] = [];
-                            if (user.reportingManagerId) recipients.push({ id: user.reportingManagerId });
+                            if (user.reportingManagerId) {
+                                recipients.push({
+                                    id: user.reportingManagerId,
+                                });
+                            }
                             const nearbyManagers = await api.getNearbyUsers();
                             for (const mgr of nearbyManagers) {
-                                if (!recipients.find((r) => r.id === mgr.id)) recipients.push({ id: mgr.id });
+                                if (!recipients.find((r) => r.id === mgr.id)) {
+                                    recipients.push({ id: mgr.id });
+                                }
                             }
-                            const actorName = user.name || 'An employee';
-                            const locString = locId ? '' : (lat && lng ? ` at ${lat.toFixed(4)}, ${lng.toFixed(4)}` : '');
-                            const message = `${actorName} ${newType.replace('-', ' ')}${locString}`;
-                            await Promise.all(recipients.map((r) => api.createNotification({ userId: r.id, message, type: 'greeting' })));
+                            const actorName = user.name || "An employee";
+                            const locString = locId
+                                ? ""
+                                : (lat && lng
+                                    ? ` at ${lat.toFixed(4)}, ${lng.toFixed(4)}`
+                                    : "");
+                            const message = `${actorName} ${
+                                newType.replace("-", " ")
+                            }${locString}`;
+                            await Promise.all(
+                                recipients.map((r) =>
+                                    api.createNotification({
+                                        userId: r.id,
+                                        message,
+                                        type: "greeting",
+                                    })
+                                ),
+                            );
                         }
                     } catch (notifyErr) {
-                        console.warn('Failed to create manager notifications:', notifyErr);
+                        console.warn(
+                            "Failed to create manager notifications:",
+                            notifyErr,
+                        );
                     }
-                    return { success: true, message: `Successfully ${newType.replace('-', ' ')}!` };
+                    return {
+                        success: true,
+                        message: `Successfully ${newType.replace("-", " ")}!`,
+                    };
                 };
 
-                // If still no valid position, record an attendance event without location
+                // If still no valid position, ABORT. Location is mandatory.
                 if (!position || !position.coords) {
-                    return await finalizeAttendance(undefined, undefined, null);
+                    return {
+                        success: false,
+                        message:
+                            "Location required. Please enable GPS/Location Services and try again.",
+                    };
                 }
                 const { latitude, longitude, accuracy } = position.coords;
-                // If accuracy is unreasonably large (>1000m), still record the raw coordinates but flag no geofence match
-                if (typeof accuracy === 'number' && accuracy > 1000) {
-                    return await finalizeAttendance(latitude, longitude, null);
-                }
+
+                // If accuracy is unreasonably large (>2000m), warn the user but allow?
+                // Decision: For "proper" tracking, let's reject extremely poor accuracy too, or just log it.
+                // Keeping it lenient for now but ensuring we HAVE coords.
                 // --- Geofencing logic ---
                 let locationId: string | null = null;
                 try {
@@ -383,7 +513,12 @@ export const useAuthStore = create<AuthState>()(
                     const userLocations = await api.getUserLocations(user.id);
                     // Check if the user is within any of their assigned geofences
                     for (const loc of userLocations) {
-                        const dist = calculateDistanceMeters(latitude, longitude, loc.latitude, loc.longitude);
+                        const dist = calculateDistanceMeters(
+                            latitude,
+                            longitude,
+                            loc.latitude,
+                            loc.longitude,
+                        );
                         if (dist <= loc.radius) {
                             locationId = loc.id;
                             break;
@@ -393,30 +528,47 @@ export const useAuthStore = create<AuthState>()(
                     if (!locationId) {
                         const allLocations = await api.getLocations();
                         for (const loc of allLocations) {
-                            const dist = calculateDistanceMeters(latitude, longitude, loc.latitude, loc.longitude);
+                            const dist = calculateDistanceMeters(
+                                latitude,
+                                longitude,
+                                loc.latitude,
+                                loc.longitude,
+                            );
                             if (dist <= loc.radius) {
                                 locationId = loc.id;
                                 // Automatically assign this location to the user for future checks
                                 try {
-                                    await api.assignLocationToUser(user.id, loc.id);
+                                    await api.assignLocationToUser(
+                                        user.id,
+                                        loc.id,
+                                    );
                                 } catch (assignErr) {
-                                    console.warn('Failed to auto‑assign location to user:', assignErr);
+                                    console.warn(
+                                        "Failed to auto‑assign location to user:",
+                                        assignErr,
+                                    );
                                 }
                                 break;
                             }
                         }
                     }
                 } catch (geoErr) {
-                    console.warn('Geofencing check failed:', geoErr);
+                    console.warn("Geofencing check failed:", geoErr);
                 }
                 // If no geofence matched, automatically create a new location using the current coordinates.
                 if (!locationId) {
                     try {
                         let friendlyName: string | null = null;
                         try {
-                            friendlyName = await reverseGeocode(latitude, longitude);
+                            friendlyName = await reverseGeocode(
+                                latitude,
+                                longitude,
+                            );
                         } catch (err) {
-                            console.warn('Reverse geocode failed for new location:', err);
+                            console.warn(
+                                "Reverse geocode failed for new location:",
+                                err,
+                            );
                         }
                         const defaultRadius = 100;
                         const newLoc = await api.createLocation({
@@ -430,21 +582,33 @@ export const useAuthStore = create<AuthState>()(
                         try {
                             await api.assignLocationToUser(user.id, newLoc.id);
                         } catch (assignErr) {
-                            console.warn('Failed to auto‑assign new location to user:', assignErr);
+                            console.warn(
+                                "Failed to auto‑assign new location to user:",
+                                assignErr,
+                            );
                         }
                         locationId = newLoc.id;
                     } catch (createErr) {
-                        console.warn('Failed to create a new geofence location:', createErr);
+                        console.warn(
+                            "Failed to create a new geofence location:",
+                            createErr,
+                        );
                         locationId = null;
                     }
                 }
 
-                return await finalizeAttendance(latitude, longitude, locationId);
-
+                return await finalizeAttendance(
+                    latitude,
+                    longitude,
+                    locationId,
+                );
             } catch (err) {
-                console.error('Error during attendance update:', err);
-                return { success: false, message: 'Failed to update attendance.' };
+                console.error("Error during attendance update:", err);
+                return {
+                    success: false,
+                    message: "Failed to update attendance.",
+                };
             }
         },
-    })
+    }),
 );

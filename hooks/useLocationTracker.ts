@@ -67,12 +67,17 @@ export const useLocationTracker = () => {
             );
 
             // 2. Watch Position (Active Movement)
+            let lastWatchLog = 0;
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
-                    // Throttle logging could be added here
+                    const now = Date.now();
+                    if (now - lastWatchLog > 30000) { // Throttle: Max once every 30s
+                        logPosition(pos);
+                        lastWatchLog = now;
+                    }
                 },
-                console.error,
-                { enableHighAccuracy: true, maximumAge: 30000 },
+                (err) => console.error("Watch Position Error:", err),
+                { enableHighAccuracy: true, maximumAge: 30000, timeout: 27000 },
             );
 
             // 3. Periodic Ping (Heartbeat)

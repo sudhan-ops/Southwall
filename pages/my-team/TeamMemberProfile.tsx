@@ -5,6 +5,7 @@ import { User, LocationLog } from '../../types';
 import { Loader2, ArrowLeft, Clock, MapPin, Navigation } from 'lucide-react';
 import { format, differenceInMinutes } from 'date-fns';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'; // Ensure CSS is loaded
 import DatePicker from '../../components/ui/DatePicker';
 import { useThemeStore } from '../../store/themeStore';
 
@@ -51,12 +52,6 @@ const TeamMemberProfile: React.FC = () => {
             if (!userId) return;
             setLoading(true);
             try {
-                // Ideally get user from a cached list or specific API, here utilizing getAllUsers for simplicity
-                // or assume we passed it in state. But fetching specific user is safer.
-                // We'll fallback to filtering from getAllUsers if get specific user API missing, 
-                // but we check if we can just get basic info.
-                // Since api.getUsers() is available, let's use that + find.
-                // Optimization: Add api.getUser(id).
                 const allUsers = await api.getUsers();
                 const foundUser = allUsers.find(u => u.id === userId);
                 setUser(foundUser || null);
@@ -82,11 +77,8 @@ const TeamMemberProfile: React.FC = () => {
         for (let i = 1; i < logs.length; i++) {
             const log = logs[i];
             const dist = getDistanceFromLatLonInKm(lastLog.latitude, lastLog.longitude, log.latitude, log.longitude);
-            const timeDiff = differenceInMinutes(new Date(log.timestamp), new Date(lastLog.timestamp));
 
-            // If moved significantly (> 100m)
             if (dist > 0.1) {
-                // Close previous stop if duration > 5 mins
                 const stopDuration = differenceInMinutes(new Date(lastLog.timestamp), new Date(currentStopStart.timestamp));
                 if (stopDuration >= 5) {
                     detectedStops.push({
@@ -96,12 +88,11 @@ const TeamMemberProfile: React.FC = () => {
                         durationMinutes: stopDuration
                     });
                 }
-                currentStopStart = log; // Start new potential stop
+                currentStopStart = log; 
             }
             lastLog = log;
         }
         
-        // Check final segment
          const finalDuration = differenceInMinutes(new Date(lastLog.timestamp), new Date(currentStopStart.timestamp));
          if (finalDuration >= 5) {
              detectedStops.push({
@@ -117,12 +108,30 @@ const TeamMemberProfile: React.FC = () => {
 
     // Initialize Map
     useEffect(() => {
-        if (mapContainerRef.current && !mapRef.current) {
-            mapRef.current = L.map(mapContainerRef.current, { zoomControl: false }).setView([12.9716, 77.5946], 12);
-            markersRef.current.addTo(mapRef.current);
-            L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
+        // Ensure container exists
+        if (!mapContainerRef.current) return;
+
+        // Cleanup existing map if present (Strict Mode safety)
+        if (mapRef.current) {
+            mapRef.current.remove();
+            mapRef.current = null;
         }
-        setTimeout(() => mapRef.current?.invalidateSize(), 100);
+
+        const map = L.map(mapContainerRef.current, { zoomControl: false }).setView([12.9716, 77.5946], 12);
+        mapRef.current = map;
+        
+        markersRef.current = L.layerGroup().addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Force resize to prevent grey/white tiles
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 200);
+
+        return () => {
+            map.remove();
+            mapRef.current = null;
+        };
     }, []);
 
     // Theme Update
@@ -143,47 +152,134 @@ const TeamMemberProfile: React.FC = () => {
         }
     }, [theme]);
 
-    // Draw Route
+    // Draw Route with Attendance Bounds
     useEffect(() => {
         if (!mapRef.current) return;
-        markersRef.current.clearLayers();
-        if (polylineRef.current) {
-            mapRef.current.removeLayer(polylineRef.current);
-            polylineRef.current = null;
-        }
-
-        if (logs.length === 0) return;
-
-        const latLngs: L.LatLngTuple[] = logs.map(l => [l.latitude, l.longitude]);
-        polylineRef.current = L.polyline(latLngs, { color: '#3b82f6', weight: 4 }).addTo(mapRef.current);
-
-        // Add start/end markers
-        const start = latLngs[0];
-        const end = latLngs[latLngs.length - 1];
         
-        L.marker(start, {
-            icon: L.divIcon({ className: '', html: '<div style="width:12px;height:12px;border-radius:50%;background:#10b981;border:2px solid white;"></div>' })
-        }).addTo(markersRef.current).bindPopup(`Start: ${format(new Date(logs[0].timestamp), 'hh:mm a')}`);
+        const drawMap = async () => {
+             markersRef.current.clearLayers();
+            if (polylineRef.current) {
+                mapRef.current?.removeLayer(polylineRef.current);
+                polylineRef.current = null;
+            }
 
-        L.marker(end, {
-             icon: L.divIcon({ className: '', html: '<div style="width:12px;height:12px;border-radius:50%;background:#ef4444;border:2px solid white;"></div>' })
-        }).addTo(markersRef.current).bindPopup(`End: ${format(new Date(logs[logs.length-1].timestamp), 'hh:mm a')}`);
+            if (!userId) return;
 
-        // Add Stop Markers
-        stops.forEach((stop, idx) => {
-             L.marker([stop.location.lat, stop.location.lng], {
-                icon: L.divIcon({ className: '', html: '<div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;border:2px solid white;"></div>' })
-            }).addTo(markersRef.current).bindPopup(`
-                <b>Stop #${idx + 1}</b><br/>
-                ${format(new Date(stop.startTime), 'hh:mm a')} - ${format(new Date(stop.endTime), 'hh:mm a')}<br/>
-                Duration: ${Math.floor(stop.durationMinutes / 60)}h ${stop.durationMinutes % 60}m
-            `);
-        });
+            // Fetch Attendance for bounds (Shift Start/End)
+            let filteredLogs = logs;
+            let startLocation = null;
+            let endLocation = null;
 
-        const bounds = L.latLngBounds(latLngs);
-        mapRef.current.fitBounds(bounds.pad(0.2));
+            try {
+                 const attendance = await api.getAttendanceEvents(userId, date, date); // date, date acts as start/end for the day
+                 // Find first check-in and last check-out
+                 const checkIns = attendance.filter(a => a.type === 'check-in').sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+                 const checkOuts = attendance.filter(a => a.type === 'check-out').sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Desc
 
-    }, [logs, stops]);
+                 if (checkIns.length > 0) {
+                     const firstCheckIn = checkIns[0];
+                     const lastCheckOut = checkOuts.length > 0 ? checkOuts[0] : null;
+
+                     // Set strict Start Point from Check-In if available
+                     if (firstCheckIn.latitude && firstCheckIn.longitude) {
+                         startLocation = { lat: firstCheckIn.latitude, lng: firstCheckIn.longitude, time: firstCheckIn.timestamp };
+                     }
+
+                     // Filter logs to be AFTER check-in
+                     filteredLogs = filteredLogs.filter(l => new Date(l.timestamp) >= new Date(firstCheckIn.timestamp));
+
+                     if (lastCheckOut) {
+                         // Filter logs to be BEFORE check-out
+                         filteredLogs = filteredLogs.filter(l => new Date(l.timestamp) <= new Date(lastCheckOut.timestamp));
+                         
+                         // Set strict End Point from Check-Out if available
+                         if (lastCheckOut.latitude && lastCheckOut.longitude) {
+                             endLocation = { lat: lastCheckOut.latitude, lng: lastCheckOut.longitude, time: lastCheckOut.timestamp };
+                         }
+                     }
+                 }
+            } catch (e) {
+                console.error("Failed to fetch attendance for map bounds", e);
+            }
+
+            // Fallback if no logs or attendance
+            if (filteredLogs.length === 0 && !startLocation) return;
+
+            // Prepare Points
+            const points: L.LatLngTuple[] = [];
+            if (startLocation) points.push([startLocation.lat, startLocation.lng]);
+            points.push(...filteredLogs.map(l => [l.latitude, l.longitude] as L.LatLngTuple));
+            if (endLocation) points.push([endLocation.lat, endLocation.lng]);
+
+            // Draw Polyline
+            if (points.length > 0) {
+                 polylineRef.current = L.polyline(points, { color: '#f97316', weight: 5 }).addTo(mapRef.current!); // Orange route
+            }
+
+            // Markers
+            // 1. Start (House/Login)
+            if (startLocation || points.length > 0) {
+                const startPt = startLocation ? [startLocation.lat, startLocation.lng] : points[0];
+                const startIcon = L.divIcon({
+                    className: 'custom-map-icon',
+                    html: `<div style="background-color: #10b981; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                           </div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32],
+                    popupAnchor: [0, -32]
+                });
+                L.marker(startPt as L.LatLngTuple, { icon: startIcon }).addTo(markersRef.current)
+                 .bindPopup(`<b>Duty Start</b><br/>${startLocation ? format(new Date(startLocation.time), 'hh:mm a') : 'Unknown'}`);
+            }
+
+            // 2. End (Flag/Logout)
+            if (endLocation || points.length > 0) {
+                 const endPt = endLocation ? [endLocation.lat, endLocation.lng] : points[points.length-1];
+                 // Only show separate end marker if it's different from start or we have movement
+                 if (points.length > 1) {
+                    const endIcon = L.divIcon({
+                        className: 'custom-map-icon',
+                        html: `<div style="background-color: #ef4444; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                               </div>`,
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                         popupAnchor: [0, -32]
+                    });
+                    L.marker(endPt as L.LatLngTuple, { icon: endIcon }).addTo(markersRef.current)
+                     .bindPopup(`<b>Duty End</b><br/>${endLocation ? format(new Date(endLocation.time), 'hh:mm a') : 'Current'}`);
+                 }
+            }
+
+            // 3. Stops (Numbered)
+            stops.forEach((stop, idx) => {
+                 const stopIcon = L.divIcon({
+                    className: 'custom-map-icon',
+                    html: `<div style="background-color: #3b82f6; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                            ${idx + 1}
+                           </div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+                
+                L.marker([stop.location.lat, stop.location.lng], { icon: stopIcon }).addTo(markersRef.current)
+                .bindPopup(`
+                    <b>Stop #${idx + 1}</b><br/>
+                    ${format(new Date(stop.startTime), 'hh:mm a')} - ${format(new Date(stop.endTime), 'hh:mm a')}<br/>
+                    Duration: ${Math.floor(stop.durationMinutes / 60)}h ${stop.durationMinutes % 60}m
+                `);
+            });
+
+            if (points.length > 0) {
+                const bounds = L.latLngBounds(points);
+                mapRef.current!.fitBounds(bounds.pad(0.2));
+            }
+        };
+
+        drawMap();
+
+    }, [logs, stops, userId, date]); // Re-run when logs or date changes
 
     const downloadCSV = () => {
         if (!logs.length) return;
