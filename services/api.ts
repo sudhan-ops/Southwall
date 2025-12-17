@@ -2474,6 +2474,37 @@ export const api = {
     return (data || []).map(toCamelCase);
   },
 
+  /**
+   * Fetch the latest known location for a list of users (within last 24h).
+   */
+  getLatestLocations: async (
+    userIds: string[],
+  ): Promise<Record<string, LocationLog>> => {
+    if (userIds.length === 0) return {};
+
+    // Look back 24 hours
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+    const { data, error } = await supabase
+      .from("user_location_logs")
+      .select("*")
+      .in("user_id", userIds)
+      .gte("timestamp", oneDayAgo.toISOString())
+      .order("timestamp", { ascending: false });
+
+    if (error) throw error;
+
+    const latestMap: Record<string, LocationLog> = {};
+    (data || []).forEach((log) => {
+      const camelLog = toCamelCase(log) as LocationLog;
+      if (!latestMap[camelLog.userId]) {
+        latestMap[camelLog.userId] = camelLog;
+      }
+    });
+    return latestMap;
+  },
+
   submitPatrolLog: async (log: Omit<PatrolLog, "id">): Promise<void> => {
     // If photo is provided as data URL, upload it first
     let photoUrl = log.photoUrl;

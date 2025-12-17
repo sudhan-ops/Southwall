@@ -13,9 +13,10 @@ interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
   onChange?: (value: string) => void;
   maxDate?: Date;
   minDate?: Date;
+  align?: 'left' | 'right';
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ label, id, error, value, onChange, maxDate, minDate, ...props }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ label, id, error, value, onChange, maxDate, minDate, align = 'left', ...props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileTheme, setIsMobileTheme] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, id, error, value, onChan
           <CalendarIcon className="h-4 w-4 text-muted" />
         </div>
         {isOpen && (
-          <div className={`absolute z-50 mt-1 rounded-lg shadow-lg overflow-hidden ${isDark ? 'dark-calendar bg-[#041b0f] border border-[#1f3d2b]' : 'bg-white border border-gray-200'}`}>
+          <div className={`absolute z-50 mt-1 rounded-lg shadow-lg overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'} ${isDark ? 'dark-calendar bg-[#041b0f] border border-[#1f3d2b]' : 'bg-white border border-gray-200'}`}>
             <Calendar
               date={selectedDate}
               onChange={handleDateChange}

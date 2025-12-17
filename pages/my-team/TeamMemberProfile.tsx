@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import { User, LocationLog } from '../../types';
-import { Loader2, ArrowLeft, Clock, MapPin, Navigation } from 'lucide-react';
-import { format, differenceInMinutes } from 'date-fns';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Ensure CSS is loaded
+import { User, LocationLog, AttendanceEvent } from '../../types';
+import { Loader2, ArrowLeft, Clock, MapPin, Navigation, MoveRight, Calendar } from 'lucide-react';
+import { format, differenceInMinutes, parseISO, isValid } from 'date-fns';
 import DatePicker from '../../components/ui/DatePicker';
 import { useThemeStore } from '../../store/themeStore';
 
@@ -23,12 +21,16 @@ const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon
 
 const deg2rad = (deg: number) => deg * (Math.PI / 180);
 
-interface Stop {
-    location: { lat: number, lng: number };
+interface TimelineItem {
+    type: 'work' | 'travel';
     startTime: string;
     endTime: string;
     durationMinutes: number;
-    address?: string; // Placeholder for reverse geocoding
+    distanceKm?: number;
+    startLocation?: { lat: number; lng: number };
+    endLocation?: { lat: number; lng: number };
+    address?: string;
+    locationId?: string | null;
 }
 
 const TeamMemberProfile: React.FC = () => {
@@ -36,16 +38,10 @@ const TeamMemberProfile: React.FC = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(null);
     const [logs, setLogs] = useState<LocationLog[]>([]);
+    const [events, setEvents] = useState<AttendanceEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const { theme } = useThemeStore();
-
-    // Map Refs
-    const mapRef = useRef<L.Map | null>(null);
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-    const polylineRef = useRef<L.Polyline | null>(null);
-    const markersRef = useRef<L.LayerGroup>(L.layerGroup());
-    const tileLayerRef = useRef<L.TileLayer | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,8 +52,16 @@ const TeamMemberProfile: React.FC = () => {
                 const foundUser = allUsers.find(u => u.id === userId);
                 setUser(foundUser || null);
 
+                // Fetch logs
                 const locationLogs = await api.getLocationHistory(userId, date);
                 setLogs(locationLogs);
+
+                // Fetch attendance events (Stops)
+                const startOfDay = `${date}T00:00:00`;
+                const endOfDay = `${date}T23:59:59`;
+                const attendanceEvents = await api.getAttendanceEvents(userId, startOfDay, endOfDay);
+                setEvents(attendanceEvents);
+
             } catch (error) {
                 console.error("Failed to load profile", error);
             } finally {
@@ -67,230 +71,142 @@ const TeamMemberProfile: React.FC = () => {
         fetchData();
     }, [userId, date]);
 
-    // Calculate Stops (Duration Logic)
-    const stops = useMemo(() => {
-        if (logs.length < 2) return [];
-        const detectedStops: Stop[] = [];
-        let currentStopStart = logs[0];
-        let lastLog = logs[0];
+    // Calculate Path Distance specifically from Logs
+    const calculatePathDistance = (start: string, end: string) => {
+        if (!logs.length) return 0; // Fallback? 
+        const startDate = new Date(start).getTime();
+        const endDate = new Date(end).getTime();
 
-        for (let i = 1; i < logs.length; i++) {
-            const log = logs[i];
-            const dist = getDistanceFromLatLonInKm(lastLog.latitude, lastLog.longitude, log.latitude, log.longitude);
+        const relevantLogs = logs.filter(l => {
+            const t = new Date(l.timestamp).getTime();
+            return t >= startDate && t <= endDate;
+        });
 
-            if (dist > 0.1) {
-                const stopDuration = differenceInMinutes(new Date(lastLog.timestamp), new Date(currentStopStart.timestamp));
-                if (stopDuration >= 5) {
-                    detectedStops.push({
-                        location: { lat: currentStopStart.latitude, lng: currentStopStart.longitude },
-                        startTime: currentStopStart.timestamp,
-                        endTime: lastLog.timestamp,
-                        durationMinutes: stopDuration
-                    });
+        if (relevantLogs.length < 2) return 0;
+
+        let totalDist = 0;
+        for (let i = 1; i < relevantLogs.length; i++) {
+            totalDist += getDistanceFromLatLonInKm(
+                relevantLogs[i - 1].latitude,
+                relevantLogs[i - 1].longitude,
+                relevantLogs[i].latitude,
+                relevantLogs[i].longitude
+            );
+        }
+        return totalDist;
+    };
+
+    // Core Logic: Segment the day into Work (at location) and Travel (between locations)
+    const timelineData = useMemo(() => {
+        const items: TimelineItem[] = [];
+        // Sort events by time
+        const sortedEvents = [...events].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+        // We process pairs of In -> Out
+        let lastCheckOutTime: string | null = null;
+        let lastCheckOutLocation: { lat: number, lng: number } | null = null;
+        
+        let ptr = 0;
+
+        while (ptr < sortedEvents.length) {
+            const e = sortedEvents[ptr];
+            
+            if (e.type === 'check-in') {
+                // 1. Calculate Travel from PREVIOUS checkout to THIS checkin
+                if (lastCheckOutTime && lastCheckOutLocation) {
+                    // Check if time difference is rational (e.g. positive)
+                    if (new Date(e.timestamp) > new Date(lastCheckOutTime)) {
+                        const travelDist = calculatePathDistance(lastCheckOutTime, e.timestamp);
+                        const travelDur = differenceInMinutes(parseISO(e.timestamp), parseISO(lastCheckOutTime));
+                        
+                        // Only add travel if it's significant (e.g. >1 min or >100m) 
+                        // But user wants to see calculation, so we include it.
+                        items.push({
+                            type: 'travel',
+                            startTime: lastCheckOutTime,
+                            endTime: e.timestamp,
+                            durationMinutes: travelDur,
+                            distanceKm: travelDist,
+                            startLocation: lastCheckOutLocation,
+                            endLocation: { lat: e.latitude || 0, lng: e.longitude || 0 }
+                        });
+                    }
                 }
-                currentStopStart = log; 
-            }
-            lastLog = log;
-        }
-        
-         const finalDuration = differenceInMinutes(new Date(lastLog.timestamp), new Date(currentStopStart.timestamp));
-         if (finalDuration >= 5) {
-             detectedStops.push({
-                location: { lat: currentStopStart.latitude, lng: currentStopStart.longitude },
-                startTime: currentStopStart.timestamp,
-                endTime: lastLog.timestamp,
-                durationMinutes: finalDuration
-             });
-         }
 
-        return detectedStops;
-    }, [logs]);
-
-    // Initialize Map
-    useEffect(() => {
-        // Ensure container exists
-        if (!mapContainerRef.current) return;
-
-        // Cleanup existing map if present (Strict Mode safety)
-        if (mapRef.current) {
-            mapRef.current.remove();
-            mapRef.current = null;
-        }
-
-        const map = L.map(mapContainerRef.current, { zoomControl: false }).setView([12.9716, 77.5946], 12);
-        mapRef.current = map;
-        
-        markersRef.current = L.layerGroup().addTo(map);
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-        // Force resize to prevent grey/white tiles
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 200);
-
-        return () => {
-            map.remove();
-            mapRef.current = null;
-        };
-    }, []);
-
-    // Theme Update
-    useEffect(() => {
-        if (!mapRef.current) return;
-        const isDark = theme === 'dark';
-        const tileUrl = isDark 
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        const attribution = isDark
-            ? '&copy; OpenStreetMap &copy; CARTO'
-            : '&copy; OpenStreetMap contributors';
-
-        if (tileLayerRef.current) {
-            tileLayerRef.current.setUrl(tileUrl);
-        } else {
-            tileLayerRef.current = L.tileLayer(tileUrl, { attribution }).addTo(mapRef.current);
-        }
-    }, [theme]);
-
-    // Draw Route with Attendance Bounds
-    useEffect(() => {
-        if (!mapRef.current) return;
-        
-        const drawMap = async () => {
-             markersRef.current.clearLayers();
-            if (polylineRef.current) {
-                mapRef.current?.removeLayer(polylineRef.current);
-                polylineRef.current = null;
-            }
-
-            if (!userId) return;
-
-            // Fetch Attendance for bounds (Shift Start/End)
-            let filteredLogs = logs;
-            let startLocation = null;
-            let endLocation = null;
-
-            try {
-                 const attendance = await api.getAttendanceEvents(userId, date, date); // date, date acts as start/end for the day
-                 // Find first check-in and last check-out
-                 const checkIns = attendance.filter(a => a.type === 'check-in').sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-                 const checkOuts = attendance.filter(a => a.type === 'check-out').sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Desc
-
-                 if (checkIns.length > 0) {
-                     const firstCheckIn = checkIns[0];
-                     const lastCheckOut = checkOuts.length > 0 ? checkOuts[0] : null;
-
-                     // Set strict Start Point from Check-In if available
-                     if (firstCheckIn.latitude && firstCheckIn.longitude) {
-                         startLocation = { lat: firstCheckIn.latitude, lng: firstCheckIn.longitude, time: firstCheckIn.timestamp };
-                     }
-
-                     // Filter logs to be AFTER check-in
-                     filteredLogs = filteredLogs.filter(l => new Date(l.timestamp) >= new Date(firstCheckIn.timestamp));
-
-                     if (lastCheckOut) {
-                         // Filter logs to be BEFORE check-out
-                         filteredLogs = filteredLogs.filter(l => new Date(l.timestamp) <= new Date(lastCheckOut.timestamp));
-                         
-                         // Set strict End Point from Check-Out if available
-                         if (lastCheckOut.latitude && lastCheckOut.longitude) {
-                             endLocation = { lat: lastCheckOut.latitude, lng: lastCheckOut.longitude, time: lastCheckOut.timestamp };
-                         }
-                     }
-                 }
-            } catch (e) {
-                console.error("Failed to fetch attendance for map bounds", e);
-            }
-
-            // Fallback if no logs or attendance
-            if (filteredLogs.length === 0 && !startLocation) return;
-
-            // Prepare Points
-            const points: L.LatLngTuple[] = [];
-            if (startLocation) points.push([startLocation.lat, startLocation.lng]);
-            points.push(...filteredLogs.map(l => [l.latitude, l.longitude] as L.LatLngTuple));
-            if (endLocation) points.push([endLocation.lat, endLocation.lng]);
-
-            // Draw Polyline
-            if (points.length > 0) {
-                 polylineRef.current = L.polyline(points, { color: '#f97316', weight: 5 }).addTo(mapRef.current!); // Orange route
-            }
-
-            // Markers
-            // 1. Start (House/Login)
-            if (startLocation || points.length > 0) {
-                const startPt = startLocation ? [startLocation.lat, startLocation.lng] : points[0];
-                const startIcon = L.divIcon({
-                    className: 'custom-map-icon',
-                    html: `<div style="background-color: #10b981; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                           </div>`,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 32],
-                    popupAnchor: [0, -32]
-                });
-                L.marker(startPt as L.LatLngTuple, { icon: startIcon }).addTo(markersRef.current)
-                 .bindPopup(`<b>Duty Start</b><br/>${startLocation ? format(new Date(startLocation.time), 'hh:mm a') : 'Unknown'}`);
-            }
-
-            // 2. End (Flag/Logout)
-            if (endLocation || points.length > 0) {
-                 const endPt = endLocation ? [endLocation.lat, endLocation.lng] : points[points.length-1];
-                 // Only show separate end marker if it's different from start or we have movement
-                 if (points.length > 1) {
-                    const endIcon = L.divIcon({
-                        className: 'custom-map-icon',
-                        html: `<div style="background-color: #ef4444; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                               </div>`,
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32],
-                         popupAnchor: [0, -32]
-                    });
-                    L.marker(endPt as L.LatLngTuple, { icon: endIcon }).addTo(markersRef.current)
-                     .bindPopup(`<b>Duty End</b><br/>${endLocation ? format(new Date(endLocation.time), 'hh:mm a') : 'Current'}`);
-                 }
-            }
-
-            // 3. Stops (Numbered)
-            stops.forEach((stop, idx) => {
-                 const stopIcon = L.divIcon({
-                    className: 'custom-map-icon',
-                    html: `<div style="background-color: #3b82f6; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                            ${idx + 1}
-                           </div>`,
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
-                });
+                // 2. Find matching checkout for THIS checkin
+                // Look ahead for the next event.
+                const nextE = sortedEvents[ptr + 1];
                 
-                L.marker([stop.location.lat, stop.location.lng], { icon: stopIcon }).addTo(markersRef.current)
-                .bindPopup(`
-                    <b>Stop #${idx + 1}</b><br/>
-                    ${format(new Date(stop.startTime), 'hh:mm a')} - ${format(new Date(stop.endTime), 'hh:mm a')}<br/>
-                    Duration: ${Math.floor(stop.durationMinutes / 60)}h ${stop.durationMinutes % 60}m
-                `);
-            });
+                if (nextE && nextE.type === 'check-out') {
+                    // Standard Session: Check In -> Check Out
+                    const duration = differenceInMinutes(parseISO(nextE.timestamp), parseISO(e.timestamp));
+                    items.push({
+                        type: 'work',
+                        startTime: e.timestamp,
+                        endTime: nextE.timestamp,
+                        durationMinutes: duration,
+                        locationId: e.locationId,
+                        startLocation: { lat: e.latitude || 0, lng: e.longitude || 0 }
+                    });
 
-            if (points.length > 0) {
-                const bounds = L.latLngBounds(points);
-                mapRef.current!.fitBounds(bounds.pad(0.2));
+                    // Set checkout state for NEXT loop
+                    lastCheckOutTime = nextE.timestamp;
+                    lastCheckOutLocation = { lat: nextE.latitude || 0, lng: nextE.longitude || 0 };
+                    
+                    ptr += 2; // Consume both events
+                } else {
+                    // Incomplete Session: Check In -> (Next is In OR End of List)
+                    items.push({
+                        type: 'work',
+                        startTime: e.timestamp,
+                        endTime: "In Progress",
+                        durationMinutes: 0, // Cannot calculate finished duration
+                        locationId: e.locationId,
+                        startLocation: { lat: e.latitude || 0, lng: e.longitude || 0 }
+                    });
+                    
+                    // Cannot calculate travel from this point onwards as we don't have an end time
+                    lastCheckOutTime = null; 
+                    lastCheckOutLocation = null;
+                    ptr += 1; // Consume only Check In
+                }
+
+            } else {
+                // Encountered a Check-Out without a preceding Check-In (Dangling)
+                // Just ignore it or advance
+                ptr += 1;
             }
-        };
+        }
 
-        drawMap();
+        return items;
+    }, [events, logs]);
 
-    }, [logs, stops, userId, date]); // Re-run when logs or date changes
+    const stats = useMemo(() => {
+        const totalDist = timelineData
+            .filter(i => i.type === 'travel')
+            .reduce((acc, curr) => acc + (curr.distanceKm || 0), 0);
+        
+        const totalTravelMins = timelineData
+            .filter(i => i.type === 'travel')
+            .reduce((acc, curr) => acc + curr.durationMinutes, 0);
 
-    const downloadCSV = () => {
-        if (!logs.length) return;
-        const headers = ['Timestamp', 'Latitude', 'Longitude', 'Accuracy (m)', 'Speed (m/s)', 'Activity'];
-        const rows = logs.map(l => [
-            l.timestamp,
-            l.latitude,
-            l.longitude,
-            l.accuracy || '',
-            l.speed || '',
-            l.activityType || ''
+        const totalWorkMins = timelineData
+            .filter(i => i.type === 'work' && i.endTime !== "In Progress")
+            .reduce((acc, curr) => acc + curr.durationMinutes, 0);
+
+        return { totalDist, totalTravelMins, totalWorkMins };
+    }, [timelineData]);
+
+     const downloadCSV = () => {
+        if (!timelineData.length) return;
+        const headers = ['Type', 'Start Time', 'End Time', 'Duration (m)', 'Distance (km)', 'Location'];
+        const rows = timelineData.map(item => [
+            item.type.toUpperCase(),
+            format(parseISO(item.startTime), 'yyyy-MM-dd HH:mm:ss'),
+            item.endTime === "In Progress" ? "In Progress" : format(parseISO(item.endTime), 'yyyy-MM-dd HH:mm:ss'),
+            item.durationMinutes,
+            item.distanceKm ? item.distanceKm.toFixed(2) : '0',
+            item.locationId || 'N/A'
         ]);
         
         const csvContent = "data:text/csv;charset=utf-8," 
@@ -299,7 +215,7 @@ const TeamMemberProfile: React.FC = () => {
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${user?.name}_location_history_${date}.csv`);
+        link.setAttribute("download", `${user?.name}_activity_report_${date}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -308,81 +224,154 @@ const TeamMemberProfile: React.FC = () => {
     if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin text-accent h-8 w-8" /></div>;
     if (!user) return <div className="p-6 text-center text-muted">User not found.</div>;
 
-    const totalDistance = logs.length > 1 ? logs.reduce((acc, curr, idx) => {
-        if (idx === 0) return 0;
-        return acc + getDistanceFromLatLonInKm(logs[idx-1].latitude, logs[idx-1].longitude, curr.latitude, curr.longitude);
-    }, 0) : 0;
-
     return (
-        <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex items-center gap-4 flex-grow">
+        <div className="p-4 md:p-6 space-y-6">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-page rounded-full text-muted hover:text-primary-text transition-colors">
                         <ArrowLeft className="h-6 w-6" />
                     </button>
                     <div>
                         <h1 className="text-2xl font-bold text-primary-text">{user.name}</h1>
-                        <p className="text-sm text-muted capitalize">Role: {user.role.replace('_', ' ')}</p>
+                        <div className="flex items-center gap-2 text-sm text-muted">
+                            <span className="capitalize px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">
+                                {user.role.replace('_', ' ')}
+                            </span>
+                             <span>•</span>
+                             <span>{user.email}</span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-3">
                      <button 
                         onClick={downloadCSV}
-                        disabled={logs.length === 0}
+                        disabled={timelineData.length === 0}
                         className="px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-accent hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Export CSV
+                        Export Report
                     </button>
-                    <DatePicker label="" id="report-date" value={date} onChange={setDate} />
+                    <DatePicker label="" id="report-date" value={date} onChange={setDate} align="right" />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Stats & Timeline */}
+                {/* Left Column: Stats & Summary */}
                 <div className="space-y-6 lg:col-span-1">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-card p-4 rounded-xl border border-border">
-                            <div className="flex items-center gap-2 text-muted mb-2">
-                                <Navigation className="h-4 w-4" />
-                                <span className="text-xs font-medium uppercase">Total Distance</span>
-                            </div>
-                            <p className="text-2xl font-bold text-primary-text">{totalDistance.toFixed(2)} km</p>
-                        </div>
-                        <div className="bg-card p-4 rounded-xl border border-border">
-                            <div className="flex items-center gap-2 text-muted mb-2">
-                                <Clock className="h-4 w-4" />
-                                <span className="text-xs font-medium uppercase">Total Stops</span>
-                            </div>
-                            <p className="text-2xl font-bold text-primary-text">{stops.length}</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-card rounded-xl border border-border p-4 max-h-[600px] overflow-y-auto">
-                        <h3 className="font-semibold text-primary-text mb-4">Daily Timeline</h3>
-                        <div className="space-y-6 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
-                            {stops.length === 0 ? (
-                                <p className="text-muted text-sm text-center py-4 pl-4">No significant stops detected.</p>
-                            ) : stops.map((stop, i) => (
-                                <div key={i} className="relative pl-8">
-                                    <div className="absolute left-0 top-1 w-4 h-4 rounded-full bg-accent border-4 border-card z-10"></div>
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-mono text-muted">
-                                            {format(new Date(stop.startTime), 'hh:mm a')} - {format(new Date(stop.endTime), 'hh:mm a')}
-                                        </span>
-                                        <span className="font-medium text-primary-text">Stop #{i + 1}</span>
-                                        <span className="text-xs text-accent">
-                                            Duration: {Math.floor(stop.durationMinutes / 60)}h {stop.durationMinutes % 60}m
-                                        </span>
-                                    </div>
+                    {/* Key Metrics Cards */}
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400">
+                                    <Navigation className="h-5 w-5" />
                                 </div>
-                            ))}
+                                <span className="text-sm font-medium text-muted">Total Distance</span>
+                            </div>
+                            <p className="text-3xl font-bold text-primary-text">
+                                {stats.totalDist.toFixed(2)} <span className="text-lg text-muted font-normal">km</span>
+                            </p>
+                            <p className="text-xs text-muted mt-1">Traveled across {timelineData.filter(x => x.type === 'travel').length} trips</p>
+                        </div>
+
+                         <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400">
+                                    <Clock className="h-5 w-5" />
+                                </div>
+                                <span className="text-sm font-medium text-muted">Work Duration</span>
+                            </div>
+                            <p className="text-3xl font-bold text-primary-text">
+                                {Math.floor(stats.totalWorkMins / 60)}h {stats.totalWorkMins % 60}m
+                            </p>
+                             <p className="text-xs text-muted mt-1">Total time at site locations</p>
+                        </div>
+
+                         <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 dark:text-amber-400">
+                                    <MoveRight className="h-5 w-5" />
+                                </div>
+                                <span className="text-sm font-medium text-muted">Travel Time</span>
+                            </div>
+                            <p className="text-3xl font-bold text-primary-text">
+                                {Math.floor(stats.totalTravelMins / 60)}h {stats.totalTravelMins % 60}m
+                            </p>
+                             <p className="text-xs text-muted mt-1">Total time spent commuting</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Map */}
-                <div className="lg:col-span-2 h-[600px] bg-card rounded-xl border border-border overflow-hidden relative z-0">
-                    <div ref={mapContainerRef} className="h-full w-full" />
+                {/* Right Column: Detailed Timeline */}
+                <div className="lg:col-span-2 space-y-4">
+                    <h3 className="font-semibold text-lg text-primary-text flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-accent" />
+                        Activity Timeline
+                    </h3>
+                    
+                    <div className="bg-card rounded-xl border border-border p-6 min-h-[400px]">
+                        {timelineData.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-[300px] text-muted">
+                                <Clock className="h-12 w-12 mb-4 opacity-20" />
+                                <p>No activity recorded for this date.</p>
+                            </div>
+                        ) : (
+                            <div className="relative space-y-0 before:absolute before:inset-y-0 before:left-6 before:w-0.5 before:bg-border/50">
+                                {timelineData.map((item, idx) => (
+                                    <div key={idx} className="relative pl-14 pb-8 last:pb-0 group">
+                                        {/* Icon Node */}
+                                        <div className={`absolute left-3 -translate-x-1/2 top-0 w-6 h-6 rounded-full border-4 border-card z-10 flex items-center justify-center
+                                            ${item.type === 'work' ? 'bg-emerald-500' : 'bg-amber-500 ring-4 ring-amber-500/10'}
+                                        `}>
+                                        </div>
+
+                                        {/* Content Card */}
+                                        <div className={`p-4 rounded-xl border ${item.type === 'work' ? 'bg-page border-border' : 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800/30'} transition-all hover:shadow-md`}>
+                                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+                                                <div>
+                                                    <span className={`text-xs font-bold uppercase tracking-wider mb-1 block ${item.type === 'work' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                        {item.type === 'work' ? 'At Location' : 'Travel'}
+                                                    </span>
+                                                    <h4 className="font-semibold text-primary-text">
+                                                        {item.type === 'work' ? (
+                                                            item.locationId ? `Site: ${item.locationId}` : 'Unknown Location (Site)' 
+                                                        ) : (
+                                                            `Travel to next stop`
+                                                        )}
+                                                    </h4>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-sm font-mono font-medium text-primary-text">
+                                                        {format(parseISO(item.startTime), 'hh:mm a')} 
+                                                        <span className="text-muted mx-1">-</span>
+                                                        {item.endTime === "In Progress" ? "Now" : format(parseISO(item.endTime), 'hh:mm a')}
+                                                    </div>
+                                                    <div className="text-xs text-muted">
+                                                        {Math.floor(item.durationMinutes / 60)}h {item.durationMinutes % 60}m
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {item.type === 'travel' && (
+                                                <div className="flex items-center gap-4 text-xs text-muted mt-3 pt-3 border-t border-border/50">
+                                                    <div className="flex items-center gap-1">
+                                                        <Navigation className="h-3 w-3" />
+                                                        <span>{item.distanceKm?.toFixed(2)} km</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            {item.type === 'work' && (
+                                                 <div className="flex items-center gap-2 text-xs text-muted mt-2">
+                                                    <MapPin className="h-3 w-3" />
+                                                    <span>Lat: {item.startLocation?.lat.toFixed(4)}, Lng: {item.startLocation?.lng.toFixed(4)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

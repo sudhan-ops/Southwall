@@ -1,2 +1,12 @@
 /* Main CSS file */
 /* Tailwind is loaded via CDN in index.html */
+
+/* Leaflet Fix for Tailwind Preflight */
+.leaflet-container img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+    max-width: none !important;
+    max-height: none !important;
+    width: auto;
+    padding: 0;
+}
