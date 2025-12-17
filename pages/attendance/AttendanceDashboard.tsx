@@ -115,9 +115,6 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
 
     useEffect(() => {
         if (chartRef.current) {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 // Theme Colors
@@ -125,80 +122,96 @@ const AttendanceTrendChart: React.FC<{ data: { labels: string[], present: number
                 const presentBg = themeColors.activeItemBg;
                 const presentBorder = themeColors.sidebarBorder;
 
-                chartInstance.current = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'Present',
-                                data: data.present,
-                                backgroundColor: presentBg,
-                                borderColor: presentBorder,
-                                borderWidth: 1,
-                                borderRadius: 4,
-                            },
-                            {
-                                label: 'Absent',
-                                data: data.absent,
-                                backgroundColor: '#EF4444',
-                                borderColor: '#DC2626',
-                                borderWidth: 1,
-                                borderRadius: 4,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(128,128,128,0.1)' } },
-                            x: {
-                                grid: { display: false },
-                                ticks: {
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    autoSkip: true,
-                                    maxTicksLimit: 7,
+                if (chartInstance.current) {
+                    // Update existing chart
+                    chartInstance.current.data.labels = data.labels;
+                    chartInstance.current.data.datasets[0].data = data.present;
+                    chartInstance.current.data.datasets[0].backgroundColor = presentBg;
+                    chartInstance.current.data.datasets[0].borderColor = presentBorder;
+                    chartInstance.current.data.datasets[1].data = data.absent;
+                    chartInstance.current.update();
+                } else {
+                    // Create new chart
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Present',
+                                    data: data.present,
+                                    backgroundColor: presentBg,
+                                    borderColor: presentBorder,
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                },
+                                {
+                                    label: 'Absent',
+                                    data: data.absent,
+                                    backgroundColor: '#EF4444',
+                                    borderColor: '#DC2626',
+                                    borderWidth: 1,
+                                    borderRadius: 4,
                                 }
-                            }
+                            ]
                         },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                align: 'center',
-                                labels: {
-                                    usePointStyle: true,
-                                    pointStyle: 'rectRounded',
-                                    boxWidth: 12,
-                                    padding: 20,
-                                    font: {
-                                        family: "'Manrope', sans-serif",
-                                        size: 12,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: 'rgba(128,128,128,0.1)' } },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        maxRotation: 0,
+                                        minRotation: 0,
+                                        autoSkip: true,
+                                        maxTicksLimit: 7,
                                     }
                                 }
                             },
-                            tooltip: {
-                                backgroundColor: '#0F172A',
-                                titleFont: { family: "'Manrope', sans-serif" },
-                                bodyFont: { family: "'Manrope', sans-serif" },
-                                cornerRadius: 8,
-                                padding: 10,
-                                displayColors: true,
-                                boxPadding: 4,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    align: 'center',
+                                    labels: {
+                                        usePointStyle: true,
+                                        pointStyle: 'rectRounded',
+                                        boxWidth: 12,
+                                        padding: 20,
+                                        font: {
+                                            family: "'Manrope', sans-serif",
+                                            size: 12,
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: '#0F172A',
+                                    titleFont: { family: "'Manrope', sans-serif" },
+                                    bodyFont: { family: "'Manrope', sans-serif" },
+                                    cornerRadius: 8,
+                                    padding: 10,
+                                    displayColors: true,
+                                    boxPadding: 4,
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
+    }, [data, colorScheme]);
+
+    // Separate effect for cleanup on unmount
+    useEffect(() => {
         return () => {
             if (chartInstance.current) {
                 chartInstance.current.destroy();
+                chartInstance.current = null;
             }
         };
-    }, [data, colorScheme]);
+    }, []);
 
     return (
         <div className="h-full w-full flex flex-col">
@@ -217,9 +230,6 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
 
     useEffect(() => {
         if (chartRef.current) {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 // Theme Colors
@@ -230,86 +240,103 @@ const ProductivityChart: React.FC<{ data: { labels: string[], hours: number[] } 
                 const gradient = ctx.createLinearGradient(0, 0, 0, 200);
                 gradient.addColorStop(0, `rgba(${themeRgb}, 0.4)`);
                 gradient.addColorStop(1, `rgba(${themeRgb}, 0)`);
-                chartInstance.current = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'Average Hours Worked',
-                            data: data.hours,
-                            borderColor: themeColor,
-                            backgroundColor: gradient,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: themeColor,
-                            pointRadius: 0,
-                            pointHoverRadius: 5,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            // Use whole-number tick steps on the y-axis so average hours are easy to read.  If
-                            // fractional hours are returned they will be rounded when rendered.
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: 'rgba(128,128,128,0.1)' },
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0,
-                                    callback: (value: any) => {
-                                        const num = typeof value === 'string' ? parseFloat(value) : (value as number);
-                                        return Math.round(num);
+
+                if (chartInstance.current) {
+                    // Update existing chart
+                    chartInstance.current.data.labels = data.labels;
+                    chartInstance.current.data.datasets[0].data = data.hours;
+                    chartInstance.current.data.datasets[0].borderColor = themeColor;
+                    chartInstance.current.data.datasets[0].backgroundColor = gradient;
+                    (chartInstance.current.data.datasets[0] as any).pointBackgroundColor = themeColor;
+                    chartInstance.current.update();
+                } else {
+                    // Create new chart
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Average Hours Worked',
+                                data: data.hours,
+                                borderColor: themeColor,
+                                backgroundColor: gradient,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: themeColor,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                // Use whole-number tick steps on the y-axis so average hours are easy to read.  If
+                                // fractional hours are returned they will be rounded when rendered.
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(128,128,128,0.1)' },
+                                    ticks: {
+                                        stepSize: 1,
+                                        precision: 0,
+                                        callback: (value: any) => {
+                                            const num = typeof value === 'string' ? parseFloat(value) : (value as number);
+                                            return Math.round(num);
+                                        },
+                                    },
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        maxRotation: 0,
+                                        minRotation: 0,
+                                        autoSkip: true,
+                                        maxTicksLimit: 7,
                                     },
                                 },
                             },
-                            x: {
-                                grid: { display: false },
-                                ticks: {
-                                    maxRotation: 0,
-                                    minRotation: 0,
-                                    autoSkip: true,
-                                    maxTicksLimit: 7,
-                                },
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                align: 'center',
-                                labels: {
-                                    usePointStyle: true,
-                                    pointStyle: 'rectRounded',
-                                    boxWidth: 12,
-                                    padding: 20,
-                                    font: {
-                                        family: "'Manrope', sans-serif",
-                                        size: 12,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    align: 'center',
+                                    labels: {
+                                        usePointStyle: true,
+                                        pointStyle: 'rectRounded',
+                                        boxWidth: 12,
+                                        padding: 20,
+                                        font: {
+                                            family: "'Manrope', sans-serif",
+                                            size: 12,
+                                        },
                                     },
                                 },
+                                tooltip: {
+                                    backgroundColor: '#0F172A',
+                                    titleFont: { family: "'Manrope', sans-serif" },
+                                    bodyFont: { family: "'Manrope', sans-serif" },
+                                    cornerRadius: 8,
+                                    padding: 10,
+                                    displayColors: true,
+                                    boxPadding: 4,
+                                },
                             },
-                            tooltip: {
-                                backgroundColor: '#0F172A',
-                                titleFont: { family: "'Manrope', sans-serif" },
-                                bodyFont: { family: "'Manrope', sans-serif" },
-                                cornerRadius: 8,
-                                padding: 10,
-                                displayColors: true,
-                                boxPadding: 4,
-                            },
-                        },
-                    }
-                });
+                        }
+                    });
+                }
             }
         }
+    }, [data, colorScheme]);
+
+    // Separate effect for cleanup
+    useEffect(() => {
         return () => {
             if (chartInstance.current) {
                 chartInstance.current.destroy();
+                chartInstance.current = null;
             }
         };
-    }, [data, colorScheme]);
+    }, []);
 
     return (
         <div className="h-full w-full flex flex-col">
@@ -416,21 +443,21 @@ const BasicReportPdfLayout: React.FC<{ data: BasicReportDataRow[]; dateRange: Ra
                     <div
                         key={pageIndex}
                         style={{
-                            padding: pageIndex === 0 ? '40px' : '0px 40px 40px 40px',
-                            paddingTop: pageIndex === 0 ? '40px' : '0px',
-                            marginTop: pageIndex === 0 ? '0px' : '-40px',
+                            padding: '40px',
+                            marginBottom: '20px', // Space between pages in preview
                             fontFamily: '"Courier New", Courier, monospace',
-                            fontSize: '14px', // Slightly larger for 1123px width
+                            fontSize: '14px',
                             color: '#000',
                             backgroundColor: '#fff',
-                            width: '1123px', // A4 Landscape width in px (96dpi)
-                            height: '794px', // A4 Landscape height in px (96dpi)
+                            width: '1123px', // A4 Landscape width
+                            height: '794px', // A4 Landscape height
                             boxSizing: 'border-box',
                             letterSpacing: '0.5px',
                             pageBreakAfter: isLastPage ? 'auto' : 'always',
                             position: 'relative',
                             display: 'flex',
                             flexDirection: 'column',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' // Add shadow for better preview distinction
                         }}
                     >
                         {/* Header Table */}
@@ -769,6 +796,7 @@ const AttendanceDashboard: React.FC = () => {
     const [attendanceEvents, setAttendanceEvents] = useState<AttendanceEvent[]>([]);
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadingProgress, setLoadingProgress] = useState(0);
 
     const [dateRange, setDateRange] = useState<Range>({
         startDate: startOfToday(),
@@ -938,8 +966,29 @@ const AttendanceDashboard: React.FC = () => {
         fetchEmployeeData();
     }, [isEmployeeView, user, dateRange, recurringHolidays]);
 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
     const fetchDashboardData = useCallback(async (startDate: Date, endDate: Date) => {
+        // Clear any existing interval to prevent overlapping animations
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
         setIsLoading(true);
+        setLoadingProgress(0);
+
+        // Progress simulation
+        intervalRef.current = setInterval(() => {
+            setLoadingProgress(prev => {
+                if (prev >= 90) {
+                    if (intervalRef.current) clearInterval(intervalRef.current);
+                    return 90;
+                }
+                return prev + 10;
+            });
+        }, 100);
+
         try {
             // Ensure we have users data
             let currentUsers = users;
@@ -1023,10 +1072,6 @@ const AttendanceDashboard: React.FC = () => {
                     if (checkIn && checkOut) {
                         const diff = differenceInMinutes(new Date(checkOut.timestamp), new Date(checkIn.timestamp));
                         totalHours += diff / 60;
-                    } else if (checkIn) {
-                        // If currently checked in (today), calculate hours until now? 
-                        // Or just ignore incomplete sessions for productivity trend?
-                        // Ignoring incomplete sessions is safer for historical data.
                     }
                 });
 
@@ -1049,12 +1094,44 @@ const AttendanceDashboard: React.FC = () => {
                 }
             });
 
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+
+            // Phase 2: Data loaded, fast-forward progress to 100% smoothly
+            intervalRef.current = setInterval(() => {
+                setLoadingProgress(prev => {
+                    if (prev >= 100) {
+                        if (intervalRef.current) clearInterval(intervalRef.current);
+                         // Small delay to show 100% completion before rendering content
+                        setTimeout(() => {
+                            setIsLoading(false);
+                        }, 200);
+                        return 100;
+                    }
+                    return Math.min(prev + 10, 100);
+                });
+            }, 50); // Fast ticks (50ms) to close the gap
+
         } catch (error) {
             console.error("Failed to load dashboard data", error);
-        } finally {
-            setIsLoading(false);
+            // On error, just finish
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            setLoadingProgress(100);
+             setTimeout(() => {
+                setIsLoading(false);
+            }, 200);
         }
     }, [users]);
+    
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+             if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        }
+    }, [])
 
     useEffect(() => {
         if (dateRange.startDate && dateRange.endDate) {
@@ -1452,10 +1529,6 @@ const AttendanceDashboard: React.FC = () => {
         }
     };
 
-    if (isLoading && !dashboardData && !isEmployeeView) {
-        return <div className="flex justify-center items-center h-96"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>;
-    }
-
     if (isEmployeeView) {
         return (
             <div className={`p-4 space-y-6 pb-24 md:bg-transparent`} style={{ backgroundColor: isSmallScreen ? themeColors.mobileBg : undefined }}>
@@ -1601,7 +1674,27 @@ const AttendanceDashboard: React.FC = () => {
     }
 
     return (
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 relative h-full overflow-hidden">
+            {isLoading && (
+                <div className={`absolute inset-0 z-50 flex flex-col justify-center items-center backdrop-blur-sm rounded-xl transition-all duration-300
+                    ${!dashboardData ? 'bg-white dark:bg-gray-950' : 'bg-white/80 dark:bg-gray-950/80'}`}>
+                     <Loader2
+                        className="h-12 w-12 animate-spin mb-4"
+                        style={{ color: themeColors.activeItemBg }}
+                    />
+                    <div className="w-64 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-2">
+                        <div
+                            className="h-2.5 rounded-full transition-all duration-300 ease-out"
+                            style={{
+                                width: `${loadingProgress}%`,
+                                backgroundColor: themeColors.activeItemBg
+                            }}
+                        ></div>
+                    </div>
+                    <p className="text-sm font-medium text-muted">Loading Data... {loadingProgress}%</p>
+                </div>
+            )}
+
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h2 className="text-2xl font-bold text-primary-text">Attendance Dashboard</h2>
             </div>
@@ -1634,7 +1727,7 @@ const AttendanceDashboard: React.FC = () => {
                             </span>
                         </Button>
                         {isDatePickerOpen && (
-                            <div className="absolute top-full left-0 mt-2 z-10 bg-card border rounded-lg shadow-lg">
+                            <div className="absolute top-full left-0 mt-2 z-50 bg-card border rounded-lg shadow-lg">
                                 <div className="flex items-center gap-2 p-3">
                                     <input
                                         type="date"
@@ -1764,10 +1857,10 @@ const AttendanceDashboard: React.FC = () => {
 
             <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ChartContainer title="Attendance Trend" icon={BarChart3}>
-                    {dashboardData ? <AttendanceTrendChart data={dashboardData.attendanceTrend} /> : <Loader2 className="h-6 w-6 animate-spin text-muted mx-auto mt-20" />}
+                    {dashboardData && <AttendanceTrendChart data={dashboardData.attendanceTrend} />}
                 </ChartContainer>
                 <ChartContainer title="Productivity Trend (Avg. Hours)" icon={TrendingUp}>
-                    {dashboardData ? <ProductivityChart data={dashboardData.productivityTrend} /> : <Loader2 className="h-6 w-6 animate-spin text-muted mx-auto mt-20" />}
+                    {dashboardData && <ProductivityChart data={dashboardData.productivityTrend} />}
                 </ChartContainer>
             </div>
 

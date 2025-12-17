@@ -191,7 +191,7 @@ const LeaveManagement: React.FC = () => {
                         onClick={() => navigate('/hr/leave-management/grant-comp-off')}
                         disabled={!isCompOffFeatureEnabled}
                         title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
+                        style={{ backgroundColor: colorScheme === 'professional-blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'professional-blue' ? '#0f264a' : '#005632' }}
                         className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
@@ -205,7 +205,7 @@ const LeaveManagement: React.FC = () => {
                         onClick={() => navigate('/hr/leave-management/grant-comp-off')}
                         disabled={!isCompOffFeatureEnabled}
                         title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
+                        style={{ backgroundColor: colorScheme === 'professional-blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'professional-blue' ? '#0f264a' : '#005632' }}
                         className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
@@ -217,19 +217,29 @@ const LeaveManagement: React.FC = () => {
             <div className="mb-6">
                 <div className="w-full sm:w-auto md:border-b border-border">
                     <nav className="flex flex-col md:flex-row md:space-x-6 md:overflow-x-auto space-y-1 md:space-y-0" aria-label="Tabs">
-                        {filterTabs.map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setFilter(tab)}
-                                className={`whitespace-nowrap font-medium text-sm rounded-lg md:rounded-none w-full md:w-auto text-left md:text-center px-4 py-3 md:px-1 md:py-3 md:bg-transparent md:border-b-2 transition-colors duration-200
-                                ${filter === tab
-                                        ? 'bg-emerald-50 text-emerald-700 md:border-emerald-500 md:bg-transparent'
-                                        : 'text-muted hover:bg-emerald-50 hover:text-emerald-700 md:border-transparent md:hover:border-emerald-500'
-                                    }`}
-                            >
-                                {formatTabName(tab)}
-                            </button>
-                        ))}
+                        {filterTabs.map(tab => {
+                            const isActive = filter === tab;
+                            const activeColor = colorScheme === 'professional-blue' ? '#1a3a6e' : '#047857'; // Blue or Emerald-700
+                            const activeBg = colorScheme === 'professional-blue' ? '#eff6ff' : '#ecfdf5'; // Blue-50 or Emerald-50
+
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => setFilter(tab)}
+                                    style={{
+                                        color: isActive ? activeColor : undefined,
+                                        backgroundColor: isActive ? (isMobile ? activeBg : 'transparent') : undefined,
+                                        borderColor: isActive && !isMobile ? activeColor : 'transparent',
+                                    }}
+                                    className={`whitespace-nowrap font-medium text-sm rounded-lg md:rounded-none w-full md:w-auto text-left md:text-center px-4 py-3 md:px-1 md:py-3 transition-colors duration-200
+                                    ${!isActive ? 'text-muted hover:bg-gray-50' : ''}
+                                    ${!isMobile ? 'md:border-b-2' : ''}
+                                    `}
+                                >
+                                    {formatTabName(tab)}
+                                </button>
+                            );
+                        })}
                     </nav>
                 </div>
             </div>
