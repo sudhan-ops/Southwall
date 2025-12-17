@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import type { AppModule, Permission } from '../../types';
-import { Plus, Edit, Trash2, Loader2, Package } from 'lucide-react';
+import type { AppModule } from '../../types';
+import { Plus, Edit, Trash2, Package } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Modal from '../../components/ui/Modal';
@@ -67,6 +67,89 @@ const ModuleManagement: React.FC = () => {
     }
   };
 
+  const handleSeedDefaults = async () => {
+    setIsLoading(true);
+    const DEFAULT_MODULES: AppModule[] = [
+      {
+        id: 'mod_admin',
+        name: 'Admin & Access Control',
+        description: 'Permissions for managing users, roles, and system modules.',
+        permissions: ['manage_users', 'manage_roles_and_permissions', 'manage_modules']
+      },
+      {
+        id: 'mod_billing',
+        name: 'Billing & Costing',
+        description: 'Permissions related to invoices and verification cost analysis.',
+        permissions: ['view_invoice_summary', 'view_verification_costing']
+        },
+      {
+        id: 'mod_dashboards',
+        name: 'Dashboards & Tracking',
+        description: 'Access to various dashboards and user activity tracking.',
+        permissions: ['view_operations_dashboard', 'view_site_dashboard', 'view_field_officer_tracking']
+      },
+      {
+        id: 'mod_self_service',
+        name: 'Employee Self-Service',
+        description: 'Basic permissions for all employees.',
+        permissions: ['view_own_attendance', 'apply_for_leave', 'download_attendance_report']
+      },
+      {
+        id: 'mod_hr_tasks',
+        name: 'HR Tasks & Management',
+        description: 'Manage leaves, policies, insurance, uniforms, and tasks.',
+         permissions: ['manage_leave_requests', 'manage_policies', 'manage_insurance', 'manage_uniforms', 'manage_approval_workflow', 'view_all_attendance', 'manage_tasks']
+      },
+      {
+         id: 'mod_office_staff',
+         name: 'Office Staff',
+         description: 'Office Staff permissions.',
+         permissions: ['view_all_attendance', 'view_all_submissions']
+      },
+      {
+        id: 'mod_org_setup',
+        name: 'Organization & HR Setup',
+        description: 'Manage sites, clients, and rules for enrollment and attendance.',
+        permissions: ['view_entity_management', 'manage_attendance_rules', 'manage_enrollment_rules', 'manage_sites']
+      },
+      {
+        id: 'mod_submissions',
+        name: 'Submissions & Verification',
+        description: 'View and manage employee onboarding submissions and approval workflows.',
+        permissions: ['view_all_submissions', 'create_enrollment']
+      },
+      {
+        id: 'mod_support',
+        name: 'Support Desk',
+        description: 'Access and manage support tickets.',
+        permissions: ['access_support_desk']
+      },
+      {
+        id: 'mod_system',
+        name: 'System & Developer',
+        description: 'Access developer settings and system configurations.',
+        permissions: ['view_developer_settings']
+      },
+       {
+        id: 'mod_ops',
+        name: 'OPS',
+        description: 'OPS Management.',
+        permissions: ['manage_sites', 'manage_tasks']
+      }
+    ];
+
+    try {
+      await api.saveModules(DEFAULT_MODULES);
+      setModules(DEFAULT_MODULES.sort((a, b) => a.name.localeCompare(b.name)));
+      setToast({ message: 'Default modules seeded successfully.', type: 'success' });
+    } catch (e) {
+      console.error(e);
+      setToast({ message: 'Failed to seed modules.', type: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
@@ -81,6 +164,15 @@ const ModuleManagement: React.FC = () => {
 
       {isLoading ? (
         <GridSkeleton count={6} />
+      ) : modules.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-border rounded-xl bg-page/50">
+            <Package className="h-12 w-12 text-muted mb-4" />
+            <h3 className="text-lg font-semibold text-primary-text">No Modules Found</h3>
+            <p className="text-muted max-w-sm mb-6">It looks like the system hasn't been initialized with modules yet.</p>
+            <Button onClick={handleSeedDefaults} variant="accent">
+                Initialize Default Modules
+            </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map(module => (

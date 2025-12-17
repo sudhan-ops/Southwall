@@ -76,8 +76,14 @@ export const useLocationTracker = () => {
                         lastWatchLog = now;
                     }
                 },
-                (err) => console.error("Watch Position Error:", err),
-                { enableHighAccuracy: true, maximumAge: 30000, timeout: 27000 },
+                (err) => {
+                    if (err.code === 3) { // Timeout
+                        console.warn("Watch Position Timeout - retrying...");
+                    } else {
+                        console.error("Watch Position Error:", err);
+                    }
+                },
+                { enableHighAccuracy: true, maximumAge: 30000, timeout: 60000 },
             );
 
             // 3. Periodic Ping (Heartbeat)

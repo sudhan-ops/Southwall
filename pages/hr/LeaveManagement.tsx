@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import type { LeaveRequest, LeaveRequestStatus, ExtraWorkLog } from '../../types';
-import { Loader2, Check, X, Plus } from 'lucide-react';
+import { Loader2, Check, X, Plus, ClipboardCheck } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import { format } from 'date-fns';
@@ -175,7 +175,7 @@ const LeaveManagement: React.FC = () => {
     const formatTabName = (tab: string) => tab.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     return (
-        <div className="p-4 border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
+        <div className="w-full p-4 lg:p-8 space-y-8">
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <RejectClaimModal
                 isOpen={isRejectModalOpen}
@@ -184,47 +184,47 @@ const LeaveManagement: React.FC = () => {
                 isConfirming={!!actioningId}
             />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-primary-text">Leave Approval Inbox</h2>
-                {!isMobile && (
-                    <Button
-                        onClick={() => navigate('/hr/leave-management/grant-comp-off')}
-                        disabled={!isCompOffFeatureEnabled}
-                        title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
-                        className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
-                    </Button>
-                )}
+            {/* Header Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-transparent p-6 lg:p-10 transition-all">
+                <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-emerald-50 rounded-lg backdrop-blur-sm">
+                                <ClipboardCheck className="h-6 w-6 text-emerald-600" />
+                            </div>
+                            <h2 className="text-2xl lg:text-3xl font-bold text-primary-text">Leave Approval Inbox</h2>
+                        </div>
+                        <p className="text-muted max-w-xl text-sm">
+                            Manage leave requests, overtime claims, and compensatory off grants.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+                         <Button
+                            onClick={() => navigate('/hr/leave-management/grant-comp-off')}
+                            disabled={!isCompOffFeatureEnabled}
+                            title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
+                            style={{ backgroundColor: '#006B3F', color: '#FFFFFF', borderColor: '#005632' }}
+                            className="flex-1 lg:flex-none border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
+                        </Button>
+                    </div>
+                </div>
             </div>
 
-            {isMobile && (
-                <div className="mb-6">
-                    <Button
-                        onClick={() => navigate('/hr/leave-management/grant-comp-off')}
-                        disabled={!isCompOffFeatureEnabled}
-                        title={!isCompOffFeatureEnabled ? "Feature disabled: 'comp_off_logs' table missing in database." : "Grant a compensatory off day"}
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
-                        className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> Grant Comp Off
-                    </Button>
-                </div>
-            )}
-
-
-            <div className="mb-6">
-                <div className="w-full sm:w-auto md:border-b border-border">
-                    <nav className="flex flex-col md:flex-row md:space-x-6 md:overflow-x-auto space-y-1 md:space-y-0" aria-label="Tabs">
+            {/* Main Content Card */}
+            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                {/* Tabs */}
+                <div className="border-b border-border bg-gray-50/50 p-1">
+                    <nav className="flex flex-col md:flex-row md:space-x-1 md:overflow-x-auto space-y-1 md:space-y-0 p-2" aria-label="Tabs">
                         {filterTabs.map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setFilter(tab)}
-                                className={`whitespace-nowrap font-medium text-sm rounded-lg md:rounded-none w-full md:w-auto text-left md:text-center px-4 py-3 md:px-1 md:py-3 md:bg-transparent md:border-b-2 transition-colors duration-200
+                                className={`whitespace-nowrap font-medium text-sm rounded-lg px-4 py-2.5 transition-all duration-200
                                 ${filter === tab
-                                        ? 'bg-emerald-50 text-emerald-700 md:border-emerald-500 md:bg-transparent'
-                                        : 'text-muted hover:bg-emerald-50 hover:text-emerald-700 md:border-transparent md:hover:border-emerald-500'
+                                        ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-border'
+                                        : 'text-muted hover:bg-white/60 hover:text-emerald-700'
                                     }`}
                             >
                                 {formatTabName(tab)}
@@ -232,86 +232,89 @@ const LeaveManagement: React.FC = () => {
                         ))}
                     </nav>
                 </div>
-            </div>
 
-            {filter === 'claims' ? (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full responsive-table">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Employee</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Date & Type</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Claim</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Reason</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border md:bg-card md:divide-y-0">
-                            {isLoading ? (
-                                <tr><td colSpan={6} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></td></tr>
-                            ) : claims.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-muted">No pending claims found.</td></tr>
-                            ) : (
-                                claims.map(claim => (
-                                    <tr key={claim.id}>
-                                        <td data-label="Employee" className="px-4 py-3 font-medium">{claim.userName}</td>
-                                        <td data-label="Date & Type" className="px-4 py-3 text-muted">{format(new Date(claim.workDate), 'dd MMM, yyyy')} ({claim.workType})</td>
-                                        <td data-label="Claim" className="px-4 py-3 text-muted">{claim.claimType}{claim.claimType === 'OT' ? ` (${claim.hoursWorked} hrs)` : ''}</td>
-                                        <td data-label="Reason" className="px-4 py-3 text-muted max-w-xs truncate">{claim.reason}</td>
-                                        <td data-label="Status" className="px-4 py-3"><ClaimStatusChip status={claim.status} /></td>
-                                        <td data-label="Actions" className="px-4 py-3">
-                                            <div className="flex md:justify-start justify-end gap-2">
-                                                <Button size="sm" variant="icon" onClick={() => handleApproveClaim(claim.id)} disabled={actioningId === claim.id} title="Approve Claim"><Check className="h-4 w-4 text-green-600" /></Button>
-                                                <Button size="sm" variant="icon" onClick={() => { setClaimToReject(claim); setIsRejectModalOpen(true); }} disabled={actioningId === claim.id} title="Reject Claim"><X className="h-4 w-4 text-red-600" /></Button>
-                                            </div>
-                                        </td>
+                {/* Content Area */}
+                <div className="p-0">
+                    {filter === 'claims' ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full responsive-table align-middle">
+                                <thead className="bg-gray-50/50 border-b border-border">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Employee</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Date & Type</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Claim</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Reason</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Actions</th>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full responsive-table">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Employee</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Type</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Dates</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Reason</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Status</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border md:bg-card md:divide-y-0">
-                            {isLoading ? (
-                                isMobile
-                                    ? <tr><td colSpan={6}><TableSkeleton rows={3} cols={6} isMobile /></td></tr>
-                                    : <TableSkeleton rows={5} cols={6} />
-                            ) : requests.length === 0 ? (
-                                <tr><td colSpan={6} className="text-center py-10 text-muted">No requests found for this filter.</td></tr>
-                            ) : (
-                                requests.map(req => (
-                                    <tr key={req.id}>
-                                        <td data-label="Employee" className="px-4 py-3 font-medium">{req.userName}</td>
-                                        <td data-label="Type" className="px-4 py-3 text-muted">{req.leaveType} {req.dayOption && `(${req.dayOption})`}</td>
-                                        <td data-label="Dates" className="px-4 py-3 text-muted">{format(new Date(req.startDate.replace(/-/g, '/')), 'dd MMM')} - {format(new Date(req.endDate.replace(/-/g, '/')), 'dd MMM')}</td>
-                                        <td data-label="Reason" className="px-4 py-3 text-muted max-w-xs truncate">{req.reason}</td>
-                                        <td data-label="Status" className="px-4 py-3"><StatusChip status={req.status} /></td>
-                                        <td data-label="Actions" className="px-4 py-3">
-                                            <div className="flex md:justify-start justify-end">
-                                                {actioningId === req.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ActionButtons request={req} />}
-                                            </div>
-                                        </td>
+                                </thead>
+                                <tbody className="divide-y divide-border bg-card">
+                                    {isLoading ? (
+                                        <tr><td colSpan={6} className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-600" /></td></tr>
+                                    ) : claims.length === 0 ? (
+                                        <tr><td colSpan={6} className="text-center py-12 text-muted">No pending claims found.</td></tr>
+                                    ) : (
+                                        claims.map(claim => (
+                                            <tr key={claim.id} className="hover:bg-gray-50/50 transition-colors">
+                                                <td data-label="Employee" className="px-6 py-4 whitespace-nowrap font-medium text-primary-text">{claim.userName}</td>
+                                                <td data-label="Date & Type" className="px-6 py-4 whitespace-nowrap text-sm text-muted">{format(new Date(claim.workDate), 'dd MMM, yyyy')} <span className="text-xs ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{claim.workType}</span></td>
+                                                <td data-label="Claim" className="px-6 py-4 whitespace-nowrap text-sm text-muted">{claim.claimType}{claim.claimType === 'OT' ? ` (${claim.hoursWorked} hrs)` : ''}</td>
+                                                <td data-label="Reason" className="px-6 py-4 text-sm text-muted max-w-xs truncate">{claim.reason}</td>
+                                                <td data-label="Status" className="px-6 py-4 whitespace-nowrap"><ClaimStatusChip status={claim.status} /></td>
+                                                <td data-label="Actions" className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex justify-end md:justify-start gap-2">
+                                                        <Button size="sm" variant="icon" onClick={() => handleApproveClaim(claim.id)} disabled={actioningId === claim.id} title="Approve Claim" className="hover:bg-green-50 text-green-600 border-green-200"><Check className="h-4 w-4" /></Button>
+                                                        <Button size="sm" variant="icon" onClick={() => { setClaimToReject(claim); setIsRejectModalOpen(true); }} disabled={actioningId === claim.id} title="Reject Claim" className="hover:bg-red-50 text-red-600 border-red-200"><X className="h-4 w-4" /></Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full responsive-table align-middle">
+                                <thead className="bg-gray-50/50 border-b border-border">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Employee</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Type</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Dates</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Reason</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-muted uppercase tracking-wider">Actions</th>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody className="divide-y divide-border bg-card">
+                                    {isLoading ? (
+                                        isMobile
+                                            ? <tr><td colSpan={6}><TableSkeleton rows={3} cols={6} isMobile /></td></tr>
+                                            : <tr><td colSpan={6} className="p-4"><TableSkeleton rows={5} cols={6} /></td></tr>
+                                    ) : requests.length === 0 ? (
+                                        <tr><td colSpan={6} className="text-center py-12 text-muted">No requests found for this filter.</td></tr>
+                                    ) : (
+                                        requests.map(req => (
+                                            <tr key={req.id} className="hover:bg-gray-50/50 transition-colors">
+                                                <td data-label="Employee" className="px-6 py-4 whitespace-nowrap font-medium text-primary-text">{req.userName}</td>
+                                                <td data-label="Type" className="px-6 py-4 whitespace-nowrap text-sm text-muted">{req.leaveType} {req.dayOption && <span className="text-xs ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{req.dayOption}</span>}</td>
+                                                <td data-label="Dates" className="px-6 py-4 whitespace-nowrap text-sm text-muted">{format(new Date(req.startDate.replace(/-/g, '/')), 'dd MMM')} - {format(new Date(req.endDate.replace(/-/g, '/')), 'dd MMM')}</td>
+                                                <td data-label="Reason" className="px-6 py-4 text-sm text-muted max-w-xs truncate">{req.reason}</td>
+                                                <td data-label="Status" className="px-6 py-4 whitespace-nowrap"><StatusChip status={req.status} /></td>
+                                                <td data-label="Actions" className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex justify-end md:justify-start">
+                                                        {actioningId === req.id ? <Loader2 className="h-4 w-4 animate-spin text-emerald-600" /> : <ActionButtons request={req} />}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };

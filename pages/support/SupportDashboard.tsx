@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import type { SupportTicket, User } from '../../types';
 import { useAuthStore } from '../../store/authStore';
-import { Loader2, Plus, LifeBuoy, Users, Phone, MessageSquare, Video, Search, Filter, UserCheck } from 'lucide-react';
+import { Loader2, Plus, LifeBuoy, Users, Phone, MessageSquare, Video, Search, Filter, UserCheck, Trash2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -40,7 +40,7 @@ const StatusChip: React.FC<{ status: SupportTicket['status'] }> = ({ status }) =
     );
 };
 
-const TicketCard: React.FC<{ ticket: SupportTicket, onClick: () => void }> = ({ ticket, onClick }) => (
+const TicketCard: React.FC<{ ticket: SupportTicket, onClick: () => void, isAdmin: boolean, onDelete: (e: React.MouseEvent) => void }> = ({ ticket, onClick, isAdmin, onDelete }) => (
     <div
         onClick={onClick}
         className="group bg-card hover:bg-accent/5 p-5 rounded-xl border border-border hover:border-accent cursor-pointer transition-all duration-300 flex flex-col justify-between h-full shadow-sm hover:shadow-md"
@@ -50,7 +50,18 @@ const TicketCard: React.FC<{ ticket: SupportTicket, onClick: () => void }> = ({ 
                 <h4 className="font-bold text-primary-text leading-snug group-hover:text-accent transition-colors line-clamp-2">
                     {ticket.title}
                 </h4>
-                <div className="flex-shrink-0 mt-1"><PriorityIndicator priority={ticket.priority} /></div>
+                <div className="flex-shrink-0 mt-1 flex gap-2">
+                    {isAdmin && (
+                        <button
+                            onClick={onDelete}
+                            className="p-1 hover:bg-red-100 rounded text-gray-400 hover:text-red-600 transition-colors"
+                            title="Delete Ticket"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </button>
+                    )}
+                    <PriorityIndicator priority={ticket.priority} />
+                </div>
             </div>
             <p className="text-xs text-muted font-mono">#{ticket.ticketNumber}</p>
         </div>
@@ -142,6 +153,7 @@ const SupportDashboard: React.FC = () => {
         searchTerm: ''
     });
 
+
     useEffect(() => {
         const fetchData = async () => {
             if (!user) return;
@@ -161,6 +173,19 @@ const SupportDashboard: React.FC = () => {
         };
         fetchData();
     }, [user]);
+
+    const handleDeleteTicket = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation(); // Prevent opening the ticket details
+        if (!window.confirm("Are you sure you want to delete this ticket? This action cannot be undone.")) return;
+
+        try {
+            await api.deleteSupportTicket(id);
+            setTickets(prev => prev.filter(t => t.id !== id));
+            setToast({ message: 'Ticket deleted successfully.', type: 'success' });
+        } catch (error) {
+            setToast({ message: 'Failed to delete ticket.', type: 'error' });
+        }
+    };
 
     const filteredTickets = useMemo(() => {
         return tickets.filter(ticket => {
@@ -352,7 +377,13 @@ const SupportDashboard: React.FC = () => {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {filteredTickets.length > 0 ? filteredTickets.map(ticket => (
-                                    <TicketCard key={ticket.id} ticket={ticket} onClick={() => navigate(`/support/ticket/${ticket.id}`)} />
+                                    <TicketCard 
+                                        key={ticket.id} 
+                                        ticket={ticket} 
+                                        onClick={() => navigate(`/support/ticket/${ticket.id}`)} 
+                                        isAdmin={user?.role === 'admin' || user?.role === 'operations_manager'}
+                                        onDelete={(e) => handleDeleteTicket(e, ticket.id)}
+                                    />
                                 )) : (
                                     <div className="col-span-full flex flex-col items-center justify-center py-12 text-muted">
                                         <div className="p-4 bg-accent/5 rounded-full mb-3">

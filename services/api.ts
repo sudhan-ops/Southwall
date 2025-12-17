@@ -690,9 +690,15 @@ export const api = {
     return (data || []).map(toCamelCase);
   },
   saveModules: async (modules: AppModule[]): Promise<void> => {
-    // A full replacement is complex, upsert is simplest for now.
+    // Ensure timestamps are present
+    const modulesWithTimestamps = modules.map((m) => ({
+      ...m,
+      created_at: m.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
+
     const { error } = await supabase.from("app_modules").upsert(
-      toSnakeCase(modules),
+      toSnakeCase(modulesWithTimestamps),
     );
     if (error) throw error;
   },
@@ -2084,6 +2090,7 @@ export const api = {
     ticketData: Partial<SupportTicket>,
   ): Promise<SupportTicket> => {
     // If an attachment was provided with a File object, upload it to the support attachments bucket
+    let attachmentPath = null;
     const attachment: any = (ticketData as any).attachment;
     if (attachment && attachment.file instanceof File) {
       try {
@@ -2091,20 +2098,33 @@ export const api = {
           attachment.file as File,
           SUPPORT_ATTACHMENTS_BUCKET,
         );
-        (ticketData as any).attachment = {
-          name: attachment.name,
-          type: attachment.type,
-          size: attachment.size,
-          path,
-        };
+        attachmentPath = path;
       } catch (uploadErr) {
         console.error("Failed to upload support ticket attachment:", uploadErr);
-        // Remove attachment to prevent sending File object to database
-        delete (ticketData as any).attachment;
       }
     }
+
+    // Remove complex attachment object from payload
+    delete (ticketData as any).attachment;
+
+    // Append attachment URL to description if exists (since no attachment_url column)
+    let finalDescription = ticketData.description || "";
+    if (attachmentPath) {
+      // Construct public URL if possible or just path
+      finalDescription += `\n\n[Attachment: ${attachmentPath}]`;
+    }
+
+    // Ensure strict timestamps and required fields
+    const cleanPayload = {
+      ...ticketData,
+      description: finalDescription,
+      raisedAt: new Date().toISOString(),
+      ticketNumber: `TKT-${Date.now()}`, // Generate ticket number as it is required
+    };
+    // Note: updatedAt is NOT sent because the support_tickets table does not have an updated_at column.
+
     const { data, error } = await supabase.from("support_tickets").insert(
-      toSnakeCase(ticketData),
+      toSnakeCase(cleanPayload),
     ).select("*, posts:ticket_posts(*, comments:ticket_comments(*))").single();
     if (error) throw error;
     return toCamelCase(data);
@@ -2142,6 +2162,13 @@ export const api = {
     ).single();
     if (error) throw error;
     return toCamelCase(data);
+  },
+  deleteSupportTicket: async (id: string): Promise<void> => {
+    const { error } = await supabase.from("support_tickets").delete().eq(
+      "id",
+      id,
+    );
+    if (error) throw error;
   },
   addTicketPost: async (
     ticketId: string,

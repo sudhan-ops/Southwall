@@ -98,43 +98,48 @@ const MyTeamList: React.FC = () => {
 
                 // Create Avatar Icon
                 // We use a divIcon with the user's image or initial
+                // Refined to be a rectangular card-like marker with photo
                 const html = `
                     <div style="
-                        width: 40px; 
-                        height: 40px; 
-                        border-radius: 50%; 
-                        border: 3px solid #fff; 
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                        width: 48px; 
+                        height: 48px; 
+                        border-radius: 12px; 
+                        border: 3px solid #10b981; 
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
                         overflow: hidden; 
-                        background: ${member.photoUrl ? 'white' : '#10b981'}; /* emerald-500 */
+                        background: white; 
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        position: relative;
+                        z-index: 10;
                     ">
                         ${member.photoUrl 
-                            ? `<img src="${member.photoUrl}" style="width: 100%; height: 100%; object-fit: cover;" />`
-                            : `<span style="color: white; font-weight: bold; font-size: 14px;">${member.name.charAt(0)}</span>`
+                            ? `<img src="${member.photoUrl}" style="width: 100%; height: 100%; object-fit: cover;" onError="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                               <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: #10b981; color: white; font-weight: bold;">${member.name.charAt(0)}</div>`
+                            : `<div style="width: 100%; height: 100%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">${member.name.charAt(0)}</div>`
                         }
                     </div>
                     <div style="
                         position: absolute;
-                        bottom: -5px;
+                        bottom: -6px;
                         left: 50%;
                         transform: translateX(-50%);
                         width: 0; 
                         height: 0; 
                         border-left: 6px solid transparent;
                         border-right: 6px solid transparent;
-                        border-top: 6px solid white;
+                        border-top: 6px solid #10b981;
+                        z-index: 5;
                     "></div>
                 `;
 
                 const icon = L.divIcon({
                     html: html,
                     className: 'custom-avatar-marker',
-                    iconSize: [40, 48],
-                    iconAnchor: [20, 48],
-                    popupAnchor: [0, -48]
+                    iconSize: [48, 56], // 48 width + 8 extra for drop shadow/padding
+                    iconAnchor: [24, 56], // Center bottom
+                    popupAnchor: [0, -56]
                 });
 
                 L.marker(latLng, { icon })
@@ -162,7 +167,7 @@ const MyTeamList: React.FC = () => {
     });
 
     return (
-        <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        <div className="p-4 md:p-6 space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-primary-text">My Team</h1>
