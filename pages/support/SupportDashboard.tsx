@@ -14,6 +14,7 @@ import Select from '../../components/ui/Select';
 import Modal from '../../components/ui/Modal';
 
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const PriorityIndicator: React.FC<{ priority: SupportTicket['priority'] }> = ({ priority }) => {
     const styles = {
@@ -84,6 +85,7 @@ const TicketCard: React.FC<{ ticket: SupportTicket, onClick: () => void, isAdmin
 
 const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void }> = ({ user, onAction }) => {
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     return (
     <div className="flex items-center gap-4 p-3 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
         <div className="relative">
@@ -100,7 +102,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
+                style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF', borderColor: themeColors.sidebarBorder }}
                 title="Call"
                 onClick={() => onAction(user.phone)}
             >
@@ -110,7 +112,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
+                style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF', borderColor: themeColors.sidebarBorder }}
                 title="Message"
                 onClick={() => onAction(user.phone)}
             >
@@ -120,7 +122,7 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
                 variant="icon"
                 size="sm"
                 className="hover:opacity-90 transition-opacity border"
-                style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }}
+                style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF', borderColor: themeColors.sidebarBorder }}
                 title="Video"
                 onClick={() => onAction(user.phone)}
             >

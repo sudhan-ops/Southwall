@@ -12,6 +12,7 @@ import { Users, UserCheck, UserX, Calendar, MapPin, Send, FileText, Activity } f
 import Toast from '../../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 import FormHeader from '../../components/onboarding/FormHeader';
 import DatePicker from '../../components/ui/DatePicker';
 import StatCard from '../../components/ui/StatCard';
@@ -19,6 +20,7 @@ import StatCard from '../../components/ui/StatCard';
 const OperationsDashboard: React.FC = () => {
     const navigate = useNavigate();
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [submissions, setSubmissions] = useState<OnboardingData[]>([]);
     const [fieldOfficers, setFieldOfficers] = useState<User[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -162,7 +164,7 @@ const OperationsDashboard: React.FC = () => {
                                 e.stopPropagation();
                                 navigate('/operations/team-activity');
                             }}
-                            style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
+                            style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF' }}
                         >
                             View Team Activity →
                         </Button>

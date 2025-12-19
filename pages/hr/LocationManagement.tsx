@@ -10,6 +10,7 @@ import { MapPin, Users as UsersIcon, Pin, Plus, Save, Edit, Trash2 } from 'lucid
 import { reverseGeocode, getPrecisePosition } from '../../utils/locationUtils';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 /**
  * LocationManagement component
@@ -39,6 +40,7 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 const LocationManagement: React.FC = () => {
   const { user } = useAuthStore();
   const { colorScheme } = useBrandingStore();
+  const themeColors = getThemeColors(colorScheme);
   const [locations, setLocations] = useState<Location[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [newName, setNewName] = useState('');
@@ -343,7 +345,7 @@ const LocationManagement: React.FC = () => {
                         <p className="text-sm text-muted">{loc.address}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button type="button" className={`p-1 ${colorScheme === 'blue' ? 'text-blue-500 hover:text-blue-700' : 'text-[#006B3F] hover:text-[#005632]'}`} title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-5 w-5" /></button>
+                        <button type="button" className="p-1 text-accent hover:opacity-70 transition-opacity" style={{ color: themeColors.primary }} title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-5 w-5" /></button>
                         <button type="button" className="p-2 hover:bg-red-500/10 rounded-full transition-colors" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-5 w-5 text-red-500" /></button>
                       </div>
                     </div>
@@ -381,7 +383,7 @@ const LocationManagement: React.FC = () => {
                         <td className="p-3">{loc.createdByName || userMap.get(loc.createdBy || '') || '-'}</td>
                         <td className="p-3">{loc.createdAt ? new Date(loc.createdAt).toLocaleString() : '-'}</td>
                         <td className="p-3 whitespace-nowrap">
-                          <button type="button" className={`mr-3 ${colorScheme === 'blue' ? 'text-blue-600 hover:text-blue-800' : 'text-[#006B3F] hover:text-[#005632]'}`} title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-4 w-4" /></button>
+                          <button type="button" className="mr-3 text-accent hover:opacity-70 transition-opacity" style={{ color: themeColors.primary }} title="Edit" onClick={() => handleEditLocation(loc)}><Edit className="h-4 w-4" /></button>
                           <button type="button" className="p-2 hover:bg-red-500/10 rounded-full transition-colors" title="Delete" onClick={() => handleDeleteLocation(loc.id)}><Trash2 className="h-5 w-5 text-red-500" /></button>
                         </td>
                       </tr>

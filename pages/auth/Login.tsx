@@ -12,6 +12,7 @@ import Input from '../../components/ui/Input';
 import Checkbox from '../../components/ui/Checkbox';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore'; // Add branding store import
+import { getThemeColors } from '../../utils/themeUtils';
 import { useDeviceFingerprint } from '../../hooks/useDeviceFingerprint';
 import type { User } from '../../types';
 import { Mail, Lock, AlertTriangle, Check } from 'lucide-react';
@@ -41,6 +42,7 @@ const getHomeRoute = (user: User) => {
 const Login: React.FC = () => {
     const { user, loginWithEmail, loginWithGoogle, error, setError, loading, setLoginAnimationPending, isLoginAnimationPending } = useAuthStore();
     const { colorScheme } = useBrandingStore(); // Get color scheme
+    const themeColors = getThemeColors(colorScheme);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -137,7 +139,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleEmailSubmit(onEmailSubmit)} className="space-y-3">
                 <fieldset disabled={isFormDisabled} className="space-y-3">
                     <div className="relative group">
-                        <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none`} />
+                        <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors pointer-events-none`} style={{ color: themeColors.isDark ? '#9ca3af' : '#6b7280' }} />
                         <Input
                             id="email"
                             type="email"
@@ -145,11 +147,16 @@ const Login: React.FC = () => {
                             placeholder="Email"
                             registration={registerEmail('email')}
                             error={emailErrors.email?.message}
-                            className={`!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all`}
+                            className="!pl-12 !py-3 !rounded-xl transition-all"
+                            style={{
+                                backgroundColor: themeColors.isDark ? '#1f2937' : '#f9fafb',
+                                color: themeColors.isDark ? '#ffffff' : '#111827',
+                                borderColor: themeColors.isDark ? '#374151' : '#e5e7eb'
+                            }}
                         />
                     </div>
                     <div className="relative group">
-                        <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#22c55e] transition-colors pointer-events-none`} />
+                        <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors pointer-events-none`} style={{ color: themeColors.isDark ? '#9ca3af' : '#6b7280' }} />
                         <Input
                             id="password"
                             type="password"
@@ -157,7 +164,12 @@ const Login: React.FC = () => {
                             placeholder="Password"
                             registration={registerEmail('password')}
                             error={emailErrors.password?.message}
-                            className={`!pl-12 !bg-black/60 !text-white !border-white/10 focus:!border-[#22c55e] placeholder:!text-gray-500 !py-3 !rounded-xl transition-all`}
+                            className="!pl-12 !py-3 !rounded-xl transition-all"
+                            style={{
+                                backgroundColor: themeColors.isDark ? '#1f2937' : '#f9fafb',
+                                color: themeColors.isDark ? '#ffffff' : '#111827',
+                                borderColor: themeColors.isDark ? '#374151' : '#e5e7eb'
+                            }}
                         />
                     </div>
                     <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
@@ -165,7 +177,7 @@ const Login: React.FC = () => {
                             <Checkbox
                                 id="rememberMe"
                                 label="Remember me"
-                                labelClassName="!text-white font-medium"
+                                labelClassName="font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
                                 inputClassName={`text-blue-600 focus:ring-blue-600 border-white/20 rounded bg-black/40`}
@@ -182,10 +194,10 @@ const Login: React.FC = () => {
                         </div>
                         <Link
                             to="/auth/forgot-password"
-                            className={`text-sm font-medium !text-white hover:text-gray-200 transition-colors auth-link ${isFormDisabled ? 'pointer-events-none opacity-50' : ''}`}
+                            className={`text-sm font-medium hover:opacity-70 transition-colors auth-link ${isFormDisabled ? 'pointer-events-none opacity-50' : ''}`}
                             aria-disabled={isFormDisabled}
                             onClick={(e) => { if (isFormDisabled) e.preventDefault(); }}
-                            style={{ color: '#ffffff' }}
+                            style={{ color: themeColors.primary }}
                         >
                             Forgot your password?
                         </Link>
@@ -203,10 +215,11 @@ const Login: React.FC = () => {
 
                 <Button
                     type="submit"
-                    className={`w-full !font-bold !py-3 !rounded-full shadow-lg transition-all transform hover:scale-[1.02] signin-btn ${isSuccess
-                        ? '!bg-[#22c55e] !border-[#22c55e] !text-white hover:!bg-[#22c55e]'
-                        : '!bg-[#22c55e] border border-[#22c55e] !text-white hover:!bg-[#16a34a] hover:!border-[#16a34a] hover:!text-white shadow-green-500/20'
-                        }`}
+                    className={`w-full !font-bold !py-3 !rounded-full shadow-lg transition-all transform hover:scale-[1.02] signin-btn !text-white`}
+                    style={{
+                        backgroundColor: themeColors.activeItemBg,
+                        borderColor: themeColors.sidebarBorder,
+                    }}
                     isLoading={loading && !isSuccess}
                     size="lg"
                     disabled={isFormDisabled && !isSuccess}
@@ -216,9 +229,9 @@ const Login: React.FC = () => {
             </form>
 
             <div className="flex items-center my-6">
-                <div className="flex-1 border-t border-white/10"></div>
-                <span className="px-4 text-sm !text-white font-medium">OR</span>
-                <div className="flex-1 border-t border-white/10"></div>
+                <div className="flex-1 border-t" style={{ borderColor: themeColors.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}></div>
+                <span className="px-4 text-sm font-medium" style={{ color: themeColors.isDark ? '#ffffff' : '#6b7280' }}>OR</span>
+                <div className="flex-1 border-t" style={{ borderColor: themeColors.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}></div>
             </div>
 
             <button
@@ -232,9 +245,9 @@ const Login: React.FC = () => {
             </button>
 
             <div className="text-center mt-4">
-                <p className="text-sm !text-white" style={{ color: '#ffffff' }}>
+                <p className="text-sm" style={{ color: themeColors.isDark ? '#ffffff' : '#6b7280' }}>
                     Don't have an account?{' '}
-                    <Link to="/auth/signup" className="font-medium !text-white hover:text-gray-200 auth-link" style={{ color: '#ffffff' }}>Sign Up</Link>
+                    <Link to="/auth/signup" className="font-medium transition-opacity hover:opacity-80" style={{ color: themeColors.primary }}>Sign Up</Link>
                 </p>
             </div>
         </>

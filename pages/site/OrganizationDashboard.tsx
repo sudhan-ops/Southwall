@@ -12,6 +12,7 @@ import Select from '../../components/ui/Select';
 
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const SiteDashboard: React.FC = () => {
     const [submissions, setSubmissions] = useState<OnboardingData[]>([]);
@@ -23,6 +24,7 @@ const SiteDashboard: React.FC = () => {
     const { user } = useAuthStore();
     const isMobile = useMediaQuery('(max-width: 767px)');
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
 
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(user?.organizationId);
@@ -92,7 +94,7 @@ const SiteDashboard: React.FC = () => {
                                 </Select>
                             </div>
                         )}
-                        <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
+                        <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF', borderColor: themeColors.sidebarBorder }} className="border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
                     </div>
                 )}
             </div>
@@ -105,7 +107,7 @@ const SiteDashboard: React.FC = () => {
                             {organizations.map(o => <option key={o.id} value={o.id}>{o.shortName}</option>)}
                         </Select>
                     )}
-                    <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF', borderColor: colorScheme === 'blue' ? '#0f264a' : '#005632' }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
+                    <Button onClick={() => navigate('/onboarding/select-organization')} style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF', borderColor: themeColors.sidebarBorder }} className="w-full justify-center border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><UserPlus className="mr-2 h-4 w-4" />New Enrollment</Button>
                 </div>
             )}
 

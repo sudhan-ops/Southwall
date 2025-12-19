@@ -12,6 +12,7 @@ import { ProfilePlaceholder } from '../../components/ui/ProfilePlaceholder';
 import { formatDistanceToNow, format } from 'date-fns';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 interface TeamMember extends User {
     lastCheckIn?: string;
@@ -26,6 +27,7 @@ interface TeamMember extends User {
 const TeamActivity: React.FC = () => {
     const { user } = useAuthStore();
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
@@ -224,7 +226,7 @@ const TeamActivity: React.FC = () => {
                         size="sm"
                         onClick={(e) => { e.stopPropagation(); handleCall(member.phone); }}
                         className="hover:bg-accent/10"
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
+                        style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF' }}
                     >
                         <Phone className="h-4 w-4" />
                     </Button>
@@ -233,7 +235,7 @@ const TeamActivity: React.FC = () => {
                         size="sm"
                         onClick={(e) => { e.stopPropagation(); handleMessage(member.phone); }}
                         className="hover:bg-accent/10"
-                        style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
+                        style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF' }}
                     >
                         <MessageSquare className="h-4 w-4" />
                     </Button>
@@ -355,7 +357,7 @@ const TeamActivity: React.FC = () => {
                 <Button
                     onClick={() => handleCall(member.phone)}
                     className="flex-1"
-                    style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
+                    style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF' }}
                 >
                     <Phone className="h-4 w-4 mr-2" />
                     Call
@@ -363,7 +365,7 @@ const TeamActivity: React.FC = () => {
                 <Button
                     onClick={() => handleMessage(member.phone)}
                     className="flex-1"
-                    style={{ backgroundColor: colorScheme === 'blue' ? '#1a3a6e' : '#006B3F', color: '#FFFFFF' }}
+                    style={{ backgroundColor: themeColors.activeItemBg, color: '#FFFFFF' }}
                 >
                     <MessageSquare className="h-4 w-4 mr-2" />
                     Message

@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import type { CompOffLog } from '../../types';
 import Button from '../../components/ui/Button';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 interface CompOffCalendarProps {
     logs: CompOffLog[];
@@ -12,6 +13,7 @@ interface CompOffCalendarProps {
 
 const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = false }) => {
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const daysInMonth = useMemo(() => {
@@ -35,8 +37,8 @@ const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = fal
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'earned': return colorScheme === 'blue' ? 'bg-blue-600 text-white border-blue-700 shadow-sm' : 'bg-[#006B3F] text-white border-[#005632] shadow-sm'; // Dynamic Theme
-            default: return 'bg-gray-50 text-gray-400 border-gray-100'; // Neutral
+            case 'earned': return { backgroundColor: themeColors.activeItemBg, color: 'white', borderColor: themeColors.sidebarBorder };
+            default: return { backgroundColor: '#f9fafb', color: '#9ca3af', borderColor: '#f3f4f6' };
         }
     };
 
@@ -69,7 +71,7 @@ const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = fal
                         const status = getDayStatus(date);
                         const colorClass = getStatusColor(status);
                         return (
-                            <div key={date.toISOString()} className={`aspect-square rounded border flex flex-col items-center justify-center ${colorClass} transition-colors`}>
+                            <div key={date.toISOString()} className="aspect-square rounded border flex flex-col items-center justify-center transition-colors" style={colorClass}>
                                 <span className="text-sm font-semibold">{format(date, 'd')}</span>
                             </div>
                         );
@@ -77,7 +79,7 @@ const CompOffCalendar: React.FC<CompOffCalendarProps> = ({ logs, isLoading = fal
                 </div>
             )}
             <div className="mt-3 flex gap-3 text-xs text-muted justify-center">
-                <div className="flex items-center gap-1"><div className={`w-2 h-2 ${colorScheme === 'blue' ? 'bg-blue-600 border-blue-700' : 'bg-[#006B3F] border-[#005632]'} border rounded-sm`}></div> Comp Off Earned</div>
+                <div className="flex items-center gap-1"><div className="w-2 h-2 border rounded-sm" style={{ backgroundColor: themeColors.activeItemBg, borderColor: themeColors.sidebarBorder }}></div> Comp Off Earned</div>
             </div>
         </div>
     );

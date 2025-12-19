@@ -1,5 +1,6 @@
 import React from 'react';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'icon';
@@ -20,19 +21,20 @@ const Button: React.FC<ButtonProps> = ({
   const variantStyles = `btn-${variant}`;
   const sizeStyles = `btn-${size}`;
   const { colorScheme } = useBrandingStore();
+  const themeColors = getThemeColors(colorScheme);
 
   const getDynamicStyles = () => {
     if (variant === 'primary') {
       return {
-        backgroundColor: '#006B3F',
-        borderColor: '#005632',
+        backgroundColor: themeColors.activeItemBg,
+        borderColor: themeColors.sidebarBorder,
         color: '#FFFFFF'
       };
     }
     if (variant === 'outline') {
       return {
-        borderColor: '#006B3F',
-        color: '#006B3F'
+        borderColor: themeColors.primary,
+        color: themeColors.primary
       };
     }
     return {};
