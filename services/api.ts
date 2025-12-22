@@ -635,12 +635,14 @@ export const api = {
     // Helper to safely execute delete without throwing on missing tables or secondary errors
     const safeDelete = async (operation: any, tableName: string) => {
       try {
-        await operation;
+        const { error } = await operation;
+        if (error && error.code !== "PGRST204" && error.status !== 404) {
+          console.warn(`Warning during ${tableName} cleanup:`, error);
+        }
       } catch (error: any) {
         // Log warnings for debugging but don't block the main deletion
-        // code 404/PGRST204 usually means the table or route doesn't exist
         if (error?.code !== "PGRST204" && error?.status !== 404) {
-          console.warn(`Warning during ${tableName} cleanup:`, error);
+          console.warn(`Critical error during ${tableName} cleanup:`, error);
         }
       }
     };
@@ -655,6 +657,16 @@ export const api = {
 
     // 2. Delete from dependent tables to avoid FK conflicts
     // We execute these deletions to wipe the user's data footprint.
+
+    // Activity & External Logs
+    await safeDelete(
+      supabase.from("user_activity").delete().eq("user_id", id),
+      "user_activity",
+    );
+    await safeDelete(
+      supabase.from("invoices").delete().eq("user_id", id),
+      "invoices",
+    );
 
     // Onboarding & Profile
     await safeDelete(
@@ -675,6 +687,13 @@ export const api = {
       supabase.from("user_location_logs").delete().eq("user_id", id),
       "user_location_logs",
     );
+    await safeDelete(
+      supabase.from("locations").update({ created_by: null }).eq(
+        "created_by",
+        id,
+      ),
+      "locations (creator)",
+    );
 
     // Attendance & Leave
     await safeDelete(
@@ -684,6 +703,13 @@ export const api = {
     await safeDelete(
       supabase.from("leave_requests").delete().eq("user_id", id),
       "leave_requests",
+    );
+    await safeDelete(
+      supabase.from("leave_requests").update({ current_approver_id: null }).eq(
+        "current_approver_id",
+        id,
+      ),
+      "leave_requests (approver)",
     );
     await safeDelete(
       supabase.from("comp_off_logs").delete().eq("user_id", id),
@@ -703,7 +729,6 @@ export const api = {
       supabase.from("tasks").delete().eq("assigned_to_id", id),
       "tasks",
     );
-    // Nullify escalation fields in tasks if this user was an escalation contact
     await safeDelete(
       supabase.from("tasks").update({ escalation_level1_user_id: null }).eq(
         "escalation_level1_user_id",
@@ -743,6 +768,15 @@ export const api = {
       "ticket_comments",
     );
 
+    // Uniform Requests
+    await safeDelete(
+      supabase.from("uniform_requests").update({ requested_by_id: null }).eq(
+        "requested_by_id",
+        id,
+      ),
+      "uniform_requests",
+    );
+
     // Patrolling
     await safeDelete(
       supabase.from("patrol_logs").delete().eq("user_id", id),
@@ -760,7 +794,30 @@ export const api = {
       "patrol_qr_codes",
     );
 
-    // 3. Finally delete the user
+    // Profiles & Related Attendance (if using the alternative attendance system)
+    try {
+      // First get the profile ID for this user
+      const { data: profile } = await supabase.from("profiles").select("id").eq(
+        "auth_uid",
+        id,
+      ).maybeSingle();
+      if (profile) {
+        // Clear attendance referencing this profile
+        await safeDelete(
+          supabase.from("attendance").delete().eq("profile_id", profile.id),
+          "attendance (profile-linked)",
+        );
+        // Delete the profile itself
+        await safeDelete(
+          supabase.from("profiles").delete().eq("id", profile.id),
+          "profiles",
+        );
+      }
+    } catch (e) {
+      // Ignore errors if profiles table doesn't exist
+    }
+
+    // 3. Finally delete the user from public.users
     const { error } = await supabase.from("users").delete().eq("id", id);
     if (error) throw error;
   },
