@@ -257,6 +257,35 @@ const toCamelCase = (data: any): any => {
   return data;
 };
 
+// Helper for fetching large datasets through pagination (Supabase default limit is 1000)
+const fetchAllPaginated = async (
+  queryBase: any,
+  maxRows: number = 10000,
+): Promise<any[]> => {
+  let allData: any[] = [];
+  let from = 0;
+  const step = 1000;
+  let hasMore = true;
+
+  while (hasMore && allData.length < maxRows) {
+    // Clone the query base to avoid side effects if reused
+    const { data, error } = await queryBase
+      .range(from, from + step - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      hasMore = false;
+    } else {
+      allData = [...allData, ...data];
+      if (data.length < step) {
+        hasMore = false;
+      }
+    }
+    from += step;
+  }
+  return allData;
+};
+
 export const api = {
   // --- Initial Data Loading ---
   getInitialAppData: async (): Promise<
@@ -271,14 +300,11 @@ export const api = {
       throw new Error("Failed to fetch core application settings.");
     }
 
-    const { data: rolesData, error: rolesError } = await supabase.from("roles")
-      .select("*");
-    if (rolesError) throw new Error("Failed to fetch user roles.");
+    const rolesQuery = supabase.from("roles").select("*");
+    const rolesData = await fetchAllPaginated(rolesQuery);
 
-    const { data: holidaysData, error: holidaysError } = await supabase.from(
-      "holidays",
-    ).select("*");
-    if (holidaysError) throw new Error("Failed to fetch holidays.");
+    const holidaysQuery = supabase.from("holidays").select("*");
+    const holidaysData = await fetchAllPaginated(holidaysQuery);
 
     return {
       settings: toCamelCase(settingsData),
@@ -303,10 +329,10 @@ export const api = {
     let query = supabase.from("onboarding_submissions").select("*");
     if (status) query = query.eq("status", status);
     if (organizationId) query = query.eq("organization_id", organizationId);
-    const { data, error } = await query.order("created_at", {
+    query = query.order("created_at", {
       ascending: false,
     });
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 
@@ -453,17 +479,17 @@ export const api = {
 
   // --- Users & Orgs ---
   getUsers: async (): Promise<User[]> => {
-    const { data, error } = await supabase.from("users").select("*, role_id");
-    if (error) throw error;
+    const query = supabase.from("users").select("*, role_id");
+    const data = await fetchAllPaginated(query);
     return (data || []).map((u) => toCamelCase({ ...u, role: u.role_id }));
   },
   getUsersWithManagers: async (): Promise<
     (User & { managerName?: string })[]
   > => {
-    const { data: users, error } = await supabase.from("users").select(
+    const query = supabase.from("users").select(
       "*, reporting_manager_id, role_id",
     );
-    if (error) throw error;
+    const users = await fetchAllPaginated(query);
     const camelUsers = (users || []).map((u) =>
       toCamelCase({ ...u, role: u.role_id })
     );
@@ -621,9 +647,9 @@ export const api = {
   },
 
   getOrganizations: async (): Promise<Organization[]> => {
-    const { data, error } = await supabase.from("organizations").select("*")
+    const query = supabase.from("organizations").select("*")
       .order("short_name");
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   createOrganization: async (org: Organization): Promise<Organization> => {
@@ -668,10 +694,10 @@ export const api = {
     }));
   },
   getSiteConfigurations: async (): Promise<SiteConfiguration[]> => {
-    const { data, error } = await supabase.from("site_configurations").select(
+    const query = supabase.from("site_configurations").select(
       "*",
     );
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   bulkUploadOrganizations: async (
@@ -685,8 +711,8 @@ export const api = {
     return { count: count || 0 };
   },
   getModules: async (): Promise<AppModule[]> => {
-    const { data, error } = await supabase.from("app_modules").select("*");
-    if (error) throw error;
+    const query = supabase.from("app_modules").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   saveModules: async (modules: AppModule[]): Promise<void> => {
@@ -703,8 +729,8 @@ export const api = {
     if (error) throw error;
   },
   getRoles: async (): Promise<Role[]> => {
-    const { data, error } = await supabase.from("roles").select("*");
-    if (error) throw error;
+    const query = supabase.from("roles").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   saveRoles: async (roles: Role[]): Promise<void> => {
@@ -712,8 +738,8 @@ export const api = {
     if (error) throw error;
   },
   getHolidays: async (): Promise<Holiday[]> => {
-    const { data, error } = await supabase.from("holidays").select("*");
-    if (error) throw error;
+    const query = supabase.from("holidays").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   addHoliday: async (holiday: Omit<Holiday, "id">): Promise<Holiday> => {
@@ -732,18 +758,18 @@ export const api = {
     start: string,
     end: string,
   ): Promise<AttendanceEvent[]> => {
-    const { data, error } = await supabase.from("attendance_events").select("*")
+    const query = supabase.from("attendance_events").select("*")
       .eq("user_id", userId).gte("timestamp", start).lte("timestamp", end);
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   getAllAttendanceEvents: async (
     start: string,
     end: string,
   ): Promise<AttendanceEvent[]> => {
-    const { data, error } = await supabase.from("attendance_events").select("*")
+    const query = supabase.from("attendance_events").select("*")
       .gte("timestamp", start).lte("timestamp", end);
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   getAttendanceDashboardData: async (
@@ -806,10 +832,10 @@ export const api = {
     // explicitly select all location columns, then the name of the
     // creator.  Supabase will return an array of objects with a
     // created_by_user property containing the joined user row.
-    const { data, error } = await supabase
+    const query = supabase
       .from("locations")
       .select("*, created_by_user:created_by (id, name)");
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     // Convert to camelCase and hoist the creator name into
     // createdByName for convenience.  Preserve other fields as is.
     return (data || []).map((raw: any) => {
@@ -834,11 +860,11 @@ export const api = {
    * override by specifying a different userId.
    */
   getUserLocations: async (userId: string): Promise<Location[]> => {
-    const { data, error } = await supabase
+    const query = supabase
       .from("user_locations")
       .select("location_id:location_id (*), id")
       .eq("user_id", userId);
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     // Flatten nested location record from join: { location_id: { ... } }
     return (data || []).map((row: any) => {
       const loc = row.location_id || {};
@@ -1059,10 +1085,8 @@ export const api = {
   },
 
   getRecurringHolidays: async (): Promise<RecurringHolidayRule[]> => {
-    const { data, error } = await supabase.from("recurring_holidays").select(
-      "*",
-    );
-    if (error) throw error;
+    const query = supabase.from("recurring_holidays").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map((row) => ({
       id: row.id,
       type: row.role_type,
@@ -1233,18 +1257,18 @@ export const api = {
         filter.startDate,
       );
     }
-    const { data, error } = await query.order("start_date", {
+    query = query.order("start_date", {
       ascending: false,
     });
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   getTasks: async (): Promise<Task[]> => {
-    const { data, error } = await supabase.from("tasks").select("*").order(
+    const query = supabase.from("tasks").select("*").order(
       "created_at",
       { ascending: false },
     );
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   createTask: async (taskData: Partial<Task>): Promise<Task> => {
@@ -1297,11 +1321,11 @@ export const api = {
     return toCamelCase(data);
   },
   getNotifications: async (userId: string): Promise<Notification[]> => {
-    const { data, error } = await supabase.from("notifications").select("*").eq(
+    const query = supabase.from("notifications").select("*").eq(
       "user_id",
       userId,
     ).order("created_at", { ascending: false });
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   createNotification: async (
@@ -1440,8 +1464,8 @@ export const api = {
     } as User;
   },
   getPolicies: async (): Promise<Policy[]> => {
-    const { data, error } = await supabase.from("policies").select("*");
-    if (error) throw error;
+    const query = supabase.from("policies").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   createPolicy: async (data: Omit<Policy, "id">): Promise<Policy> => {
@@ -1452,8 +1476,8 @@ export const api = {
     return toCamelCase(inserted);
   },
   getInsurances: async (): Promise<Insurance[]> => {
-    const { data, error } = await supabase.from("insurances").select("*");
-    if (error) throw error;
+    const query = supabase.from("insurances").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   createInsurance: async (data: Omit<Insurance, "id">): Promise<Insurance> => {
@@ -1596,10 +1620,10 @@ export const api = {
     let query = supabase.from("extra_work_logs").select("*");
     if (userId) query = query.eq("user_id", userId);
     else query = query.eq("status", "Pending");
-    const { data, error } = await query.order("work_date", {
+    query = query.order("work_date", {
       ascending: false,
     });
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   approveExtraWorkClaim: async (
@@ -1923,11 +1947,11 @@ export const api = {
     await new Promise((resolve) => setTimeout(resolve, 500));
   },
   getCompOffLogs: async (userId: string): Promise<CompOffLog[]> => {
-    const { data, error } = await supabase.from("comp_off_logs").select("*").eq(
+    const query = supabase.from("comp_off_logs").select("*").eq(
       "user_id",
       userId,
     ).order("date_earned", { ascending: false });
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   checkCompOffTableExists: async (): Promise<void> => {
@@ -2021,8 +2045,8 @@ export const api = {
     console.log("Mock updating ladies uniforms for", siteId, config);
   },
   getUniformRequests: async (): Promise<UniformRequest[]> => {
-    const { data, error } = await supabase.from("uniform_requests").select("*");
-    if (error) throw error;
+    const query = supabase.from("uniform_requests").select("*");
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   submitUniformRequest: async (
@@ -2073,10 +2097,10 @@ export const api = {
     });
   },
   getSupportTickets: async (): Promise<SupportTicket[]> => {
-    const { data, error } = await supabase.from("support_tickets").select(
+    const query = supabase.from("support_tickets").select(
       "*, posts:ticket_posts(*, comments:ticket_comments(*))",
     );
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
   getSupportTicketById: async (id: string): Promise<SupportTicket | null> => {
@@ -2207,10 +2231,10 @@ export const api = {
     startDate: string,
     endDate: string,
   ): Promise<SubmissionCostBreakdown[]> => {
-    const { data, error } = await supabase.from("onboarding_submissions")
+    const query = supabase.from("onboarding_submissions")
       .select("id, employee_id, personal, enrollment_date, verification_usage")
       .gte("enrollment_date", startDate).lte("enrollment_date", endDate);
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
 
     return (data || []).map((sub) => {
       const camelSub = toCamelCase(sub);
@@ -2416,8 +2440,7 @@ export const api = {
   getPatrolQrCodes: async (siteId?: string): Promise<PatrolQRCode[]> => {
     let query = supabase.from("patrol_qr_codes").select("*");
     if (siteId) query = query.eq("site_id", siteId);
-    const { data, error } = await query;
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 
@@ -2468,12 +2491,12 @@ export const api = {
    * Currently, it fetches users where reporting_manager_id matches the param.
    */
   getTeamMembers: async (managerId: string): Promise<User[]> => {
-    const { data, error } = await supabase
+    const query = supabase
       .from("users")
       .select("*")
       .eq("reporting_manager_id", managerId);
 
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 
@@ -2489,7 +2512,7 @@ export const api = {
     const end = new Date(date);
     end.setHours(23, 59, 59, 999);
 
-    const { data, error } = await supabase
+    const query = supabase
       .from("user_location_logs")
       .select("*")
       .eq("user_id", userId)
@@ -2497,7 +2520,7 @@ export const api = {
       .lte("timestamp", end.toISOString())
       .order("timestamp", { ascending: true }); // Ordered for route plotting
 
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 
@@ -2513,14 +2536,14 @@ export const api = {
     const oneDayAgo = new Date();
     oneDayAgo.setHours(oneDayAgo.getHours() - 24);
 
-    const { data, error } = await supabase
+    const query = supabase
       .from("user_location_logs")
       .select("*")
       .in("user_id", userIds)
       .gte("timestamp", oneDayAgo.toISOString())
       .order("timestamp", { ascending: false });
 
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
 
     const latestMap: Record<string, LocationLog> = {};
     (data || []).forEach((log) => {
@@ -2583,25 +2606,24 @@ export const api = {
       query = query.eq("patrol_qr_codes.site_id", siteId);
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     // map the inner joined data if needed, or just return flattened
     // The toCamelCase helper might need adjustment if nested objects return
     return (data || []).map(toCamelCase);
   },
 
   getPatrolDailyScores: async (date: string): Promise<PatrolDailyScore[]> => {
-    const { data, error } = await supabase.from("patrol_daily_scores")
+    const query = supabase.from("patrol_daily_scores")
       .select("*")
       .eq("date", date);
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 
   getCheckpoints: async (siteId: string): Promise<PatrolQRCode[]> => {
-    const { data, error } = await supabase.from("patrol_qr_codes").select("*")
+    const query = supabase.from("patrol_qr_codes").select("*")
       .eq("site_id", siteId).eq("status", "active");
-    if (error) throw error;
+    const data = await fetchAllPaginated(query);
     return (data || []).map(toCamelCase);
   },
 };
