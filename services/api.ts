@@ -632,61 +632,132 @@ export const api = {
   },
 
   deleteUser: async (id: string) => {
+    // Helper to safely execute delete without throwing on missing tables or secondary errors
+    const safeDelete = async (operation: any, tableName: string) => {
+      try {
+        await operation;
+      } catch (error: any) {
+        // Log warnings for debugging but don't block the main deletion
+        // code 404/PGRST204 usually means the table or route doesn't exist
+        if (error?.code !== "PGRST204" && error?.status !== 404) {
+          console.warn(`Warning during ${tableName} cleanup:`, error);
+        }
+      }
+    };
+
     // 1. Update any users who report to this user - set reporting_manager_id to null
-    await supabase.from("users").update({
-      reporting_manager_id: null,
-    }).eq("reporting_manager_id", id);
+    await safeDelete(
+      supabase.from("users").update({
+        reporting_manager_id: null,
+      }).eq("reporting_manager_id", id),
+      "users (reporting manager)",
+    );
 
     // 2. Delete from dependent tables to avoid FK conflicts
     // We execute these deletions to wipe the user's data footprint.
 
     // Onboarding & Profile
-    await supabase.from("onboarding_submissions").delete().eq("user_id", id);
-    await supabase.from("user_documents").delete().eq("user_id", id);
+    await safeDelete(
+      supabase.from("onboarding_submissions").delete().eq("user_id", id),
+      "onboarding_submissions",
+    );
+    await safeDelete(
+      supabase.from("user_documents").delete().eq("user_id", id),
+      "user_documents",
+    );
 
     // Locations & Tracking
-    await supabase.from("user_locations").delete().eq("user_id", id);
-    await supabase.from("user_location_logs").delete().eq("user_id", id);
+    await safeDelete(
+      supabase.from("user_locations").delete().eq("user_id", id),
+      "user_locations",
+    );
+    await safeDelete(
+      supabase.from("user_location_logs").delete().eq("user_id", id),
+      "user_location_logs",
+    );
 
     // Attendance & Leave
-    await supabase.from("attendance_events").delete().eq("user_id", id);
-    await supabase.from("leave_requests").delete().eq("user_id", id);
-    await supabase.from("comp_off_logs").delete().eq("user_id", id);
-    await supabase.from("extra_work_logs").delete().eq("user_id", id);
+    await safeDelete(
+      supabase.from("attendance_events").delete().eq("user_id", id),
+      "attendance_events",
+    );
+    await safeDelete(
+      supabase.from("leave_requests").delete().eq("user_id", id),
+      "leave_requests",
+    );
+    await safeDelete(
+      supabase.from("comp_off_logs").delete().eq("user_id", id),
+      "comp_off_logs",
+    );
+    await safeDelete(
+      supabase.from("extra_work_logs").delete().eq("user_id", id),
+      "extra_work_logs",
+    );
 
     // Tasks & Notifications
-    await supabase.from("notifications").delete().eq("user_id", id);
-    await supabase.from("tasks").delete().eq("assigned_to_id", id);
-    // Nullify escalation fields in tasks if this user was an escalation contact
-    await supabase.from("tasks").update({ escalation_level1_user_id: null }).eq(
-      "escalation_level1_user_id",
-      id,
+    await safeDelete(
+      supabase.from("notifications").delete().eq("user_id", id),
+      "notifications",
     );
-    await supabase.from("tasks").update({ escalation_level2_user_id: null }).eq(
-      "escalation_level2_user_id",
-      id,
+    await safeDelete(
+      supabase.from("tasks").delete().eq("assigned_to_id", id),
+      "tasks",
+    );
+    // Nullify escalation fields in tasks if this user was an escalation contact
+    await safeDelete(
+      supabase.from("tasks").update({ escalation_level1_user_id: null }).eq(
+        "escalation_level1_user_id",
+        id,
+      ),
+      "tasks (escalation L1)",
+    );
+    await safeDelete(
+      supabase.from("tasks").update({ escalation_level2_user_id: null }).eq(
+        "escalation_level2_user_id",
+        id,
+      ),
+      "tasks (escalation L2)",
     );
 
     // Support Desk
-    // Nullify references in tickets so the tickets aren't lost but the user reference is gone
-    await supabase.from("support_tickets").update({ raised_by_id: null }).eq(
-      "raised_by_id",
-      id,
+    await safeDelete(
+      supabase.from("support_tickets").update({ raised_by_id: null }).eq(
+        "raised_by_id",
+        id,
+      ),
+      "support_tickets (raised by)",
     );
-    await supabase.from("support_tickets").update({ assigned_to_id: null }).eq(
-      "assigned_to_id",
-      id,
+    await safeDelete(
+      supabase.from("support_tickets").update({ assigned_to_id: null }).eq(
+        "assigned_to_id",
+        id,
+      ),
+      "support_tickets (assigned to)",
     );
-    await supabase.from("ticket_posts").delete().eq("author_id", id);
-    await supabase.from("ticket_comments").delete().eq("author_id", id);
+    await safeDelete(
+      supabase.from("ticket_posts").delete().eq("author_id", id),
+      "ticket_posts",
+    );
+    await safeDelete(
+      supabase.from("ticket_comments").delete().eq("author_id", id),
+      "ticket_comments",
+    );
 
     // Patrolling
-    await supabase.from("patrol_logs").delete().eq("user_id", id);
-    await supabase.from("patrol_daily_scores").delete().eq("user_id", id);
-    // Nullify createdBy in QR codes
-    await supabase.from("patrol_qr_codes").update({ created_by: null }).eq(
-      "created_by",
-      id,
+    await safeDelete(
+      supabase.from("patrol_logs").delete().eq("user_id", id),
+      "patrol_logs",
+    );
+    await safeDelete(
+      supabase.from("patrol_daily_scores").delete().eq("user_id", id),
+      "patrol_daily_scores",
+    );
+    await safeDelete(
+      supabase.from("patrol_qr_codes").update({ created_by: null }).eq(
+        "created_by",
+        id,
+      ),
+      "patrol_qr_codes",
     );
 
     // 3. Finally delete the user

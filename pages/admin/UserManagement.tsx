@@ -87,11 +87,15 @@ const UserManagement: React.FC = () => {
             setIsSaving(true);
             try {
                 await api.deleteUser(currentUser.id);
-                setToast({ message: 'User deleted. Remember to also remove them from Supabase Auth.', type: 'success' });
+                // Optimistically remove from local state for instant feedback
+                setUsers(prev => prev.filter(u => u.id !== currentUser.id));
+                setToast({ 
+                    message: 'User deleted successfully. Note: Authenticated users must also be removed from Supabase Auth manually if needed.', 
+                    type: 'success' 
+                });
                 setIsDeleteModalOpen(false);
-                fetchUsers();
             } catch (error) {
-                setToast({ message: 'Failed to delete user.', type: 'error' });
+                setToast({ message: 'Failed to delete user. Please check if there are linked records in other modules.', type: 'error' });
             } finally {
                 setIsSaving(false);
             }
