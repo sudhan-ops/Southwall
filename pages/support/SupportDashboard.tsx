@@ -28,7 +28,7 @@ const PriorityIndicator: React.FC<{ priority: SupportTicket['priority'] }> = ({ 
 
 const StatusChip: React.FC<{ status: SupportTicket['status'] }> = ({ status }) => {
     const styles = {
-        Open: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+        Open: 'bg-accent/10 text-accent border-accent/20',
         'In Progress': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
         'Pending Requester': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
         Resolved: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
@@ -90,8 +90,8 @@ const NearbyUserItem: React.FC<{ user: User, onAction: (phone?: string) => void 
     <div className="flex items-center gap-4 p-3 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
         <div className="relative">
             <ProfilePlaceholder photoUrl={user.photoUrl} seed={user.id} className="w-12 h-12 rounded-full shadow-sm" />
-            {/* Larger, more visible status indicator: bright green if checked in, red if not */}
-            <span className={`absolute -bottom-0.5 -right-0.5 block h-4 w-4 rounded-full ${user.isAvailable ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)]' : 'bg-rose-600 shadow-[0_0_6px_rgba(225,29,72,0.6)]'} ring-2 ring-white`}></span>
+            {/* Larger, more visible status indicator: accent color if checked in, red if not */}
+            <span className={`absolute -bottom-0.5 -right-0.5 block h-4 w-4 rounded-full ${user.isAvailable ? 'bg-accent shadow-[0_0_10px_rgba(34,197,94,0.8)]' : 'bg-rose-600 shadow-[0_0_6px_rgba(225,29,72,0.6)]'} ring-2 ring-white`}></span>
         </div>
         <div className="flex-grow min-w-0">
             <p className="text-sm font-bold text-primary-text truncate">{user.name}</p>
@@ -275,8 +275,8 @@ const SupportDashboard: React.FC = () => {
                 <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-emerald-50 rounded-lg backdrop-blur-sm">
-                                <LifeBuoy className="h-6 w-6 text-emerald-600" />
+                            <div className="p-2 bg-accent/10 rounded-lg backdrop-blur-sm">
+                                <LifeBuoy className="h-6 w-6 text-accent" />
                             </div>
                             <h2 className="text-2xl lg:text-3xl font-bold text-primary-text">Support & Audit</h2>
                         </div>

@@ -34,7 +34,7 @@ const VerificationChecks: React.FC<{ submission: OnboardingData; isSyncing: bool
         const isFailed = hasSyncedOrFailed && status === false;
 
         const Icon = isChecked ? CheckSquare : (isFailed ? XSquare : Square);
-        const color = isChecked ? 'text-green-600' : (isFailed ? 'text-red-600' : 'text-muted');
+        const color = isChecked ? 'text-accent' : (isFailed ? 'text-red-600' : 'text-muted');
         const title = isChecked ? 'Verified' : (isFailed ? 'Failed' : 'Pending Verification');
 
         return (

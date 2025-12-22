@@ -525,7 +525,7 @@ const EntityManagement: React.FC = () => {
                 return (
                     <div className="border-0 shadow-none md:bg-card md:p-6 md:rounded-xl md:shadow-card">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
-                            <Button onClick={() => navigate('/hr/entity-management/add-group')} className="btn-primary border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Plus className="mr-2 h-4" />Add Group</Button>
+                            <Button onClick={() => navigate('/hr/entity-management/add-group')} className="hover:opacity-90 shadow-lg hover:shadow-xl transition-all duration-300"><Plus className="mr-2 h-4" />Add Group</Button>
                             <div className="flex items-center gap-2 flex-wrap">
                                 <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="hover:bg-gray-100"><FileText className="mr-2 h-4 w-4" /> Template</Button>
                                 <Button type="button" variant="outline" onClick={() => importRef.current?.click()} className="hover:bg-gray-100"><Upload className="mr-2 h-4 w-4" /> Import</Button>
@@ -702,14 +702,14 @@ const EntityManagement: React.FC = () => {
                     <div className="flex items-center gap-2 flex-wrap">
                         <Button variant="outline" onClick={() => setIsInstructionsOpen(true)} className="hover:bg-gray-100"><HelpCircle className="mr-2 h-4 w-4" /> Help</Button>
                         <input type="file" ref={importRef} className="hidden" accept=".csv" onChange={handleImport} />
-                        <Button onClick={handleSaveAll} className="btn-primary border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
+                        <Button onClick={handleSaveAll} className="hover:opacity-90 shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
                     </div>
                 )}
             </div>
 
             {isMobile && (
                 <div className="flex flex-col gap-3 mb-4">
-                    <Button onClick={handleSaveAll} className="w-full justify-center btn-primary border hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
+                    <Button onClick={handleSaveAll} className="w-full justify-center hover:opacity-90 shadow-lg hover:shadow-xl transition-all duration-300"><Save className="mr-2 h-4 w-4" /> Save All Changes</Button>
                     <Button variant="outline" onClick={() => setIsInstructionsOpen(true)} className="w-full justify-center hover:bg-gray-100"><HelpCircle className="mr-2 h-4 w-4" /> Help</Button>
                     <input type="file" ref={importRef} className="hidden" accept=".csv" onChange={handleImport} />
                 </div>
