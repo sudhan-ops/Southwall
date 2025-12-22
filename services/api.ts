@@ -632,6 +632,64 @@ export const api = {
   },
 
   deleteUser: async (id: string) => {
+    // 1. Update any users who report to this user - set reporting_manager_id to null
+    await supabase.from("users").update({
+      reporting_manager_id: null,
+    }).eq("reporting_manager_id", id);
+
+    // 2. Delete from dependent tables to avoid FK conflicts
+    // We execute these deletions to wipe the user's data footprint.
+
+    // Onboarding & Profile
+    await supabase.from("onboarding_submissions").delete().eq("user_id", id);
+    await supabase.from("user_documents").delete().eq("user_id", id);
+
+    // Locations & Tracking
+    await supabase.from("user_locations").delete().eq("user_id", id);
+    await supabase.from("user_location_logs").delete().eq("user_id", id);
+
+    // Attendance & Leave
+    await supabase.from("attendance_events").delete().eq("user_id", id);
+    await supabase.from("leave_requests").delete().eq("user_id", id);
+    await supabase.from("comp_off_logs").delete().eq("user_id", id);
+    await supabase.from("extra_work_logs").delete().eq("user_id", id);
+
+    // Tasks & Notifications
+    await supabase.from("notifications").delete().eq("user_id", id);
+    await supabase.from("tasks").delete().eq("assigned_to_id", id);
+    // Nullify escalation fields in tasks if this user was an escalation contact
+    await supabase.from("tasks").update({ escalation_level1_user_id: null }).eq(
+      "escalation_level1_user_id",
+      id,
+    );
+    await supabase.from("tasks").update({ escalation_level2_user_id: null }).eq(
+      "escalation_level2_user_id",
+      id,
+    );
+
+    // Support Desk
+    // Nullify references in tickets so the tickets aren't lost but the user reference is gone
+    await supabase.from("support_tickets").update({ raised_by_id: null }).eq(
+      "raised_by_id",
+      id,
+    );
+    await supabase.from("support_tickets").update({ assigned_to_id: null }).eq(
+      "assigned_to_id",
+      id,
+    );
+    await supabase.from("ticket_posts").delete().eq("author_id", id);
+    await supabase.from("ticket_comments").delete().eq("author_id", id);
+
+    // Patrolling
+    await supabase.from("patrol_logs").delete().eq("user_id", id);
+    await supabase.from("patrol_daily_scores").delete().eq("user_id", id);
+    // Nullify createdBy in QR codes
+    await supabase.from("patrol_qr_codes").update({ created_by: null }).eq(
+      "created_by",
+      id,
+    );
+
+    // 3. Finally delete the user
     const { error } = await supabase.from("users").delete().eq("id", id);
     if (error) throw error;
   },
