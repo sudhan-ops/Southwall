@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import Button from '../../components/ui/Button';
 import { LogOut, ArrowLeft } from 'lucide-react';
+import { getThemeColors } from '../../utils/themeUtils';
+import { useBrandingStore } from '../../store/brandingStore';
 
 const LogoutPage: React.FC = () => {
     const navigate = useNavigate();
     const { logout } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
 
     const handleConfirmLogout = async () => {
         await logout();
@@ -18,10 +22,8 @@ const LogoutPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
-            {/* Background is handled globally by index.html (#041b0f) */}
-
-            <div className="w-full max-w-md bg-card rounded-2xl shadow-card p-8 text-center relative z-10">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative" style={{ backgroundColor: themeColors.mobileBg }}>
+            <div className={`w-full max-w-md rounded-2xl p-8 text-center relative z-10 ${themeColors.mobileBg === '#ffffff' ? 'bg-white shadow-xl border' : 'bg-card shadow-card'}`}>
                 <div className="flex justify-center mb-6">
                     <div className="p-4 rounded-full bg-red-100">
                         <LogOut className="h-10 w-10 text-red-600" />

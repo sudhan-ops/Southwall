@@ -218,7 +218,7 @@ const ProfilePage: React.FC = () => {
 
     if (isMobileView) {
         return (
-            <div className="p-4 space-y-8 md:bg-transparent" style={{ backgroundColor: themeColors.mobileBg }}>
+            <div className="p-4 space-y-8" style={{ backgroundColor: 'transparent' }}>
                 {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
                 {/* Logout Modal removed */}
                 {/* Attendance Confirmation Modal removed */}
@@ -249,7 +249,7 @@ const ProfilePage: React.FC = () => {
                                     borderColor: themeColors.isDark ? '#374151' : '#e5e7eb',
                                     color: themeColors.isDark ? 'white' : '#111827'
                                 }}
-                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                                labelClassName={themeColors.isDark ? 'text-gray-300' : 'text-slate-600'} 
                             />
                             <Input 
                                 label="Email Address" 
@@ -264,7 +264,7 @@ const ProfilePage: React.FC = () => {
                                     borderColor: themeColors.isDark ? '#4b5563' : '#e5e7eb',
                                     color: themeColors.isDark ? '#9ca3af' : '#6b7280'
                                 }}
-                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                                labelClassName={themeColors.isDark ? 'text-gray-300' : 'text-slate-600'} 
                             />
                             <Input 
                                 label="Phone Number" 
@@ -278,7 +278,7 @@ const ProfilePage: React.FC = () => {
                                     borderColor: themeColors.isDark ? '#374151' : '#e5e7eb',
                                     color: themeColors.isDark ? 'white' : '#111827'
                                 }}
-                                labelClassName={!themeColors.isDark ? 'text-gray-700' : 'text-gray-300'} 
+                                labelClassName={themeColors.isDark ? 'text-gray-300' : 'text-slate-600'} 
                             />
                             <div className="flex justify-end pt-2"><Button type="submit" isLoading={isSaving} disabled={!isDirty}>Save Changes</Button></div>
                         </form>
@@ -306,7 +306,7 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`}>Work Hours Tracking</h3>
+                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`} style={{ color: themeColors.isDark ? 'white' : '#111827' }}>Work Hours Tracking</h3>
                         <div className="fo-attendance-card space-y-4" style={{ backgroundColor: themeColors.isDark ? 'transparent' : '#f9fafb', borderColor: themeColors.isDark ? undefined : '#e5e7eb', borderWidth: themeColors.isDark ? 0 : 1 }}>
                             <div className="flex justify-around">
                                 <div className="text-center">
@@ -345,7 +345,7 @@ const ProfilePage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`}>Account Actions</h3>
+                        <h3 className={`fo-section-title mb-4 ${!themeColors.isDark ? 'text-gray-900 border-gray-200' : ''}`} style={{ color: themeColors.isDark ? 'white' : '#111827' }}>Account Actions</h3>
                         <div className="space-y-4">
                             <Button onClick={() => navigate('/leaves/dashboard')} variant="secondary" className="w-full justify-center !py-3" style={!themeColors.isDark ? { backgroundColor: '#f3f4f6', color: '#1f2937' } : {}} title="View your leave history and balances"><Crosshair className="mr-2 h-5 w-5" /> Leave Tracker</Button>
                             <Button onClick={handleLogoutClick} variant="danger" className="w-full justify-center !py-3"><LogOut className="mr-2 h-5 w-5" /> Log Out</Button>
@@ -373,7 +373,14 @@ const ProfilePage: React.FC = () => {
                 <div className="text-center md:text-left relative z-10 flex-1 mt-16 md:mt-0">
                     <h2 className="text-2xl md:text-3xl font-bold text-primary-text tracking-tight">{user.name}</h2>
                     <div className="flex items-center justify-center md:justify-start gap-2 mt-1.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs md:text-sm font-medium">
+                        <span 
+                            className="px-2.5 py-0.5 rounded-full text-xs md:text-sm font-medium border"
+                            style={{ 
+                                backgroundColor: themeColors.isDark ? 'rgba(34, 211, 238, 0.1)' : themeColors.secondary,
+                                color: themeColors.primary,
+                                borderColor: themeColors.primary
+                            }}
+                        >
                             {getRoleName(user.role)}
                         </span>
                     </div>
@@ -415,7 +422,7 @@ const ProfilePage: React.FC = () => {
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
                                     <p className="text-xs md:text-sm font-medium text-gray-500 mb-1">Last Check In</p>
-                                    <p className="text-2xl md:text-3xl font-bold text-emerald-600">{formatTime(lastCheckInTime)}</p>
+                                    <p className="text-2xl md:text-3xl font-bold" style={{ color: themeColors.primary }}>{formatTime(lastCheckInTime)}</p>
                                 </div>
                                 <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
                                     <p className="text-xs md:text-sm font-medium text-gray-500 mb-1">Last Check Out</p>
@@ -430,7 +437,7 @@ const ProfilePage: React.FC = () => {
                                     <Button
                                         onClick={() => navigate('/attendance/check-in')}
                                         variant="primary"
-                                        className="flex-1 !py-3 text-base md:text-lg shadow-lg shadow-emerald-100 hover:shadow-emerald-200 transition-all"
+                                        className="flex-1 !py-3 text-base md:text-lg shadow-lg hover:opacity-90 transition-all"
                                         disabled={isCheckedIn || isActionInProgress}
                                     >
                                         <LogIn className="mr-2 h-5 w-5" /> Check In

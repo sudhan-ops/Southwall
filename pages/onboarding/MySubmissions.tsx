@@ -9,14 +9,15 @@ import StatusChip from '../../components/ui/StatusChip';
 import { useEnrollmentRulesStore } from '../../store/enrollmentRulesStore';
 import { useBrandingStore } from '../../store/brandingStore';
 import CardListSkeleton from '../../components/skeletons/CardListSkeleton';
+import { getThemeColors } from '../../utils/themeUtils';
 
 type StatusFilter = 'in-progress' | 'existing';
 
 // Reusable component for the small checkboxes with labels
-const CheckboxItem: React.FC<{ label: string, checked: boolean }> = ({ label, checked }) => (
+const CheckboxItem: React.FC<{ label: string, checked: boolean, themeColors: any }> = ({ label, checked, themeColors }) => (
     <div className="flex items-center gap-1.5">
-        {checked ? <CheckSquare className="h-4 w-4 text-emerald-400" /> : <Square className="h-4 w-4 text-gray-500" />}
-        <span className={checked ? 'text-gray-300' : 'text-gray-500'}>{label}</span>
+        {checked ? <CheckSquare className="h-4 w-4" style={{ color: themeColors.primary }} /> : <Square className="h-4 w-4 text-gray-500" />}
+        <span className={checked && themeColors.mobileBg !== '#ffffff' ? 'text-gray-200' : checked ? 'text-slate-700' : 'text-gray-500'}>{label}</span>
     </div>
 );
 
@@ -24,6 +25,7 @@ const CheckboxItem: React.FC<{ label: string, checked: boolean }> = ({ label, ch
 const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }) => {
     const { esiCtcThreshold } = useEnrollmentRulesStore();
     const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
 
     const progress = useMemo(() => {
         const { personal, uan, esi, gmc } = submission;
@@ -52,24 +54,34 @@ const SubmissionCard: React.FC<{ submission: OnboardingData }> = ({ submission }
     }, [submission, esiCtcThreshold]);
 
     return (
-        <Link to={`/onboarding/add/personal?id=${submission.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-xl">
-            <div className={`bg-[#041b0f] md:bg-[#243524] hover:border-emerald-500 p-3 rounded-xl flex gap-4 items-start border border-transparent transition-colors duration-200`}>
-                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-gray-600">
+        <Link 
+            to={`/onboarding/add/personal?id=${submission.id}`} 
+            className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-xl"
+            style={{ ringColor: themeColors.primary, ringOffsetColor: themeColors.mobileBg }}
+        >
+            <div 
+                className={`p-3 rounded-xl flex gap-4 items-start border transition-colors duration-200 border-transparent hover:border-accent`}
+                style={{ 
+                    backgroundColor: themeColors.mobileBg === '#ffffff' ? '#f8fafc' : themeColors.sidebarBg,
+                    borderColor: themeColors.mobileBg === '#ffffff' ? '#e2e8f0' : 'transparent'
+                }}
+            >
+                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2" style={{ borderColor: themeColors.sidebarBorder }}>
                     <ProfilePlaceholder photoUrl={submission.personal.photo?.preview} seed={submission.id} />
                 </div>
                 <div className="flex-grow">
                     <div className="flex justify-between items-start gap-2">
-                        <p className="font-semibold text-green-400">{`${submission.personal.firstName} ${submission.personal.lastName}`}</p>
+                        <p className="font-semibold" style={{ color: themeColors.mobileBg === '#ffffff' ? '#0f172a' : themeColors.primary }}>{`${submission.personal.firstName} ${submission.personal.lastName}`}</p>
                         <div className="flex-shrink-0">
                             <StatusChip status={submission.status} />
                         </div>
                     </div>
                     <p className="text-sm text-gray-400">{submission.personal.mobile}</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3 text-xs">
-                        <CheckboxItem label="Aadhaar" checked={progress.aadhaar} />
-                        <CheckboxItem label="UAN" checked={progress.uan} />
-                        <CheckboxItem label="PF" checked={progress.pf} />
-                        <CheckboxItem label="ESI / GMC" checked={progress.esiGmc} />
+                        <CheckboxItem label="Aadhaar" checked={progress.aadhaar} themeColors={themeColors} />
+                        <CheckboxItem label="UAN" checked={progress.uan} themeColors={themeColors} />
+                        <CheckboxItem label="PF" checked={progress.pf} themeColors={themeColors} />
+                        <CheckboxItem label="ESI / GMC" checked={progress.esiGmc} themeColors={themeColors} />
                     </div>
                 </div>
             </div>
@@ -118,6 +130,8 @@ const MySubmissions: React.FC = () => {
             );
     }, [submissions, statusFilter, searchTerm]);
 
+    const themeColors = getThemeColors(colorScheme);
+
     const handleAddNew = () => {
         navigate('/onboarding/select-organization');
     };
@@ -132,22 +146,48 @@ const MySubmissions: React.FC = () => {
     ];
 
     return (
-        <div className={`h-full flex flex-col bg-[#041b0f] text-white`}>
+        <div className={`h-full flex flex-col`} style={{ backgroundColor: themeColors.mobileBg, color: themeColors.isDark || themeColors.mobileBg !== '#ffffff' ? 'white' : '#0f172a' }}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
-            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 bg-[#041b0f]/80 border-[#374151] backdrop-blur-sm border-b`}>
-                <button onClick={() => navigate('/onboarding')} aria-label="Go back" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 hover:bg-white/10`}>
+            <header 
+                className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header sticky top-0 z-10 backdrop-blur-sm border-b`}
+                style={{ 
+                    backgroundColor: themeColors.mobileBg === '#ffffff' ? 'rgba(255, 255, 255, 0.8)' : themeColors.mobileBg + 'cc',
+                    borderColor: themeColors.mobileBg === '#ffffff' ? '#e2e8f0' : themeColors.sidebarBorder
+                }}
+            >
+                <button 
+                  onClick={() => navigate('/onboarding')} 
+                  aria-label="Go back" 
+                  className={`p-2 rounded-full hover:bg-black/10`}
+                  style={{ color: themeColors.mobileBg === '#ffffff' ? '#64748b' : 'white' }}
+                >
                     <ArrowLeft className="h-6 w-6" />
                 </button>
                 <h1 className="text-lg font-semibold">On Boarding</h1>
                 <div className="flex items-center gap-1">
-                    <button onClick={handleSearchIconClick} aria-label="Search employee" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 hover:bg-white/10`}>
+                    <button 
+                      onClick={handleSearchIconClick} 
+                      aria-label="Search employee" 
+                      className={`p-2 rounded-full hover:bg-black/10`}
+                      style={{ color: themeColors.mobileBg === '#ffffff' ? '#64748b' : 'white' }}
+                    >
                         <Search className="h-6 w-6" />
                     </button>
-                    <button onClick={handleAddNew} aria-label="Add new employee" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 hover:bg-white/10`}>
+                    <button 
+                      onClick={handleAddNew} 
+                      aria-label="Add new employee" 
+                      className={`p-2 rounded-full hover:bg-black/10`}
+                      style={{ color: themeColors.mobileBg === '#ffffff' ? '#64748b' : 'white' }}
+                    >
                         <UserPlus className="h-6 w-6" />
                     </button>
-                    <button onClick={() => navigate('/profile')} aria-label="Exit to profile" className={`p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 hover:bg-white/10`}>
+                    <button 
+                      onClick={() => navigate('/profile')} 
+                      aria-label="Exit to profile" 
+                      className={`p-2 rounded-full hover:bg-black/10`}
+                      style={{ color: themeColors.mobileBg === '#ffffff' ? '#64748b' : 'white' }}
+                    >
                         <X className="h-6 w-6" />
                     </button>
                 </div>
@@ -159,13 +199,14 @@ const MySubmissions: React.FC = () => {
                         <button
                             key={tab.key}
                             onClick={() => setStatusFilter(tab.key)}
-                            className={`flex-1 py-2 text-sm font-semibold uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#041b0f] focus-visible:ring-emerald-400 rounded-sm ${statusFilter === tab.key
-                                ? 'border-b-2 border-emerald-500 text-emerald-600'
-                                : `border-b-2 border-transparent text-gray-400 hover:text-white`
-                                }`}
-                        >
-                            {tab.label}
-                        </button>
+                             className={`flex-1 py-2 text-sm font-semibold uppercase tracking-wider transition-colors duration-200 focus-visible:outline-none rounded-sm ${statusFilter === tab.key
+                                 ? 'border-b-2'
+                                 : `border-b-2 border-transparent text-gray-400 hover:text-gray-600`
+                                 }`}
+                             style={statusFilter === tab.key ? { borderBottomColor: themeColors.primary, color: themeColors.primary } : {}}
+                         >
+                             {tab.label}
+                         </button>
                     ))}
                 </div>
             </div>

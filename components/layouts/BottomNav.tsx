@@ -4,6 +4,7 @@ import { Home, CalendarCheck, ListTodo, User } from 'lucide-react';
 import { usePermissionsStore } from '../../store/permissionsStore';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const BottomNav: React.FC = () => {
     const { user } = useAuthStore();
@@ -42,20 +43,15 @@ const BottomNav: React.FC = () => {
         }
     ];
 
-    // Dynamic colors
-    const themeColors = colorScheme !== 'green'
-        ? {
-            bg: '#FFFFFF',
-            border: '#e2e8f0',
-            activeText: '#1a3a6e',
-            inactiveText: 'text-slate-400'
-        }
-        : {
-            bg: '#041b0f',
-            border: '#1f3d2b',
-            activeText: '#22c55e',
-            inactiveText: 'text-gray-400'
-        };
+    const globalThemeColors = getThemeColors(colorScheme);
+    
+    // Derived theme colors for BottomNav
+    const themeColors = {
+        bg: globalThemeColors.sidebarBg,
+        border: globalThemeColors.sidebarBorder,
+        activeText: globalThemeColors.primary,
+        inactiveText: globalThemeColors.isDark || globalThemeColors.sidebarBg !== '#ffffff' ? 'text-gray-400' : 'text-slate-400'
+    };
 
     return (
         <nav

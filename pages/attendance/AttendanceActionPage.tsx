@@ -4,11 +4,15 @@ import { useAuthStore } from '../../store/authStore';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import { LogIn, LogOut } from 'lucide-react';
+import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const AttendanceActionPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleCheckInStatus, isCheckedIn } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -16,8 +20,8 @@ const AttendanceActionPage: React.FC = () => {
     const isCheckIn = location.pathname.includes('check-in');
     const action = isCheckIn ? 'Check In' : 'Check Out';
     const Icon = isCheckIn ? LogIn : LogOut;
-    const iconBgColor = isCheckIn ? 'bg-emerald-100' : 'bg-red-100';
-    const iconColor = isCheckIn ? 'text-emerald-600' : 'text-red-600';
+    const iconBgColor = isCheckIn ? (themeColors.isDark ? 'rgba(34, 211, 238, 0.1)' : themeColors.secondary) : 'bg-red-100';
+    const iconColor = isCheckIn ? themeColors.primary : 'text-red-600';
 
     const handleConfirm = async () => {
         setIsSubmitting(true);

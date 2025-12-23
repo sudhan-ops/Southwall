@@ -6,10 +6,14 @@ import { useSettingsStore } from '../../store/settingsStore';
 import { api } from '../../services/api';
 import type { AttendanceEvent } from '../../types';
 import Button from '../../components/ui/Button';
+import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 const AttendanceCalendar: React.FC = () => {
     const { user } = useAuthStore();
     const { officeHolidays, fieldHolidays, attendance, recurringHolidays } = useSettingsStore();
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<AttendanceEvent[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -153,7 +157,7 @@ const AttendanceCalendar: React.FC = () => {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'present': return 'bg-emerald-500 text-white border-emerald-600 shadow-sm'; // Vibrant Green
+            case 'present': return 'text-white border-transparent shadow-sm'; // Using style for bg
             case 'absent': return 'bg-rose-500 text-white border-rose-600 shadow-sm'; // Vibrant Red/Pink
             case 'holiday': return 'bg-red-600 text-white border-red-700 shadow-sm'; // Deep Red
             case 'floating-holiday': return 'bg-amber-500 text-white border-amber-600 shadow-sm'; // Vibrant Amber
@@ -191,7 +195,11 @@ const AttendanceCalendar: React.FC = () => {
                         const status = getDayStatus(date);
                         const colorClass = getStatusColor(status);
                         return (
-                            <div key={date.toISOString()} className={`aspect-square rounded border flex flex-col items-center justify-center ${colorClass} transition-colors`}>
+                            <div 
+                                key={date.toISOString()} 
+                                className={`aspect-square rounded border flex flex-col items-center justify-center ${colorClass} transition-colors`}
+                                style={status === 'present' ? { backgroundColor: themeColors.primary } : {}}
+                            >
                                 <span className="text-sm font-semibold">{format(date, 'd')}</span>
                             </div>
                         );
@@ -199,7 +207,7 @@ const AttendanceCalendar: React.FC = () => {
                 </div>
             )}
             <div className="mt-3 flex gap-3 text-xs text-muted justify-center flex-wrap">
-                <div className="flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500 border border-emerald-600 rounded-sm"></div> Present</div>
+                <div className="flex items-center gap-1"><div className="w-2 h-2 border rounded-sm" style={{ backgroundColor: themeColors.primary, borderColor: themeColors.primary }}></div> Present</div>
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-rose-500 border border-rose-600 rounded-sm"></div> Absent</div>
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-red-600 border border-red-700 rounded-sm"></div> Holiday</div>
                 <div className="flex items-center gap-1"><div className="w-2 h-2 bg-amber-500 border border-amber-600 rounded-sm"></div> Floating Holiday</div>

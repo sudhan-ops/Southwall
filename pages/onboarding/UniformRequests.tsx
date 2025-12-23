@@ -13,6 +13,8 @@ import Modal from '../../components/ui/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useOnboardingStore } from '../../store/onboardingStore';
 import { useAuthStore } from '../../store/authStore';
+import { getThemeColors } from '../../utils/themeUtils';
+import { useBrandingStore } from '../../store/brandingStore';
 
 type UniformFormData = {
     siteId: string;
@@ -337,8 +339,11 @@ const UniformRequests: React.FC = () => {
     
     const totalItems = (items: UniformRequestItem[]) => items.reduce((sum, item) => sum + item.quantity, 0);
 
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
+
     if (isLoading || !masterUniforms) {
-        return <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin text-muted" /></div>;
+        return <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" style={{ color: themeColors.primary }} /></div>;
     }
 
     if (view === 'form') {
@@ -351,12 +356,19 @@ const UniformRequests: React.FC = () => {
         };
 
         return (
-            <div className="h-full flex flex-col">
-                 <header className="p-4 flex-shrink-0 flex items-center gap-4 fo-mobile-header">
+            <div className="h-full flex flex-col" style={{ backgroundColor: themeColors.mobileBg, color: themeColors.isDark || themeColors.mobileBg !== '#ffffff' ? 'white' : '#0f172a' }}>
+                 <header 
+                    className="p-4 flex-shrink-0 flex items-center gap-4 fo-mobile-header border-b"
+                    style={{ 
+                        backgroundColor: themeColors.sidebarBg, 
+                        color: 'white',
+                        borderColor: themeColors.sidebarBorder 
+                    }}
+                >
                     <button onClick={handleCancel} aria-label="Go back">
                         <ArrowLeft className="h-6 w-6" />
                     </button>
-                    <h1>{editingRequest ? 'Edit' : 'New'} Request</h1>
+                    <h1 className="text-xl font-bold">{editingRequest ? 'Edit' : 'New'} Request</h1>
                 </header>
                 <main className="flex-1 overflow-y-auto p-4">
                     <UniformRequestForm
@@ -372,15 +384,22 @@ const UniformRequests: React.FC = () => {
     }
 
     return (
-        <div className={`h-full flex flex-col bg-[#041b0f] text-white`}>
+        <div className={`h-full flex flex-col`} style={{ backgroundColor: themeColors.mobileBg, color: themeColors.isDark || themeColors.mobileBg !== '#ffffff' ? 'white' : '#0f172a' }}>
             {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
             <Modal isOpen={!!deletingRequest} onClose={() => setDeletingRequest(null)} onConfirm={handleConfirmDelete} title="Confirm Deletion">
                 Are you sure you want to delete this uniform request? This cannot be undone.
             </Modal>
 
-            <header className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header`}>
+            <header 
+                className={`p-4 flex-shrink-0 flex items-center justify-between fo-mobile-header border-b`}
+                style={{ 
+                    backgroundColor: themeColors.sidebarBg, 
+                    color: 'white',
+                    borderColor: themeColors.sidebarBorder 
+                }}
+            >
                 <h1 className="text-lg font-semibold">Uniform Requests</h1>
-                <button onClick={handleNewRequest} aria-label="New Uniform Request" className={``}>
+                <button onClick={handleNewRequest} aria-label="New Uniform Request">
                     <UserPlus className="h-6 w-6" />
                 </button>
             </header>
@@ -388,10 +407,17 @@ const UniformRequests: React.FC = () => {
             <main className="flex-1 overflow-y-auto p-4 space-y-3">
                 {requests.length > 0 ? (
                     requests.map(req => (
-                        <div key={req.id} className={`p-3 rounded-xl border bg-[#243524] border-[#374151]`}>
+                        <div 
+                            key={req.id} 
+                            className={`p-3 rounded-xl border`}
+                            style={{ 
+                                backgroundColor: themeColors.mobileBg === '#ffffff' ? '#f8fafc' : themeColors.sidebarBg,
+                                borderColor: themeColors.mobileBg === '#ffffff' ? '#e2e8f0' : themeColors.sidebarBorder
+                            }}
+                        >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className={`font-semibold text-white`}>{req.siteName}</p>
+                                    <p className={`font-semibold`} style={{ color: themeColors.mobileBg === '#ffffff' ? '#0f172a' : 'white' }}>{req.siteName}</p>
                                     <p className={`text-xs text-gray-400`}>{format(new Date(req.requestedDate), 'dd MMM, yyyy')}</p>
                                 </div>
                                 <UniformStatusChip status={req.status} />
@@ -399,7 +425,7 @@ const UniformRequests: React.FC = () => {
                             <div className="mt-3 flex justify-between items-end">
                                 <div className={`text-sm text-gray-300`}>
                                     <p>{req.gender} Uniforms</p>
-                                    <p className="font-semibold">{totalItems(req.items)} Items</p>
+                                    <p className="font-semibold" style={{ color: themeColors.primary }}>{totalItems(req.items)} Items</p>
                                 </div>
                                 {req.status === 'Pending' && (
                                     <div className="flex items-center gap-2">

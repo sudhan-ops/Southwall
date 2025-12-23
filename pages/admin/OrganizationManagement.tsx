@@ -15,6 +15,8 @@ import { SiteConfigurationForm } from '../../components/hr/SiteConfigurationForm
 import ManpowerDetailsModal from '../../components/admin/ManpowerDetailsModal';
 import TableSkeleton from '../../components/skeletons/TableSkeleton';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 import { useSettingsStore } from '../../store/settingsStore';
 import { differenceInDays } from 'date-fns';
 import Input from '../../components/ui/Input';
@@ -69,6 +71,8 @@ const fromCSV = (csvText: string): Record<string, string>[] => {
 
 export const SiteManagement: React.FC = () => {
     const navigate = useNavigate();
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [siteConfigs, setSiteConfigs] = useState<SiteConfiguration[]>([]);
     const [allClients, setAllClients] = useState<(Entity & { companyName: string })[]>([]);
@@ -298,7 +302,11 @@ export const SiteManagement: React.FC = () => {
                                 <Plus className="w-5 h-5 mr-2" />
                                 Quick Add Site
                             </Button>
-                            <Button onClick={() => navigate('/admin/sites/add')} className="mr-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                            <Button 
+                                onClick={() => navigate('/admin/sites/add')} 
+                                className="mr-2 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                                style={{ backgroundColor: themeColors.primary }}
+                            >
                                 <Plus className="w-5 h-5 mr-2" />
                                 Add Site
                             </Button>
@@ -316,7 +324,11 @@ export const SiteManagement: React.FC = () => {
 
                 {isMobile && (
                     <div className="flex flex-col gap-3 mb-4">
-                        <Button onClick={() => navigate('/admin/sites/add')} className="w-full justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                        <Button 
+                            onClick={() => navigate('/admin/sites/add')} 
+                            className="w-full justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                            style={{ backgroundColor: themeColors.primary }}
+                        >
                             <Plus className="w-5 h-5 mr-2" />
                             Add Site
                         </Button>

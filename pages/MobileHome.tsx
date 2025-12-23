@@ -45,7 +45,7 @@ const MobileHome: React.FC = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4" style={{ backgroundColor: globalThemeColors.mobileBg }}>
+        <div className="min-h-[calc(100vh-180px)] flex flex-col pb-4" style={{ backgroundColor: 'transparent' }}>
             {/* Header Section - No negative margin since main Header is hidden */}
             <div className="border p-6 rounded-3xl shadow-lg -mx-4 mb-6" style={{ backgroundColor: globalThemeColors.sidebarBg, borderColor: globalThemeColors.sidebarBorder }}>
                 <div className="flex items-center justify-between mb-4">
@@ -89,7 +89,7 @@ const MobileHome: React.FC = () => {
                 <button
                     onClick={handleLogout}
                     className="w-full flex items-center justify-center space-x-2 p-4 rounded-xl font-semibold active:scale-95 transition-all text-white shadow-lg"
-                    style={{ backgroundColor: '#1f2937' }}
+                    style={{ backgroundColor: globalThemeColors.mobileBg === '#ffffff' ? '#1f2937' : globalThemeColors.primary }}
                 >
                     <LogOut className="w-5 h-5" />
                     <span>Log Out</span>

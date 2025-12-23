@@ -6,6 +6,10 @@
 .professional-blue-theme .bg-accent {
    background-color: #2563eb !important;
 }
+.professional-blue-theme {
+   --accent-color: #2563eb;
+   --mobile-bg: #ffffff;
+}
 .professional-blue-theme .bg-accent-light {
    background-color: rgba(37, 99, 235, 0.1) !important;
 }
@@ -62,6 +66,8 @@
 .dark-saas-theme body, .dark-saas-theme, .dark-saas-theme #root {
    background-color: #020617 !important;
    color: #e5e7eb !important;
+   --accent-color: #22d3ee;
+   --mobile-bg: #020617;
 }
 .dark-saas-theme .bg-card, .dark-saas-theme .bg-page {
    background-color: #0f172a !important;
@@ -125,6 +131,10 @@
 .teal-mint-theme .bg-accent {
    background-color: #0d9488 !important;
 }
+.teal-mint-theme {
+   --accent-color: #0d9488;
+   --mobile-bg: #ffffff;
+}
 .teal-mint-theme .bg-accent-light {
    background-color: rgba(13, 148, 136, 0.1) !important;
 }
@@ -178,6 +188,10 @@
 
 .indigo-violet-theme .bg-accent {
    background-color: #4f46e5 !important;
+}
+.indigo-violet-theme {
+   --accent-color: #4f46e5;
+   --mobile-bg: #ffffff;
 }
 .indigo-violet-theme .bg-accent-light {
    background-color: rgba(79, 70, 229, 0.1) !important;
@@ -233,6 +247,10 @@
 .green-finance-theme .bg-accent {
    background-color: #15803d !important;
 }
+.green-finance-theme {
+   --accent-color: #15803d;
+   --mobile-bg: #ffffff;
+}
 .green-finance-theme .bg-accent-light {
    background-color: rgba(21, 128, 61, 0.1) !important;
 }
@@ -287,6 +305,10 @@
 .orange-energy-theme .bg-accent {
    background-color: #ea580c !important;
 }
+.orange-energy-theme {
+   --accent-color: #ea580c;
+   --mobile-bg: #ffffff;
+}
 .orange-energy-theme .bg-accent-light {
    background-color: rgba(234, 88, 12, 0.1) !important;
 }
@@ -339,6 +361,10 @@
 
 .red-alert-theme .bg-accent {
    background-color: #dc2626 !important;
+}
+.red-alert-theme {
+   --accent-color: #dc2626;
+   --mobile-bg: #ffffff;
 }
 .red-alert-theme .bg-accent-light {
    background-color: rgba(220, 38, 38, 0.1) !important;
@@ -393,6 +419,10 @@
 .neutral-gray-theme .bg-accent {
    background-color: #374151 !important;
 }
+.neutral-gray-theme {
+   --accent-color: #374151;
+   --mobile-bg: #ffffff;
+}
 .neutral-gray-theme .bg-accent-light {
    background-color: rgba(55, 65, 81, 0.1) !important;
 }
@@ -445,6 +475,10 @@
 
 .cyan-tech-theme .bg-accent {
    background-color: #0891b2 !important;
+}
+.cyan-tech-theme {
+   --accent-color: #0891b2;
+   --mobile-bg: #ffffff;
 }
 .cyan-tech-theme .bg-accent-light {
    background-color: rgba(8, 145, 178, 0.1) !important;
@@ -499,6 +533,8 @@
 .black-gold-theme body, .black-gold-theme, .black-gold-theme #root {
    background-color: #0b0f19 !important;
    color: #f9fafb !important;
+   --accent-color: #facc15;
+   --mobile-bg: #0b0f19;
 }
 .black-gold-theme .bg-card, .black-gold-theme .bg-page {
    background-color: #111827 !important;

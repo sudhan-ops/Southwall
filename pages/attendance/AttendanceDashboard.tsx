@@ -1648,11 +1648,12 @@ const AttendanceDashboard: React.FC = () => {
                                     </div>
                                     <div className="flex flex-col items-end gap-1.5">
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm
-                                            ${log.status === 'Present' ? 'bg-emerald-500 text-white dark:bg-emerald-600' :
+                                            ${log.status === 'Present' ? 'text-white dark:bg-emerald-600' :
                                                 log.status === 'Absent' ? 'bg-rose-500 text-white dark:bg-rose-600' :
                                                     log.status === 'Holiday' ? 'bg-amber-500 text-white dark:bg-amber-600' :
                                                         log.status === 'Weekend' ? 'bg-indigo-500 text-white dark:bg-indigo-600' :
-                                                            'bg-gray-500 text-white dark:bg-gray-600'}`}>
+                                                            'bg-gray-500 text-white dark:bg-gray-600'}`}
+                                            style={log.status === 'Present' ? { backgroundColor: themeColors.primary } : {}}>
                                             {log.status}
                                         </span>
                                         {(log.checkIn !== '-' || log.checkOut !== '-') && (

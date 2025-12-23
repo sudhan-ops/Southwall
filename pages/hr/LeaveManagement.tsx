@@ -221,8 +221,8 @@ const LeaveManagement: React.FC = () => {
                     <nav className="flex flex-col md:flex-row md:space-x-6 md:overflow-x-auto space-y-1 md:space-y-0" aria-label="Tabs">
                         {filterTabs.map(tab => {
                             const isActive = filter === tab;
-                            const activeColor = colorScheme === 'professional-blue' ? '#1a3a6e' : '#047857'; // Blue or Emerald-700
-                            const activeBg = colorScheme === 'professional-blue' ? '#eff6ff' : '#ecfdf5'; // Blue-50 or Emerald-50
+                            const activeColor = themeColors.primary;
+                            const activeBg = themeColors.isDark ? 'rgba(34, 211, 238, 0.1)' : themeColors.secondary;
 
                             return (
                                 <button

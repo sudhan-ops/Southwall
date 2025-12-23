@@ -157,6 +157,11 @@
     />
     <link rel="stylesheet" href="/themes.css" />
     <style>
+      :root {
+        --accent-color: #3b82f6; /* Default Blue if somehow missing */
+        --mobile-bg: #ffffff;
+      }
+
       /* Force login page text colors - Universal Override for All Themes */
       /* Using 'body' prefix increases specificity (0-2-1 or 0-1-2) to override 
          theme-specific class rules (e.g. .red-theme h1 is 0-1-1) defined later in this file. */
@@ -193,7 +198,7 @@
         width: 48px !important;
         height: 48px !important;
         border-radius: 8px;
-        border: 3px solid #006b3f;
+        border: 3px solid var(--accent-color);
         /* accent color */
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         background-size: cover;
@@ -211,7 +216,7 @@
         height: 0;
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
-        border-top: 8px solid #006b3f;
+        border-top: 8px solid var(--accent-color);
       }
 
       .user-marker-popup .leaflet-popup-content-wrapper {
@@ -237,9 +242,9 @@
       }
 
       .pro-dark-theme .user-marker-popup .leaflet-popup-content-wrapper {
-        background-color: #0d2c18;
+        background-color: var(--mobile-bg, #0f172a);
         color: #e5e7eb;
-        border: 1px solid #123820;
+        border: 1px solid var(--accent-color, #3b82f6);
       }
 
       .pro-dark-theme .user-marker-popup .popup-name {
@@ -251,12 +256,11 @@
       }
 
       .pro-dark-theme .leaflet-popup-tip {
-        background-color: #0d2c18;
+        background-color: var(--mobile-bg, #0f172a);
       }
 
       .pro-dark-theme .leaflet-control-attribution a {
-        color: #86efac;
-        /* A light green from the dark theme */
+        color: var(--accent-color);
       }
 
       /* A subtle filter for any map tiles in dark mode to reduce brightness */
@@ -268,7 +272,7 @@
       .dark-calendar .rdrCalendarWrapper,
       .dark-calendar .rdrDateDisplayWrapper,
       .dark-calendar .rdrMonthAndYearWrapper {
-        background-color: #041b0f !important;
+        background-color: var(--mobile-bg, #041b0f) !important;
         color: #ffffff !important;
       }
 
@@ -281,7 +285,7 @@
       }
 
       .dark-calendar .rdrMonthAndYearPickers select {
-        background-color: #041b0f !important;
+        background-color: var(--mobile-bg, #041b0f) !important;
         color: #ffffff !important;
       }
 
@@ -533,29 +537,48 @@
         min-height: 143vh;
       }
 
-      @media (max-width: 768px) {
-        html,
-        body {
-          background-color: #041b0f !important;
-        }
-
-        /* SouthWall Blue Theme Override for Mobile */
-        html.blue-theme,
-        body.blue-theme,
-        .blue-theme #root {
-          background-color: #ffffff !important;
-        }
-      }
-
       #root {
         min-height: 143vh;
       }
 
       @media (max-width: 768px) {
-        #root {
-          background-color: #041b0f !important;
+        html,
+        body {
+          background-color: var(--mobile-bg) !important;
         }
-        .blue-theme #root {
+
+        /* Use light background for light themes */
+        html.blue-theme, body.blue-theme,
+        html.professional-blue-theme, body.professional-blue-theme,
+        html.purple-theme, body.purple-theme,
+        html.red-theme, body.red-theme,
+        html.amber-theme, body.amber-theme,
+        html.teal-mint-theme, body.teal-mint-theme,
+        html.indigo-violet-theme, body.indigo-violet-theme,
+        html.green-finance-theme, body.green-finance-theme,
+        html.orange-energy-theme, body.orange-energy-theme,
+        html.red-alert-theme, body.red-alert-theme,
+        html.neutral-gray-theme, body.neutral-gray-theme,
+        html.cyan-tech-theme, body.cyan-tech-theme {
+          background-color: #ffffff !important;
+        }
+
+        #root {
+          background-color: var(--mobile-bg) !important;
+        }
+        
+        .blue-theme #root,
+        .professional-blue-theme #root,
+        .purple-theme #root,
+        .red-theme #root,
+        .amber-theme #root,
+        .teal-mint-theme #root,
+        .indigo-violet-theme #root,
+        .green-finance-theme #root,
+        .orange-energy-theme #root,
+        .red-alert-theme #root,
+        .neutral-gray-theme #root,
+        .cyan-tech-theme #root {
           background-color: #ffffff !important;
         }
       }

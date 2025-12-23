@@ -5,6 +5,8 @@ import type { AttendanceEvent } from '../../types';
 import { Loader2, MapPin, Clock, Calendar } from 'lucide-react';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, differenceInMinutes } from 'date-fns';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useBrandingStore } from '../../store/brandingStore';
+import { getThemeColors } from '../../utils/themeUtils';
 
 type TimeRange = 'day' | 'week' | 'month';
 
@@ -18,6 +20,8 @@ interface GroupedAttendance {
 
 const EmployeeLog: React.FC = () => {
     const { user } = useAuthStore();
+    const { colorScheme } = useBrandingStore();
+    const themeColors = getThemeColors(colorScheme);
     const [events, setEvents] = useState<AttendanceEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedRange, setSelectedRange] = useState<TimeRange>('day');
@@ -268,17 +272,19 @@ const EmployeeLog: React.FC = () => {
                                         <div
                                             key={`${event.timestamp}-${index}`}
                                             className={`p-3 rounded-lg border-l-4 ${event.type === 'check-in'
-                                                ? 'bg-emerald-50 border-emerald-500'
+                                                ? 'bg-blue-50/30 border-blue-500' 
                                                 : 'bg-rose-50 border-rose-500'
                                                 }`}
+                                            style={event.type === 'check-in' ? { borderColor: themeColors.primary, borderLeftColor: themeColors.primary } : {}}
                                         >
                                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                                                 <div className="flex items-center gap-3">
                                                     <div
                                                         className={`p-2 rounded-lg ${event.type === 'check-in'
-                                                            ? 'bg-emerald-100 text-emerald-700'
+                                                            ? ''
                                                             : 'bg-rose-100 text-rose-700'
                                                             }`}
+                                                        style={event.type === 'check-in' ? { backgroundColor: themeColors.secondary, color: themeColors.primary } : {}}
                                                     >
                                                         <Clock className="h-4 w-4" />
                                                     </div>
@@ -310,7 +316,7 @@ const EmployeeLog: React.FC = () => {
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
                                         <span className="text-gray-500">Check-ins:</span>
-                                        <span className="ml-2 font-semibold text-emerald-600">
+                                        <span className="ml-2 font-semibold" style={{ color: themeColors.primary }}>
                                             {group.checkIns.length}
                                         </span>
                                     </div>
