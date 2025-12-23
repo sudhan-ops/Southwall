@@ -110,6 +110,15 @@ const signInWithGoogle = async () => {
     });
 };
 
+const signInWithZoho = async () => {
+    return await supabase.auth.signInWithOAuth({
+        provider: "zoho" as any,
+        options: {
+            redirectTo: window.location.origin,
+        },
+    });
+};
+
 const signOut = async (): Promise<void> => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -135,6 +144,7 @@ export const authService = {
     signInWithPassword,
     signUpWithPassword,
     signInWithGoogle,
+    signInWithZoho,
     signOut,
     resetPasswordForEmail,
     updateUserPassword,

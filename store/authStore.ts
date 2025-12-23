@@ -249,6 +249,20 @@ export const useAuthStore = create<AuthState>()(
             return { error: null };
         },
 
+        loginWithZoho: async () => {
+            set({ error: null, loading: true });
+            const { error } = await authService.signInWithZoho();
+
+            if (error) {
+                const friendlyError = getFriendlyAuthError(error.message);
+                set({ error: friendlyError, loading: false });
+                return { error: { message: friendlyError } };
+            }
+
+            set({ loading: false });
+            return { error: null };
+        },
+
         sendPasswordReset: async (email: string) => {
             const { error } = await authService.resetPasswordForEmail(email);
             if (error) {
