@@ -134,7 +134,7 @@ const UserManagement: React.FC = () => {
                 // Optimistically remove from local state for instant feedback
                 setUsers(prev => prev.filter(u => u.id !== currentUser.id));
                 setToast({ 
-                    message: 'User deleted successfully. Note: Authenticated users must also be removed from Supabase Auth manually if needed.', 
+                    message: 'User and authentication account deleted successfully.', 
                     type: 'success' 
                 });
                 setIsDeleteModalOpen(false);

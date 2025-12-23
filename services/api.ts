@@ -675,34 +675,16 @@ export const api = {
     // 2. Delete from dependent tables to avoid FK conflicts
     // We execute these deletions to wipe the user's data footprint.
 
-    // Activity & External Logs
-    await safeDelete(
-      supabase.from("user_activity").delete().eq("user_id", id),
-      "user_activity",
-    );
-    await safeDelete(
-      supabase.from("invoices").delete().eq("user_id", id),
-      "invoices",
-    );
-
     // Onboarding & Profile
     await safeDelete(
       supabase.from("onboarding_submissions").delete().eq("user_id", id),
       "onboarding_submissions",
-    );
-    await safeDelete(
-      supabase.from("user_documents").delete().eq("user_id", id),
-      "user_documents",
     );
 
     // Locations & Tracking
     await safeDelete(
       supabase.from("user_locations").delete().eq("user_id", id),
       "user_locations",
-    );
-    await safeDelete(
-      supabase.from("user_location_logs").delete().eq("user_id", id),
-      "user_location_logs",
     );
     await safeDelete(
       supabase.from("locations").update({ created_by: null }).eq(
@@ -842,32 +824,23 @@ export const api = {
       "patrol_qr_codes",
     );
 
-    // Profiles & Related Attendance (if using the alternative attendance system)
+    // 3. Finally delete the user from Supabase Auth (which cascades to public.users)
     try {
-      // First get the profile ID for this user
-      const { data: profile } = await supabase.from("profiles").select("id").eq(
-        "auth_uid",
-        id,
-      ).maybeSingle();
-      if (profile) {
-        // Clear attendance referencing this profile
-        await safeDelete(
-          supabase.from("attendance").delete().eq("profile_id", profile.id),
-          "attendance (profile-linked)",
-        );
-        // Delete the profile itself
-        await safeDelete(
-          supabase.from("profiles").delete().eq("id", profile.id),
-          "profiles",
-        );
-      }
+      const { error: fnError } = await supabase.functions.invoke(
+        "admin-manage-user",
+        {
+          body: { action: "delete-user", userId: id },
+        },
+      );
+      if (fnError) throw fnError;
     } catch (e) {
-      // Ignore errors if profiles table doesn't exist
+      console.warn(
+        "Edge function delete-user failed, falling back to direct public.users deletion:",
+        e,
+      );
+      const { error } = await supabase.from("users").delete().eq("id", id);
+      if (error) throw error;
     }
-
-    // 3. Finally delete the user from public.users
-    const { error } = await supabase.from("users").delete().eq("id", id);
-    if (error) throw error;
   },
 
   updateUserReportingManager: async (
@@ -1650,26 +1623,28 @@ export const api = {
         throw signUpError || new Error("Failed to sign up user");
       }
       const newAuthUser = signUpData.user;
-      // Upsert into the public.users table.  This will create a row if it
-      // doesn’t exist, and update the name and role if it does.  We use
-      // upsert instead of update to handle the trigger delay between auth
-      // signup and the creation of the profile row.
+      // Upsert into the public.users table.
       try {
-        await supabase.from("users").upsert({
+        const { error: profileError } = await supabase.from("users").upsert({
           id: newAuthUser.id,
           name,
           email,
           role_id: role,
         }, { onConflict: "id" });
-      } catch (profileErr) {
-        console.warn(
-          "Failed to upsert user profile after fallback signup:",
-          profileErr,
-        );
+
+        if (profileError) {
+          console.error("Profile upsert failed during fallback:", profileError);
+          // If profile creation failed, we should throw so the UI knows the user isn't fully ready.
+          throw new Error(
+            `Auth account created but profile setup failed: ${profileError.message}`,
+          );
+        }
+      } catch (err: any) {
+        console.error("Error during fallback profile setup:", err);
+        throw err;
       }
-      // Finally return a user object combining the known fields.  Note that
-      // some optional fields (phone, organization) will be undefined until the
-      // record is fully hydrated by the trigger and subsequent fetches.
+
+      // Finally return a user object combining the known fields.
       return {
         id: newAuthUser.id,
         name,

@@ -83,6 +83,18 @@ Deno.serve(async (req: any) => {
       );
     }
 
+    if (action === "delete-user") {
+      const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ message: "User deleted successfully" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        },
+      );
+    }
+
     return new Response(JSON.stringify({ error: "Invalid action" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
