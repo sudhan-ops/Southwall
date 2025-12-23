@@ -1,10 +1,7 @@
-
-
-
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import type { UserRole, Permission, Role } from '../types';
-import { api } from '../services/api';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import type { Permission, Role, UserRole } from "../types";
+import { api } from "../services/api";
 
 interface PermissionsState {
   permissions: Record<UserRole, Permission[]>;
@@ -19,32 +16,81 @@ const defaultPermissions: Record<UserRole, Permission[]> = {
   // Unverified users have no permissions - they should be redirected to pending approval page
   unverified: [],
   admin: [
-    'view_all_submissions', 'manage_users', 'manage_sites', 'view_entity_management',
-    'view_developer_settings', 'view_operations_dashboard', 'view_site_dashboard',
-    'create_enrollment', 'manage_roles_and_permissions', 'manage_attendance_rules',
-    'view_all_attendance', 'view_own_attendance', 'apply_for_leave', 'manage_leave_requests',
-    'manage_approval_workflow', 'download_attendance_report', 'manage_tasks',
-    'manage_policies', 'manage_insurance', 'manage_enrollment_rules',
-    'manage_uniforms', 'view_invoice_summary', 'view_verification_costing',
-    'view_field_officer_tracking', 'manage_modules', 'access_support_desk',
+    "view_all_submissions",
+    "manage_users",
+    "manage_sites",
+    "view_entity_management",
+    "view_developer_settings",
+    "view_operations_dashboard",
+    "view_site_dashboard",
+    "create_enrollment",
+    "manage_roles_and_permissions",
+    "manage_attendance_rules",
+    "view_all_attendance",
+    "view_own_attendance",
+    "apply_for_leave",
+    "manage_leave_requests",
+    "manage_approval_workflow",
+    "download_attendance_report",
+    "manage_tasks",
+    "manage_policies",
+    "manage_insurance",
+    "manage_enrollment_rules",
+    "manage_uniforms",
+    "view_invoice_summary",
+    "view_verification_costing",
+    "view_field_officer_tracking",
+    "manage_modules",
+    "access_support_desk",
   ],
   hr: [
-    'view_all_submissions', 'manage_users', 'manage_sites', 'view_entity_management',
-    'manage_attendance_rules', 'view_all_attendance', 'view_own_attendance',
-    'apply_for_leave', 'manage_leave_requests', 'download_attendance_report',
-    'manage_policies', 'manage_insurance', 'manage_enrollment_rules',
-    'manage_uniforms', 'view_invoice_summary', 'view_verification_costing', 'access_support_desk',
+    "view_all_submissions",
+    "manage_users",
+    "manage_sites",
+    "view_entity_management",
+    "manage_attendance_rules",
+    "view_all_attendance",
+    "view_own_attendance",
+    "apply_for_leave",
+    "manage_leave_requests",
+    "download_attendance_report",
+    "manage_policies",
+    "manage_insurance",
+    "manage_enrollment_rules",
+    "manage_uniforms",
+    "view_invoice_summary",
+    "view_verification_costing",
+    "access_support_desk",
   ],
   finance: [
-    'view_invoice_summary',
-    'view_verification_costing',
-    'view_own_attendance',
-    'apply_for_leave'
+    "view_invoice_summary",
+    "view_verification_costing",
+    "view_own_attendance",
+    "apply_for_leave",
   ],
-  developer: ['view_developer_settings'],
-  operation_manager: ['view_operations_dashboard', 'view_all_attendance', 'view_own_attendance', 'apply_for_leave', 'manage_leave_requests', 'manage_tasks', 'access_support_desk'],
-  site_manager: ['view_site_dashboard', 'create_enrollment', 'view_own_attendance', 'apply_for_leave', 'access_support_desk'],
-  field_officer: ['create_enrollment', 'view_own_attendance', 'apply_for_leave', 'access_support_desk'],
+  developer: ["view_developer_settings"],
+  operation_manager: [
+    "view_operations_dashboard",
+    "view_all_attendance",
+    "view_own_attendance",
+    "apply_for_leave",
+    "manage_leave_requests",
+    "manage_tasks",
+    "access_support_desk",
+  ],
+  site_manager: [
+    "view_site_dashboard",
+    "create_enrollment",
+    "view_own_attendance",
+    "apply_for_leave",
+    "access_support_desk",
+  ],
+  field_officer: [
+    "create_enrollment",
+    "view_own_attendance",
+    "apply_for_leave",
+    "access_support_desk",
+  ],
 };
 
 export const usePermissionsStore = create(
@@ -54,12 +100,22 @@ export const usePermissionsStore = create(
 
       initRoles: (roles) => {
         if (!roles) return;
-        const currentPermissions = get().permissions;
-        const newPermissions = { ...currentPermissions };
+        const newPermissions = { ...get().permissions };
         let hasChanged = false;
 
-        roles.forEach(role => {
-          if (!newPermissions[role.id]) {
+        roles.forEach((role) => {
+          // If the role has permissions defined in the DB, use those
+          if (role.permissions && role.permissions.length > 0) {
+            // Only update if they've changed to avoid infinite loops or unnecessary renders
+            if (
+              JSON.stringify(newPermissions[role.id]) !==
+                JSON.stringify(role.permissions)
+            ) {
+              newPermissions[role.id] = role.permissions;
+              hasChanged = true;
+            }
+          } else if (!newPermissions[role.id]) {
+            // Otherwise initialize with empty array if not already present
             newPermissions[role.id] = [];
             hasChanged = true;
           }
@@ -108,8 +164,8 @@ export const usePermissionsStore = create(
       },
     }),
     {
-      name: 'paradigm_app_permissions_v2',
+      name: "paradigm_app_permissions_v2",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

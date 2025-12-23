@@ -83,12 +83,26 @@ const RoleManagement: React.FC = () => {
     }, []);
 
 
-    const handlePermissionChange = (role: UserRole, permission: Permission, checked: boolean) => {
-        const currentPermissions = permissions[role] || [];
+    const handlePermissionChange = async (roleId: UserRole, permission: Permission, checked: boolean) => {
+        const currentPermissions = permissions[roleId] || [];
         const newPermissions = checked
             ? [...currentPermissions, permission]
             : currentPermissions.filter(p => p !== permission);
-        setRolePermissions(role, newPermissions);
+        
+        // Update local state first for responsiveness
+        setRolePermissions(roleId, newPermissions);
+
+        // Persist to database
+        try {
+            const updatedRoles = roles.map(r => 
+                r.id === roleId ? { ...r, permissions: newPermissions } : r
+            );
+            await api.saveRoles(updatedRoles);
+        } catch (error) {
+            console.error("Failed to save permission change:", error);
+            setToast({ message: "Failed to persist permission change.", type: 'error' });
+            // Optionally revert local state here, but for now we'll just show an error
+        }
     };
 
     const handleSaveRoleName = async (newName: string) => {

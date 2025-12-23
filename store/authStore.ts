@@ -282,8 +282,9 @@ export const useAuthStore = create<AuthState>()(
                     );
                 }
             }
-            // Clear the long-term token on logout
+            // Clear session-related items from localStorage
             localStorage.removeItem("supabase.auth.rememberMe");
+            localStorage.removeItem("paradigm_app_last_path");
             // The onAuthStateChange listener in App.tsx will call setUser(null).
             await authService.signOut();
         },

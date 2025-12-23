@@ -32,6 +32,7 @@ import type {
   PatrolLog,
   PatrolQRCode,
   PerfiosVerificationData,
+  Permission,
   Policy,
   RecurringHolidayRule,
   Role,
@@ -938,10 +939,19 @@ export const api = {
   getRoles: async (): Promise<Role[]> => {
     const query = supabase.from("roles").select("*");
     const data = await fetchAllPaginated(query);
-    return (data || []).map(toCamelCase);
+    return (data || []).map((role) => ({
+      id: role.id,
+      displayName: role.display_name,
+      permissions: role.permissions as Permission[],
+    }));
   },
   saveRoles: async (roles: Role[]): Promise<void> => {
-    const { error } = await supabase.from("roles").upsert(toSnakeCase(roles));
+    const dbRoles = roles.map((r) => ({
+      id: r.id,
+      display_name: r.displayName,
+      permissions: r.permissions || [],
+    }));
+    const { error } = await supabase.from("roles").upsert(dbRoles);
     if (error) throw error;
   },
   getHolidays: async (): Promise<Holiday[]> => {

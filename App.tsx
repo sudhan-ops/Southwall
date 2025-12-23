@@ -472,11 +472,16 @@ const App: React.FC = () => {
       location.pathname === '/splash'
     )) {
       const lastPath = localStorage.getItem(LAST_PATH_KEY);
-      // Only use lastPath if it exists AND is not the root path itself
-      if (lastPath && shouldStorePath(lastPath) && lastPath !== '/' && lastPath !== '/#') {
-        localStorage.removeItem(LAST_PATH_KEY); // Clear after use
+      
+      // Safety check: Don't redirect to admin paths if the user isn't an admin
+      const isAdminPath = lastPath?.startsWith('/admin');
+      const isUserAdmin = user.role === 'admin';
+      
+      if (lastPath && shouldStorePath(lastPath) && lastPath !== '/' && lastPath !== '/#' && (!isAdminPath || isUserAdmin)) {
+        localStorage.removeItem(LAST_PATH_KEY);
         navigate(lastPath, { replace: true });
       } else {
+        localStorage.removeItem(LAST_PATH_KEY);
         if (user.role === 'unverified') {
           navigate('/pending-approval', { replace: true });
         } else {

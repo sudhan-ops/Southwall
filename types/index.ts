@@ -5,6 +5,7 @@ export type UserRole = string;
 export interface Role {
   id: string;
   displayName: string;
+  permissions?: Permission[];
 }
 
 export type Permission =
