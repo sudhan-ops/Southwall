@@ -37,6 +37,13 @@ const Button: React.FC<ButtonProps> = ({
         color: themeColors.primary
       };
     }
+    if (variant === 'danger') {
+      return {
+        backgroundColor: '#ef4444',
+        borderColor: '#dc2626',
+        color: '#FFFFFF'
+      };
+    }
     return {};
   };
 

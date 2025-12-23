@@ -445,7 +445,14 @@ const ProfilePage: React.FC = () => {
                                     <Button
                                         onClick={() => navigate('/attendance/check-out')}
                                         variant="danger"
-                                        className="flex-1 !py-3 text-base md:text-lg shadow-lg shadow-red-100 hover:shadow-red-200 transition-all"
+                                        className={`flex-1 !py-3 text-base md:text-lg shadow-lg transition-all ${
+                                            !isCheckedIn ? 'opacity-70 saturate-[0.8]' : ''
+                                        }`}
+                                        style={{ 
+                                            backgroundColor: '#ef4444', 
+                                            color: '#ffffff',
+                                            cursor: !isCheckedIn || isActionInProgress ? 'not-allowed' : 'pointer'
+                                        }}
                                         disabled={!isCheckedIn || isActionInProgress}
                                     >
                                         <LogOut className="mr-2 h-5 w-5" /> Check Out
