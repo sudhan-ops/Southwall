@@ -40,11 +40,14 @@ const SignUp: React.FC = () => {
         return (
             <div className="text-center">
                 <MailCheck className="mx-auto h-12 w-12 text-accent" />
-                <h3 className="mt-4 text-lg font-semibold text-white" style={{ color: '#ffffff' }}>Confirm your email</h3>
+                <h3 className="mt-4 text-lg font-semibold text-white" style={{ color: '#ffffff' }}>Pending Admin Approval</h3>
                 <p className="mt-2 text-sm text-gray-300" style={{ color: '#ffffff' }}>
-                    We've sent a confirmation link to your email address. Please click the link to activate your account.
+                    Your registration has been received! Our administrators will review your account and assign your access level soon.
                 </p>
-                <div className="mt-6">
+                <p className="mt-4 text-sm text-gray-400" style={{ color: '#ffffff', opacity: 0.8 }}>
+                    You will receive an email once your account is approved and ready for use.
+                </p>
+                <div className="mt-8">
                     <Link to="/auth/login" className="font-medium text-white/80 hover:text-white" style={{ color: '#ffffff' }}>
                         &larr; Back to Login
                     </Link>

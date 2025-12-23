@@ -1,24 +1,15 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import Button from '../components/ui/Button';
+import { Link } from 'react-router-dom';
 import { Clock, LogOut } from 'lucide-react';
-import Logo from '../components/ui/Logo';
+import { useAuthStore } from '../../store/authStore';
+import Button from '../../components/ui/Button';
 
-const PendingApproval: React.FC = () => {
+const WaitingForApproval: React.FC = () => {
     const { logout, user } = useAuthStore();
-    const navigate = useNavigate();
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/auth/login', { replace: true });
-    };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-page p-4">
+        <div className="min-h-[80vh] flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center space-y-6 bg-card p-10 rounded-2xl shadow-card border border-border/40">
-                <Logo className="h-10 mx-auto mb-2" />
-                
                 <div className="bg-yellow-500/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto">
                     <Clock className="h-10 w-10 text-yellow-500 animate-pulse" />
                 </div>
@@ -57,11 +48,11 @@ const PendingApproval: React.FC = () => {
                         Check Status Again
                     </Button>
                     <Button 
-                        variant="secondary" 
-                        onClick={handleLogout} 
-                        className="w-full"
+                        variant="icon" 
+                        onClick={() => logout()} 
+                        className="w-full text-muted hover:text-red-400 !bg-transparent border-none"
                     >
-                        <LogOut className="h-4 w-4 mr-2" /> Log Out
+                        <LogOut className="h-4 w-4 mr-2" /> Sign Out
                     </Button>
                 </div>
                 
@@ -73,4 +64,4 @@ const PendingApproval: React.FC = () => {
     );
 };
 
-export default PendingApproval;
+export default WaitingForApproval;

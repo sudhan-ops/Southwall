@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import type { User } from '../../types';
-import { ShieldCheck, Plus, Edit, Trash2, Info, UserCheck, MapPin } from 'lucide-react';
+import { ShieldCheck, Plus, Edit, Trash2, Info, UserCheck, MapPin, Key, Lock } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import Toast from '../../components/ui/Toast';
@@ -23,6 +23,9 @@ const UserManagement: React.FC = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
 
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [currentUserForLocation, setCurrentUserForLocation] = useState<User | null>(null);
@@ -82,6 +85,47 @@ const UserManagement: React.FC = () => {
         }
     };
 
+    const handleResetPassword = (user: User) => {
+        setCurrentUser(user);
+        setIsResetConfirmOpen(true);
+    };
+
+    const handleConfirmReset = async () => {
+        if (currentUser) {
+            setIsSaving(true);
+            try {
+                await api.adminResetPassword(currentUser.id, currentUser.email);
+                setToast({ message: 'Password reset link sent successfully!', type: 'success' });
+                setIsResetConfirmOpen(false);
+            } catch (error) {
+                setToast({ message: 'Failed to send reset link.', type: 'error' });
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    };
+
+    const handleChangePassword = (user: User) => {
+        setCurrentUser(user);
+        setNewPassword('');
+        setIsPasswordModalOpen(true);
+    }
+
+    const handleConfirmPasswordChange = async () => {
+        if (currentUser && newPassword) {
+            setIsSaving(true);
+            try {
+                await api.adminChangePassword(currentUser.id, newPassword);
+                setToast({ message: 'Password changed successfully!', type: 'success' });
+                setIsPasswordModalOpen(false);
+            } catch (error) {
+                setToast({ message: 'Failed to change password.', type: 'error' });
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    };
+
     const handleConfirmDelete = async () => {
         if (currentUser) {
             setIsSaving(true);
@@ -126,6 +170,41 @@ const UserManagement: React.FC = () => {
                 isConfirming={isSaving}
             >
                 Are you sure you want to delete the user "{currentUser?.name}"? This action cannot be undone.
+            </Modal>
+
+            <Modal
+                isOpen={isResetConfirmOpen}
+                onClose={() => setIsResetConfirmOpen(false)}
+                onConfirm={handleConfirmReset}
+                title="Send Reset Password Link"
+                isConfirming={isSaving}
+            >
+                Do you want to send a password reset link to <strong>{currentUser?.email}</strong>?
+            </Modal>
+
+            <Modal
+                isOpen={isPasswordModalOpen}
+                onClose={() => setIsPasswordModalOpen(false)}
+                onConfirm={handleConfirmPasswordChange}
+                title={`Change Password for ${currentUser?.name}`}
+                isConfirming={isSaving}
+                confirmButtonText="Change Password"
+                confirmButtonVariant="primary"
+            >
+                <div className="space-y-4 py-2">
+                    <p className="text-sm text-muted">Set a new password for this user. They will be able to login with this password immediately.</p>
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium">New Password</label>
+                        <input 
+                            type="password" 
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="At least 6 characters"
+                            className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-accent outline-none"
+                            autoFocus
+                        />
+                    </div>
+                </div>
             </Modal>
 
             <LocationAssignmentModal
@@ -184,6 +263,8 @@ const UserManagement: React.FC = () => {
                                         {user.role === 'unverified' && (
                                             <Button variant="outline" size="sm" onClick={() => handleApprove(user)} aria-label={`Approve user ${user.name}`} title={`Approve user ${user.name}`}><UserCheck className="h-4 w-4 mr-2" />Approve</Button>
                                         )}
+                                        <Button variant="icon" size="sm" onClick={() => handleChangePassword(user)} aria-label={`Set direct password for ${user.name}`} title={`Set direct password for ${user.name}`} className="text-blue-600 hover:text-blue-700"><Lock className="h-4 w-4" /></Button>
+                                        <Button variant="icon" size="sm" onClick={() => handleResetPassword(user)} aria-label={`Send reset link to ${user.name}`} title={`Send reset link to ${user.name}`} className="text-yellow-600 hover:text-yellow-700"><Key className="h-4 w-4" /></Button>
                                         <Button variant="icon" size="sm" onClick={() => handleEdit(user)} aria-label={`Edit user ${user.name}`} title={`Edit user ${user.name}`}><Edit className="h-4 w-4" /></Button>
                                         <Button variant="icon" onClick={() => handleDelete(user)} aria-label={`Delete user ${user.name}`} title={`Delete user ${user.name}`} className="p-2 hover:bg-red-500/10 rounded-full transition-colors"><Trash2 className="h-5 w-5 text-red-500" /></Button>
                                     </div>

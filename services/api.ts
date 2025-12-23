@@ -620,6 +620,23 @@ export const api = {
     return toCamelCase({ ...data, role: data.role_id });
   },
 
+  adminChangePassword: async (
+    userId: string,
+    newPassword: string,
+  ): Promise<void> => {
+    const { error } = await supabase.functions.invoke("admin-manage-user", {
+      body: { action: "change-password", userId, password: newPassword },
+    });
+    if (error) throw error;
+  },
+
+  adminResetPassword: async (userId: string, email: string): Promise<void> => {
+    const { error } = await supabase.functions.invoke("admin-manage-user", {
+      body: { action: "reset-password", userId, email },
+    });
+    if (error) throw error;
+  },
+
   createUser: async (userData: Partial<User>): Promise<User> => {
     const { role, ...rest } = userData;
     const dbData: any = toSnakeCase(rest);
@@ -695,11 +712,21 @@ export const api = {
       "locations (creator)",
     );
 
-    // Attendance & Leave
+    // Attendance & Approvals
     await safeDelete(
       supabase.from("attendance_events").delete().eq("user_id", id),
       "attendance_events",
     );
+    await safeDelete(
+      supabase.from("attendance_approvals").delete().eq("user_id", id),
+      "attendance_approvals (requester)",
+    );
+    await safeDelete(
+      supabase.from("attendance_approvals").delete().eq("manager_id", id),
+      "attendance_approvals (manager)",
+    );
+
+    // Leave & Comp-Off
     await safeDelete(
       supabase.from("leave_requests").delete().eq("user_id", id),
       "leave_requests",
@@ -716,8 +743,22 @@ export const api = {
       "comp_off_logs",
     );
     await safeDelete(
+      supabase.from("comp_off_logs").update({ granted_by_id: null }).eq(
+        "granted_by_id",
+        id,
+      ),
+      "comp_off_logs (granter)",
+    );
+    await safeDelete(
       supabase.from("extra_work_logs").delete().eq("user_id", id),
       "extra_work_logs",
+    );
+    await safeDelete(
+      supabase.from("extra_work_logs").update({ approver_id: null }).eq(
+        "approver_id",
+        id,
+      ),
+      "extra_work_logs (approver)",
     );
 
     // Tasks & Notifications
@@ -727,7 +768,14 @@ export const api = {
     );
     await safeDelete(
       supabase.from("tasks").delete().eq("assigned_to_id", id),
-      "tasks",
+      "tasks (assigned)",
+    );
+    await safeDelete(
+      supabase.from("tasks").update({ created_by_id: null }).eq(
+        "created_by_id",
+        id,
+      ),
+      "tasks (creator)",
     );
     await safeDelete(
       supabase.from("tasks").update({ escalation_level1_user_id: null }).eq(
