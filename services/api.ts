@@ -1601,8 +1601,10 @@ export const api = {
       if (newUser) return newUser;
       // If the user cannot be found immediately, fall through to the
       // fallback creation path below.
-      console.warn(
-        "admin-create-user completed but user not found; falling back to client side signup",
+      // If the user cannot be found immediately, throw an error to trigger the
+      // fallback creation path below.
+      throw new Error(
+        "admin-create-user completed but user not found; forcing fallback to client side signup",
       );
     } catch (fnError: any) {
       // If the edge function call fails entirely (e.g. network error or not
@@ -1610,6 +1612,12 @@ export const api = {
       const msg = typeof fnError?.message === "string"
         ? fnError.message
         : String(fnError);
+      
+      console.warn(
+        "Edge function 'admin-create-user' failed or not reachable. Falling back to client-side signup.",
+        { error: msg }
+      );
+
       if (
         !msg.toLowerCase().includes("failed to send a request") &&
         !msg.toLowerCase().includes("edge function")
@@ -1617,44 +1625,69 @@ export const api = {
         // For other errors (such as email already registered), surface them directly.
         throw fnError;
       }
-      console.warn(
-        "Edge function not reachable, falling back to client side signup",
-      );
-      // Create the auth user using the client side anon key.  This will send a
-      // confirmation email automatically.  We include the name in user
-      // metadata so it is persisted in auth.users.
+
+      // Create the auth user using the client side anon key.
       const { data: signUpData, error: signUpError } = await supabase.auth
         .signUp({
           email,
           password,
           options: { data: { name } },
         });
+
       if (signUpError || !signUpData?.user) {
+        console.error("Client-side signup failed:", signUpError);
         throw signUpError || new Error("Failed to sign up user");
       }
-      const newAuthUser = signUpData.user;
-      // Upsert into the public.users table.
-      try {
-        const { error: profileError } = await supabase.from("users").upsert({
-          id: newAuthUser.id,
-          name,
-          email,
-          role_id: role,
-        }, { onConflict: "id" });
 
-        if (profileError) {
-          console.error("Profile upsert failed during fallback:", profileError);
-          // If profile creation failed, we should throw so the UI knows the user isn't fully ready.
-          throw new Error(
-            `Auth account created but profile setup failed: ${profileError.message}`,
-          );
+      const newAuthUser = signUpData.user;
+      console.log("Client-side signup successful. User ID:", newAuthUser.id);
+
+      // Wait a moment for any server-side triggers (handle_new_auth_user) to fire.
+      // This helps avoid race conditions where the profile row hasn't been created yet
+      // or the auth user isn't fully visible to constraints.
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Strategy:
+      // 1. Try to UPDATE the profile first (assuming trigger created it).
+      // 2. If UPDATE returns no data, assume trigger didn't run and try INSERT/UPSERT.
+      
+      try {
+        const { data: updatedProfile, error: updateError } = await supabase
+          .from("users")
+          .update({
+            name,
+            role_id: role,
+          })
+          .eq("id", newAuthUser.id)
+          .select()
+          .single();
+
+        if (!updateError && updatedProfile) {
+           console.log("Profile updated successfully via fallback path.");
+        } else {
+          console.warn("Update profile failed or not found, attempting blocking Upsert.", updateError);
+          
+          // If update failed, force an upsert.
+          const { error: profileError } = await supabase.from("users").upsert({
+            id: newAuthUser.id,
+            name,
+            email,
+            role_id: role,
+          }, { onConflict: "id" });
+
+          if (profileError) {
+            console.error("Profile upsert failed during fallback:", profileError);
+            throw new Error(
+              `Auth account created but profile setup failed: ${profileError.message}`,
+            );
+          }
         }
       } catch (err: any) {
         console.error("Error during fallback profile setup:", err);
         throw err;
       }
 
-      // Finally return a user object combining the known fields.
+      // Return the new user object
       return {
         id: newAuthUser.id,
         name,

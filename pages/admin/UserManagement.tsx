@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../services/api';
 import type { User } from '../../types';
 import { ShieldCheck, Plus, Edit, Trash2, Info, UserCheck, MapPin, Key, Lock } from 'lucide-react';
@@ -16,6 +16,7 @@ import LocationAssignmentModal from '../../components/admin/LocationAssignmentMo
 
 const UserManagement: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +48,21 @@ const UserManagement: React.FC = () => {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    // Handle navigation state message separately
+    useEffect(() => {
+        if (location.state && (location.state as any).message) {
+            setToast({
+                message: (location.state as any).message,
+                type: (location.state as any).type || 'success'
+            });
+            // Clear state after a small delay to ensure toast displays
+            const timer = setTimeout(() => {
+                navigate('.', { replace: true, state: {} });
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [location.state, navigate]);
 
     const handleAdd = () => {
         navigate('/admin/users/add');
@@ -133,9 +149,9 @@ const UserManagement: React.FC = () => {
                 await api.deleteUser(currentUser.id);
                 // Optimistically remove from local state for instant feedback
                 setUsers(prev => prev.filter(u => u.id !== currentUser.id));
-                setToast({ 
-                    message: 'User and authentication account deleted successfully.', 
-                    type: 'success' 
+                setToast({
+                    message: 'User and authentication account deleted successfully.',
+                    type: 'success'
                 });
                 setIsDeleteModalOpen(false);
             } catch (error) {
@@ -195,8 +211,8 @@ const UserManagement: React.FC = () => {
                     <p className="text-sm text-muted">Set a new password for this user. They will be able to login with this password immediately.</p>
                     <div className="space-y-1">
                         <label className="text-sm font-medium">New Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="At least 6 characters"

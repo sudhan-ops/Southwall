@@ -124,9 +124,14 @@ const AddUserPage: React.FC = () => {
         });
         setToast({ message: 'User created successfully!', type: 'success' });
       }
-      setTimeout(() => navigate('/admin/users'), 1500);
+      setTimeout(() => navigate('/admin/users', { state: { message: isEditing ? 'User updated successfully!' : 'User created successfully!', type: 'success' } }), 1000);
     } catch (error: any) {
-      setToast({ message: error.message || 'Failed to save user.', type: 'error' });
+      const msg = error.message || '';
+      if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('User already registered')) {
+        setToast({ message: 'User already exists in the system. Please check the User List.', type: 'error' });
+      } else {
+        setToast({ message: msg || 'Failed to save user.', type: 'error' });
+      }
     } finally {
       setIsSubmitting(false);
     }
