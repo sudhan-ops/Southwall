@@ -282,10 +282,24 @@ export const useAuthStore = create<AuthState>()(
                     );
                 }
             }
+            
+            // FIX: Explicitly clear the user state immediately to prevent race conditions
+            // where the UI might bounce back to the app if signOut takes time or fails.
+            set({ 
+                user: null, 
+                isCheckedIn: false, 
+                isAttendanceLoading: false, 
+                lastCheckInTime: null, 
+                lastCheckOutTime: null, 
+                isLoginAnimationPending: false,
+                error: null
+            });
+
             // Clear session-related items from localStorage
             localStorage.removeItem("supabase.auth.rememberMe");
             localStorage.removeItem("paradigm_app_last_path");
-            // The onAuthStateChange listener in App.tsx will call setUser(null).
+            
+            // Finally sign out from Supabase (this cleans up the session on the server/client lib)
             await authService.signOut();
         },
 
