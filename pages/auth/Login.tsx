@@ -172,17 +172,18 @@ const Login: React.FC = () => {
                             }}
                         />
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
-                        <div className="flex-shrink-0 login-checkbox-container">
+                    <div className="flex flex-row items-center justify-between gap-3">
+                        <div className="flex-shrink-0 login-checkbox-container !bg-transparent">
                             <Checkbox
                                 id="rememberMe"
                                 label="Remember me"
                                 labelClassName="font-medium"
                                 // Spread the props returned by react-hook-form's register function
                                 {...registerEmail('rememberMe')}
-                                inputClassName={`text-blue-600 focus:ring-blue-600 border-white/20 rounded bg-black/40`}
+                                inputClassName={`text-blue-600 focus:ring-blue-600 border-white/20 rounded !bg-transparent`}
                             />
-                            <style dangerouslySetInnerHTML={{__html: `
+                            <style dangerouslySetInnerHTML={{
+                                __html: `
                                 .login-checkbox-container label {
                                     color: #ffffff !important;
                                     opacity: 1 !important;
