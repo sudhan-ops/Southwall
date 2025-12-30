@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X, Smartphone, Monitor, Apple, ArrowRight } from 'lucide-react';
+import { IOSInstallModal } from './IOSInstallModal';
 
 export const InstallAppPrompt: React.FC = () => {
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [isIOSModalOpen, setIsIOSModalOpen] = useState(false);
+    const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop' | 'unknown'>('unknown');
 
     useEffect(() => {
+        // Detect Platform
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        if (/iphone|ipad|ipod/.test(userAgent)) {
+            setPlatform('ios');
+        } else if (/android/.test(userAgent)) {
+            setPlatform('android');
+        } else {
+            setPlatform('desktop');
+        }
+
         const handler = (e: any) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
-            // Stash the event so it can be triggered later.
             setDeferredPrompt(e);
-            // Check if user has already dismissed it this session
+
             const isDismissed = sessionStorage.getItem('pwa-prompt-dismissed');
             if (!isDismissed) {
                 setIsVisible(true);
@@ -20,29 +31,31 @@ export const InstallAppPrompt: React.FC = () => {
 
         window.addEventListener('beforeinstallprompt', handler);
 
+        // If it's iOS, we should show the prompt anyway because we can't detect 'beforeinstallprompt'
+        const isDismissed = sessionStorage.getItem('pwa-prompt-dismissed');
+        if (/iphone|ipad|ipod/.test(userAgent) && !isDismissed) {
+            setIsVisible(true);
+        }
+
         return () => {
             window.removeEventListener('beforeinstallprompt', handler);
         };
     }, []);
 
     const handleInstallClick = async () => {
-        if (!deferredPrompt) return;
+        if (!deferredPrompt) {
+            // If no deferredPrompt but they clicked Android/Web, it might already be installed or browser doesn't support it
+            // For now, we'll try to trigger if available
+            return;
+        }
 
-        // Show the prompt
         deferredPrompt.prompt();
-
-        // Wait for the user to respond to the prompt
         const { outcome } = await deferredPrompt.userChoice;
 
         if (outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-        } else {
-            console.log('User dismissed the install prompt');
+            setDeferredPrompt(null);
+            setIsVisible(false);
         }
-
-        // We've used the prompt, and can't use it again, throw it away
-        setDeferredPrompt(null);
-        setIsVisible(false);
     };
 
     const handleDismiss = () => {
@@ -50,43 +63,104 @@ export const InstallAppPrompt: React.FC = () => {
         sessionStorage.setItem('pwa-prompt-dismissed', 'true');
     };
 
-    if (!isVisible) return null;
+    if (!isVisible && !isIOSModalOpen) return null;
 
     return (
-        <div className="fixed bottom-24 left-4 right-4 z-50 animate-slide-up md:max-w-md md:left-auto md:right-6">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-emerald-500/20 p-5 overflow-hidden relative group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+        <>
+            <div className="fixed bottom-24 left-4 right-4 z-50 animate-slide-up md:max-w-lg md:left-auto md:right-6">
+                <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-200 dark:border-slate-800 p-6 overflow-hidden relative group">
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
 
-                <button
-                    onClick={handleDismiss}
-                    className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                >
-                    <X size={18} />
-                </button>
-
-                <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                        <Smartphone size={24} />
-                    </div>
-
-                    <div className="flex-1 pr-6">
-                        <h3 className="font-bold text-slate-900 dark:text-white text-base">Southwall App</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 leading-relaxed">
-                            Install our app for a faster experience and offline access.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="mt-5 flex gap-3">
                     <button
-                        onClick={handleInstallClick}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-lg shadow-emerald-500/20"
+                        onClick={handleDismiss}
+                        className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-50 dark:bg-slate-800 rounded-full"
                     >
-                        <Download size={18} />
-                        Install Application
+                        <X size={18} />
                     </button>
+
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="flex-shrink-0 w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                            <Download size={28} />
+                        </div>
+
+                        <div>
+                            <h3 className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">Download Southwall</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">Choose your platform for a premium experience</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                        {/* Web / Desktop Button */}
+                        <button
+                            onClick={handleInstallClick}
+                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all active:scale-[0.98] ${platform === 'desktop'
+                                    ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                                    : 'bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800'
+                                }`}
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-slate-600 dark:text-slate-300">
+                                    <Monitor size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">Web / Desktop</p>
+                                    <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">Available Now</p>
+                                </div>
+                            </div>
+                            <ArrowRight size={18} className="text-slate-400" />
+                        </button>
+
+                        {/* Android Button */}
+                        <button
+                            onClick={handleInstallClick}
+                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all active:scale-[0.98] ${platform === 'android'
+                                    ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                                    : 'bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800'
+                                }`}
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-opacity-80">
+                                    <Smartphone size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">Android App</p>
+                                    <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">Direct Download</p>
+                                </div>
+                            </div>
+                            <ArrowRight size={18} className="text-slate-400" />
+                        </button>
+
+                        {/* iOS Button */}
+                        <button
+                            onClick={() => setIsIOSModalOpen(true)}
+                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all active:scale-[0.98] ${platform === 'ios'
+                                    ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                                    : 'bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800'
+                                }`}
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-slate-900 dark:text-white">
+                                    <Apple size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">iPhone / iOS</p>
+                                    <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">Install Guide</p>
+                                </div>
+                            </div>
+                            <ArrowRight size={18} className="text-slate-400" />
+                        </button>
+                    </div>
+
+                    <p className="mt-5 text-[10px] text-center text-slate-400 font-medium uppercase tracking-[0.2em]">
+                        Fast • Secure • Offline Ready
+                    </p>
                 </div>
             </div>
-        </div>
+
+            <IOSInstallModal
+                isOpen={isIOSModalOpen}
+                onClose={() => setIsIOSModalOpen(false)}
+            />
+        </>
     );
 };
