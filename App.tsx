@@ -116,6 +116,7 @@ import ScrollToTop from './components/ScrollToTop';
 import PatrolDashboard from './pages/patrol/PatrolDashboard';
 import { PatrolScanner } from './components/patrol/PatrolScanner';
 import { PatrolQRGenerator } from './components/patrol/PatrolQRGenerator';
+import { InstallAppPrompt } from './components/InstallAppPrompt';
 
 // Theme Manager
 const ThemeManager: React.FC = () => {
@@ -156,14 +157,14 @@ const BrandingManager: React.FC = () => {
 
   useEffect(() => {
     const body = document.body;
-    
+
     // Remove all theme classes first
     body.classList.remove(
       'blue-theme', 'green-theme', 'purple-theme', 'red-theme', 'amber-theme',
       'professional-blue-theme', 'dark-saas-theme', 'teal-mint-theme', 'indigo-violet-theme', 'green-finance-theme',
       'orange-energy-theme', 'red-alert-theme', 'neutral-gray-theme', 'cyan-tech-theme', 'black-gold-theme'
     );
-    
+
     // Add the current theme class
     body.classList.add(`${colorScheme}-theme`);
 
@@ -423,17 +424,17 @@ const App: React.FC = () => {
         }
         // Hydrate global logo if available but respect user local choice
         if (settings.apiSettings?.globalLogo) {
-             const logoState = useLogoStore.getState();
-             if (logoState.setDefaultLogoValue) {
-                 logoState.setDefaultLogoValue(settings.apiSettings.globalLogo);
-             }
-             
-             if (!logoState.userHasSetLogo && logoState.initLogo) {
-                logoState.initLogo(settings.apiSettings.globalLogo);
-             } else if (!logoState.userHasSetLogo) {
-                // Fallback if initLogo not available (should be)
-                logoState.setCurrentLogo(settings.apiSettings.globalLogo);
-             }
+          const logoState = useLogoStore.getState();
+          if (logoState.setDefaultLogoValue) {
+            logoState.setDefaultLogoValue(settings.apiSettings.globalLogo);
+          }
+
+          if (!logoState.userHasSetLogo && logoState.initLogo) {
+            logoState.initLogo(settings.apiSettings.globalLogo);
+          } else if (!logoState.userHasSetLogo) {
+            // Fallback if initLogo not available (should be)
+            logoState.setCurrentLogo(settings.apiSettings.globalLogo);
+          }
         }
       } catch (error) {
         console.error('Failed to load initial application data:', error);
@@ -472,11 +473,11 @@ const App: React.FC = () => {
       location.pathname === '/splash'
     )) {
       const lastPath = localStorage.getItem(LAST_PATH_KEY);
-      
+
       // Safety check: Don't redirect to admin paths if the user isn't an admin
       const isAdminPath = lastPath?.startsWith('/admin');
       const isUserAdmin = user.role === 'admin';
-      
+
       if (lastPath && shouldStorePath(lastPath) && lastPath !== '/' && lastPath !== '/#' && (!isAdminPath || isUserAdmin)) {
         localStorage.removeItem(LAST_PATH_KEY);
         navigate(lastPath, { replace: true });
@@ -506,6 +507,7 @@ const App: React.FC = () => {
       <ThemeManager />
       <BrandingManager />
       {user && <IdleTimeoutManager />}
+      <InstallAppPrompt />
       <Routes>
         {/* 1. Public Authentication Routes */}
         <Route path="/auth" element={<AuthLayout />}>
@@ -607,9 +609,9 @@ const App: React.FC = () => {
 
           {/* My Team & Tracking */}
           <Route element={<ProtectedRoute requiredPermission="view_field_officer_tracking" />}>
-             <Route path="my-team" element={<MyTeamList />} />
-             <Route path="my-team/:userId" element={<TeamMemberProfile />} />
-             <Route path="hr/tracking" element={<FieldOfficerTracking />} />
+            <Route path="my-team" element={<MyTeamList />} />
+            <Route path="my-team/:userId" element={<TeamMemberProfile />} />
+            <Route path="hr/tracking" element={<FieldOfficerTracking />} />
           </Route>
           <Route element={<ProtectedRoute requiredPermission="view_site_dashboard" />}>
             <Route path="site/dashboard" element={<SiteDashboard />} />
